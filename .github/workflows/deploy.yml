@@ -126,6 +126,7 @@ jobs:
           port: ${{ secrets.PROD_PORT || 22 }}
           source: "docker-compose.yml,.env.production,scripts"
           target: "~/second-bloom-admin-panel"
+          debug: true
       
       - name: Deploy to production server
         uses: appleboy/ssh-action@v1.0.3
@@ -134,6 +135,7 @@ jobs:
           username: ${{ secrets.PROD_USER }}
           key: ${{ secrets.PROD_SSH_KEY }}
           port: ${{ secrets.PROD_PORT || 22 }}
+          debug: true
           script: |
             cd ~/second-bloom-admin-panel
             

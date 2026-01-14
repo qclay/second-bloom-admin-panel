@@ -5,26 +5,18 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - BUILDKIT_INLINE_CACHE=1
     container_name: second-bloom-admin-panel
     restart: unless-stopped
     ports:
-      - "${PORT:-3001}:3000"
+      - "${PORT:-4000}:4000"
     environment:
       - NODE_ENV=${NODE_ENV:-production}
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-      - API_BASE_URL=${API_BASE_URL}
-      - PORT=3000
-      - HOSTNAME=0.0.0.0
-    env_file:
-      - .env.production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:4000}
+      - API_BASE_URL=${API_BASE_URL:-http://localhost:4000}
     networks:
       - admin-network
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
     labels:
       - "com.secondbloom.description=Second Bloom Admin Panel - Production"
       - "com.secondbloom.version=1.0"
