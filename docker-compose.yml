@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
       args:
         - BUILDKIT_INLINE_CACHE=1
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+        - API_BASE_URL=${API_BASE_URL}
     container_name: second-bloom-admin-panel
     restart: unless-stopped
     ports:
