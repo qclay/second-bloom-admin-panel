@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import { authService } from '@/services/auth.service';
@@ -15,6 +15,13 @@ export default function LoginPage() {
   const [otpCode, setOtpCode] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const setAuth = useAuthStore((state) => state.setAuth);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, router]);
 
   const sendOtpMutation = useMutation({
     mutationFn: authService.sendOtp,
@@ -59,7 +66,6 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 p-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-          {/* Logo and Header */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
               <span className="text-3xl">🌸</span>
@@ -72,7 +78,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Form */}
           {step === 'phone' ? (
             <form onSubmit={handleSendOtp} className="space-y-4">
               <Input
@@ -125,7 +130,6 @@ export default function LoginPage() {
             </form>
           )}
 
-          {/* Footer */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
               🔒 Secure login with OTP verification

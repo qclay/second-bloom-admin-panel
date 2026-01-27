@@ -109,7 +109,6 @@ export default function OrdersPage() {
                         value={order.status}
                         onChange={(e) => {
                           const newStatus = e.target.value as OrderStatus;
-                          // Show confirmation for critical status changes
                           if (newStatus === 'CANCELLED' || newStatus === 'REFUNDED' || (order.status === 'DELIVERED' && newStatus !== 'DELIVERED')) {
                             setStatusConfirm({ isOpen: true, orderId: order.id, newStatus });
                           } else {
@@ -138,7 +137,6 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {/* Status Change Confirmation */}
       <ConfirmDialog
         isOpen={statusConfirm.isOpen}
         onClose={() => setStatusConfirm({ isOpen: false, orderId: null, newStatus: null })}

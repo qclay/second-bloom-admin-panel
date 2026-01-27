@@ -135,7 +135,6 @@ export default function CategoriesPage() {
 
   return (
     <div className="p-8">
-      {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Categories</h1>
@@ -149,7 +148,6 @@ export default function CategoriesPage() {
         </Button>
       </div>
 
-      {/* Empty State */}
       {data?.data.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16">
           <div className="text-center max-w-md mx-auto">
@@ -251,7 +249,6 @@ export default function CategoriesPage() {
         </div>
       )}
 
-      {/* Modal */}
       {isModalOpen && (
         <div 
           className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 modal-backdrop"
@@ -268,7 +265,6 @@ export default function CategoriesPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6">
-              {/* Image Upload */}
               <div className="mb-6">
                 <label className="block text-sm font-bold text-gray-700 mb-2">
                   Category Image
@@ -366,7 +362,6 @@ export default function CategoriesPage() {
         </div>
       )}
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, categoryId: null })}

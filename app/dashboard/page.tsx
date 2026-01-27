@@ -36,7 +36,6 @@ export default function DashboardPage() {
   const totalRevenue = ordersData?.data.reduce((sum, order) => sum + order.totalPrice, 0) || 0;
   const pendingOrders = ordersData?.data.filter(o => o.status === 'PENDING').length || 0;
 
-  // Mock data for charts (replace with real data when available)
   const orderStatusData = [
     { name: 'Pending', value: ordersData?.data.filter(o => o.status === 'PENDING').length || 0 },
     { name: 'Confirmed', value: ordersData?.data.filter(o => o.status === 'CONFIRMED').length || 0 },
@@ -108,13 +107,11 @@ export default function DashboardPage() {
 
   return (
     <div className="p-8 page-transition">
-      {/* Header */}
       <div className="mb-8 animate-fade-in">
         <h1 className="text-3xl font-bold text-gray-900 mb-2 animate-slide-in">Dashboard</h1>
         <p className="text-gray-600 animate-slide-in" style={{ animationDelay: '0.1s' }}>Welcome back! Here&apos;s what&apos;s happening today.</p>
       </div>
       
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {stats.map((stat, index) => (
           <div
@@ -139,9 +136,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Revenue Chart */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-animate animate-fade-in">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Monthly Revenue</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -174,7 +169,6 @@ export default function DashboardPage() {
           </ResponsiveContainer>
         </div>
 
-        {/* Order Status Pie Chart */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-animate animate-fade-in">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Order Status Distribution</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -199,7 +193,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Products by Category Chart */}
       {productCategoryData.length > 0 && (
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 card-animate animate-fade-in">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Products by Category</h3>
@@ -222,7 +215,6 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Quick Actions */}
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 animate-fade-in card-animate" style={{ animationDelay: '0.4s' }}>
         <h2 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -273,7 +265,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Additional Info */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-animate animate-fade-in">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Activity</h3>

@@ -107,7 +107,6 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-200">
           <p className="text-sm font-bold text-blue-600 mb-1">Total Users</p>
@@ -218,7 +217,6 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* Block/Unblock Confirmation */}
       <ConfirmDialog
         isOpen={blockConfirm.isOpen}
         onClose={() => setBlockConfirm({ isOpen: false, user: null })}
@@ -231,7 +229,6 @@ export default function UsersPage() {
         icon={blockConfirm.user?.isActive ? "🚫" : "✓"}
       />
 
-      {/* Role Change Confirmation */}
       <ConfirmDialog
         isOpen={roleConfirm.isOpen}
         onClose={() => setRoleConfirm({ isOpen: false, user: null, newRole: null })}

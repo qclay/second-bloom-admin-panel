@@ -234,7 +234,6 @@ export default function ProductsPage() {
                 {product.description || 'No description'}
               </p>
 
-              {/* Seller Info */}
               <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-100">
                 <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">
                   {product.seller?.firstName?.[0] || 'S'}
@@ -411,7 +410,6 @@ export default function ProductsPage() {
         </div>
       )}
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, productId: null })}
