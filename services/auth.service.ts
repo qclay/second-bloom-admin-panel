@@ -2,12 +2,14 @@ import { apiClient, ApiResponse } from '@/lib/api-client';
 import { User } from '@/types';
 
 export interface SendOtpRequest {
+  countryCode: string;
   phoneNumber: string;
 }
 
 export interface VerifyOtpRequest {
+  countryCode: string;
   phoneNumber: string;
-  code: string;
+  code: number;
 }
 
 export interface AuthResponse {

@@ -9,9 +9,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 
+const DEFAULT_COUNTRY_CODE = '+998';
+
+function parsePhoneInput(value: string): { countryCode: string; phoneNumber: string } {
+  const digits = value.replace(/\D/g, '');
+  if (digits.startsWith('998') && digits.length >= 9) {
+    return { countryCode: '+998', phoneNumber: digits };
+  }
+  if (digits.length > 0) {
+    return { countryCode: DEFAULT_COUNTRY_CODE, phoneNumber: '998' + digits };
+  }
+  return { countryCode: DEFAULT_COUNTRY_CODE, phoneNumber: '' };
+}
+
 export default function LoginPage() {
   const router = useRouter();
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneInput, setPhoneInput] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const setAuth = useAuthStore((state) => state.setAuth);
@@ -54,12 +67,15 @@ export default function LoginPage() {
 
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    sendOtpMutation.mutate({ phoneNumber });
+    const { countryCode, phoneNumber } = parsePhoneInput(phoneInput);
+    sendOtpMutation.mutate({ countryCode, phoneNumber });
   };
 
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    verifyOtpMutation.mutate({ phoneNumber, code: otpCode });
+    const { countryCode, phoneNumber } = parsePhoneInput(phoneInput);
+    const code = parseInt(otpCode, 10);
+    verifyOtpMutation.mutate({ countryCode, phoneNumber, code });
   };
 
   return (
@@ -83,8 +99,8 @@ export default function LoginPage() {
               <Input
                 label="Phone Number"
                 type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                value={phoneInput}
+                onChange={(e) => setPhoneInput(e.target.value)}
                 placeholder="+998901234567"
                 required
               />
@@ -101,8 +117,9 @@ export default function LoginPage() {
               <Input
                 label="OTP Code"
                 type="text"
+                inputMode="numeric"
                 value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value)}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                 placeholder="Enter 6-digit code"
                 required
                 maxLength={6}
