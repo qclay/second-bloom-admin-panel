@@ -16,12 +16,14 @@ export default function DashboardLayout({
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [isLoading, setIsLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/login');
     } else {
-      setIsLoading(false);
+      const id = setTimeout(() => setIsLoading(false), 0);
+      return () => clearTimeout(id);
     }
   }, [isAuthenticated, router]);
 
@@ -45,6 +47,8 @@ export default function DashboardLayout({
     router.push('/login');
   };
 
+  const closeSidebar = () => setSidebarOpen(false);
+
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: '📊' },
     { name: 'Categories', href: '/dashboard/categories', icon: '📁' },
@@ -57,69 +61,121 @@ export default function DashboardLayout({
     { name: 'Settings', href: '/dashboard/settings', icon: '⚙️' },
   ];
 
+  const sidebar = (
+    <>
+      <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between lg:justify-start gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
+            <span className="text-xl">🌸</span>
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-lg font-bold text-gray-900 truncate">Second Bloom</h1>
+            <p className="text-xs text-gray-500">Admin Panel</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={closeSidebar}
+          className="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-600"
+          aria-label="Close menu"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <nav className="flex-1 p-4 overflow-y-auto">
+        <div className="space-y-1">
+          {navigation.map((item, index) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={closeSidebar}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
+                  isActive
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold shadow-lg'
+                    : 'text-gray-700 hover:bg-gray-100 font-medium'
+                }`}
+                style={{ animationDelay: `${index * 0.05}s` }}
+              >
+                <span className="text-xl">{item.icon}</span>
+                <span className="text-sm">{item.name}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+
+      <div className="p-4 border-t border-gray-200">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shrink-0">
+            {user?.firstName?.[0] || user?.phoneNumber?.[0] || 'A'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-gray-900 truncate">
+              {user?.firstName || user?.phoneNumber || 'Admin'}
+            </p>
+            <p className="text-xs text-gray-500">{user?.role || 'ADMIN'}</p>
+          </div>
+        </div>
+        <button
+          onClick={() => { closeSidebar(); handleLogout(); }}
+          className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2"
+        >
+          <span>🚪</span>
+          <span>Logout</span>
+        </button>
+      </div>
+    </>
+  );
+
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-              <span className="text-xl">🌸</span>
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">Second Bloom</h1>
-              <p className="text-xs text-gray-500">Admin Panel</p>
-            </div>
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50">
+      <header className="lg:hidden sticky top-0 z-40 flex items-center justify-between h-14 px-4 bg-white border-b border-gray-200 shadow-sm shrink-0">
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          className="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100"
+          aria-label="Open menu"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
+            <span className="text-lg">🌸</span>
           </div>
+          <span className="font-bold text-gray-900">Second Bloom</span>
         </div>
+        <div className="w-10" />
+      </header>
 
-        <nav className="flex-1 p-4 overflow-y-auto">
-          <div className="space-y-1">
-            {navigation.map((item, index) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 animate-fade-in ${
-                    isActive
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold shadow-lg transform scale-105'
-                      : 'text-gray-700 hover:bg-gray-100 hover:scale-105 font-medium'
-                  }`}
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <span className={`text-xl transition-transform duration-300 ${isActive ? 'animate-float' : ''}`}>
-                    {item.icon}
-                  </span>
-                  <span className="text-sm">{item.name}</span>
-                </Link>
-              );
-            })}
-          </div>
-        </nav>
+      {sidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-[60] bg-black/50"
+          onClick={closeSidebar}
+          aria-hidden
+        />
+      )}
 
-        <div className="p-4 border-t border-gray-200">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
-              {user?.firstName?.[0] || user?.phoneNumber?.[0] || 'A'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">
-                {user?.firstName || user?.phoneNumber || 'Admin'}
-              </p>
-              <p className="text-xs text-gray-500">{user?.role || 'ADMIN'}</p>
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2"
-          >
-            <span>🚪</span>
-            <span>Logout</span>
-          </button>
-        </div>
+      <aside
+        className={`
+          w-64 bg-white border-r border-gray-200 flex flex-col shrink-0
+          fixed lg:static inset-y-0 left-0 z-[70] lg:z-auto
+          top-0 lg:top-auto
+          transform transition-transform duration-200 ease-out
+          lg:shadow-[2px_0_8px_rgba(0,0,0,0.04)]
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
+        {sidebar}
       </aside>
 
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto min-w-0 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         {children}
       </main>
     </div>

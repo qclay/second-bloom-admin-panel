@@ -6,7 +6,7 @@ import { categoryService } from '@/services/category.service';
 import { productService } from '@/services/product.service';
 import { orderService } from '@/services/order.service';
 import { userService } from '@/services/user.service';
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 export default function DashboardPage() {
   const { data: categoriesData } = useQuery({
@@ -106,9 +106,9 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="p-8 page-transition">
+    <div className="page-transition">
       <div className="mb-8 animate-fade-in">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2 animate-slide-in">Dashboard</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 animate-slide-in">Dashboard</h1>
         <p className="text-gray-600 animate-slide-in" style={{ animationDelay: '0.1s' }}>Welcome back! Here&apos;s what&apos;s happening today.</p>
       </div>
       

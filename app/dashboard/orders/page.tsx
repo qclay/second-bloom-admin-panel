@@ -3,10 +3,9 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orderService } from '@/services/order.service';
-import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
-import { Order, OrderStatus } from '@/types';
+import { OrderStatus } from '@/types';
 
 export default function OrdersPage() {
   const queryClient = useQueryClient();
@@ -46,7 +45,7 @@ export default function OrdersPage() {
 
   if (isLoading) {
     return (
-      <div className="p-8">
+      <div>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading orders...</p>
@@ -56,9 +55,9 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="p-8">
+    <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Orders</h1>
         <p className="text-gray-600 mt-1">Manage customer orders</p>
       </div>
 

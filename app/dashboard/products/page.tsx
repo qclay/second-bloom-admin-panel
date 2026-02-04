@@ -24,7 +24,7 @@ export default function ProductsPage() {
     type: 'FRESH' as 'FRESH' | 'DRIED' | 'ARTIFICIAL' | 'OTHER',
     status: 'ACTIVE' as 'DRAFT' | 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK',
   });
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [uploadedImageIds, setUploadedImageIds] = useState<string[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; productId: string | null }>({
@@ -154,7 +154,7 @@ export default function ProductsPage() {
 
   if (isLoading) {
     return (
-      <div className="p-8">
+      <div>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading products...</p>
@@ -164,8 +164,8 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Products</h1>
           <p className="text-gray-600 mt-1">Manage your product inventory</p>
@@ -208,10 +208,13 @@ export default function ProductsPage() {
           >
             <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
               {product.images[0] ? (
+                // eslint-disable-next-line @next/next/no-img-element -- dynamic API URL, lazy loading used
                 <img
                   src={product.images[0].url}
                   alt={product.title}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
@@ -308,11 +311,14 @@ export default function ProductsPage() {
                   {imagePreviews.length > 0 ? (
                     <div className="grid grid-cols-3 gap-4">
                       {imagePreviews.map((preview, idx) => (
+                        // eslint-disable-next-line @next/next/no-img-element -- blob URL preview
                         <img
                           key={idx}
                           src={preview}
                           alt={`Preview ${idx + 1}`}
                           className="w-full h-32 object-cover rounded-lg"
+                          loading="lazy"
+                          decoding="async"
                         />
                       ))}
                     </div>

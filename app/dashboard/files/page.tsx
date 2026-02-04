@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 
 export default function FilesPage() {
   const queryClient = useQueryClient();
-  const [uploading, setUploading] = useState(false);
+  const [, setUploading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; fileId: string | null }>({
     isOpen: false,
     fileId: null,
@@ -51,7 +51,7 @@ export default function FilesPage() {
 
   if (isLoading) {
     return (
-      <div className="p-8">
+      <div>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading files...</p>
@@ -61,7 +61,7 @@ export default function FilesPage() {
   }
 
   return (
-    <div className="p-8">
+    <div>
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Files</h1>
@@ -88,10 +88,13 @@ export default function FilesPage() {
           >
             <div className="aspect-square bg-gray-100 overflow-hidden">
               {file.fileType === 'IMAGE' ? (
+                // eslint-disable-next-line @next/next/no-img-element -- dynamic API URL, lazy loading used
                 <img
                   src={file.url}
                   alt={file.filename}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">

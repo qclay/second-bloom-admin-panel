@@ -19,7 +19,7 @@ export interface CreateProductDto {
   imageIds?: string[];
 }
 
-export interface UpdateProductDto extends Partial<CreateProductDto> {}
+export type UpdateProductDto = Partial<CreateProductDto>;
 
 export interface ProductQuery {
   page?: number;

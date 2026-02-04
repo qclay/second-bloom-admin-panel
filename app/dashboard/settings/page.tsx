@@ -21,10 +21,9 @@ export default function SettingsPage() {
 
   const updateMutation = useMutation({
     mutationFn: () => userService.update(user!.id, formData),
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
       toast.success('Profile updated successfully!');
-      // Update auth store if needed
       useAuthStore.getState().setAuth(
         { ...user!, ...formData },
         useAuthStore.getState().accessToken!,
@@ -43,7 +42,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="p-8">
+    <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
         <p className="text-gray-600 mt-1">Manage your account preferences</p>

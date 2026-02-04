@@ -20,7 +20,7 @@ export default function CategoriesPage() {
     imageId: '',
     isActive: true,
   });
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; categoryId: string | null }>({
     isOpen: false,
@@ -124,7 +124,7 @@ export default function CategoriesPage() {
 
   if (isLoading) {
     return (
-      <div className="p-8">
+      <div>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading categories...</p>
@@ -134,8 +134,8 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Categories</h1>
           <p className="text-gray-600 mt-1">Manage your product categories</p>
@@ -159,7 +159,7 @@ export default function CategoriesPage() {
             </h3>
             <p className="text-gray-600 mb-6">
               Start organizing your marketplace by creating product categories. 
-              Categories help buyers find what they're looking for.
+              Categories help buyers find what they&apos;re looking for.
             </p>
             <Button
               onClick={() => setIsModalOpen(true)}
@@ -180,10 +180,13 @@ export default function CategoriesPage() {
             {/* Image */}
             <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
               {category.image ? (
+                // eslint-disable-next-line @next/next/no-img-element -- dynamic API URL, lazy loading used
                 <img
                   src={category.image.url}
                   alt={category.name}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
@@ -272,10 +275,13 @@ export default function CategoriesPage() {
                 <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-purple-400 transition-colors">
                   {imagePreview ? (
                     <div className="relative">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- blob URL preview */}
                       <img
                         src={imagePreview}
                         alt="Preview"
                         className="max-h-48 mx-auto rounded-lg"
+                        loading="lazy"
+                        decoding="async"
                       />
                       <button
                         type="button"

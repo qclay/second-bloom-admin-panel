@@ -79,9 +79,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 p-4 sm:p-6">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8">
           <div className="text-center mb-8">
             <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
               <span className="text-3xl">🌸</span>

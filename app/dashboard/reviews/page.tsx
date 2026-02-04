@@ -2,7 +2,7 @@
 
 export default function ReviewsPage() {
   return (
-    <div className="p-8">
+    <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Reviews</h1>
         <p className="text-gray-600 mt-1">Manage product reviews and ratings</p>
