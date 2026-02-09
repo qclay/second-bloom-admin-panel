@@ -1,15 +1,24 @@
 import { apiClient, ApiResponse } from '@/lib/api-client';
 import { Product, PaginatedResponse } from '@/types';
 
+export interface AuctionOptions {
+  startPrice?: number;
+  endTime?: string;
+  durationHours?: number;
+  autoExtend?: boolean;
+  extendMinutes?: number;
+}
+
 export interface CreateProductDto {
   title: string;
   description?: string;
-  price: number;
+  price?: number;
   currency?: string;
   categoryId: string;
   tags?: string[];
   type?: string;
-  condition?: string;
+  conditionId: string;
+  sizeId: string;
   quantity?: number;
   status?: string;
   isFeatured?: boolean;
@@ -17,6 +26,8 @@ export interface CreateProductDto {
   city?: string;
   district?: string;
   imageIds?: string[];
+  createAuction?: boolean;
+  auction?: AuctionOptions;
 }
 
 export type UpdateProductDto = Partial<CreateProductDto>;

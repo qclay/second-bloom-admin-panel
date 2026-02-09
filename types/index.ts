@@ -52,6 +52,18 @@ export interface ProductImage {
   url?: string;
 }
 
+export interface ProductCondition {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface ProductSize {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export interface Product {
   id: string;
   title: string;
@@ -66,7 +78,8 @@ export interface Product {
   images: ProductImage[];
   tags: string[];
   type: 'FRESH' | 'DRIED' | 'ARTIFICIAL' | 'OTHER';
-  condition: 'NEW' | 'USED' | 'REFURBISHED' | null;
+  condition?: ProductCondition | 'NEW' | 'USED' | 'REFURBISHED' | null;
+  size?: ProductSize;
   quantity: number;
   status: 'DRAFT' | 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK';
   isFeatured: boolean;

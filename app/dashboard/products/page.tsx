@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productService } from '@/services/product.service';
 import { categoryService } from '@/services/category.service';
+import { conditionService } from '@/services/condition.service';
+import { sizeService } from '@/services/size.service';
 import { fileService } from '@/services/file.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,9 +22,14 @@ export default function ProductsPage() {
     description: '',
     price: '' as number | string,
     categoryId: '',
+    conditionId: '',
+    sizeId: '',
     quantity: '' as number | string,
     type: 'FRESH' as 'FRESH' | 'DRIED' | 'ARTIFICIAL' | 'OTHER',
     status: 'ACTIVE' as 'DRAFT' | 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK',
+    createAuction: false,
+    auctionStartPrice: '' as number | string,
+    auctionDurationHours: 2 as number,
   });
   const [, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -42,6 +49,16 @@ export default function ProductsPage() {
     queryFn: () => categoryService.getAll({}),
   });
 
+  const { data: conditionsData } = useQuery({
+    queryKey: ['conditions'],
+    queryFn: () => conditionService.getAll({}),
+  });
+
+  const { data: sizesData } = useQuery({
+    queryKey: ['sizes'],
+    queryFn: () => sizeService.getAll({}),
+  });
+
   const uploadMutation = useMutation({
     mutationFn: fileService.upload,
     onSuccess: (data) => {
@@ -52,9 +69,9 @@ export default function ProductsPage() {
 
   const createMutation = useMutation({
     mutationFn: productService.create,
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
-      toast.success('Product created');
+      toast.success(variables.createAuction ? 'Product and auction created' : 'Product created');
       resetForm();
     },
     onError: (error: unknown) => {
@@ -105,30 +122,68 @@ export default function ProductsPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const submitData = {
-      ...formData,
-      price: typeof formData.price === 'string' ? (formData.price === '' ? 0 : Number(formData.price)) : formData.price,
+    const priceValue = typeof formData.price === 'string' ? (formData.price === '' ? 0 : Number(formData.price)) : formData.price;
+    const auctionStartPriceValue = typeof formData.auctionStartPrice === 'string' ? (formData.auctionStartPrice === '' ? 0 : Number(formData.auctionStartPrice)) : formData.auctionStartPrice;
+
+    const baseData: Record<string, unknown> = {
+      title: formData.title,
+      description: formData.description,
+      categoryId: formData.categoryId,
       quantity: typeof formData.quantity === 'string' ? (formData.quantity === '' ? 1 : Number(formData.quantity)) : formData.quantity,
+      type: formData.type,
+      status: formData.status,
       imageIds: uploadedImageIds,
     };
 
     if (editingId) {
-      updateMutation.mutate({ id: editingId, data: submitData });
+      const updateData = {
+        ...baseData,
+        price: priceValue,
+        ...(formData.conditionId && { conditionId: formData.conditionId }),
+        ...(formData.sizeId && { sizeId: formData.sizeId }),
+      };
+      updateMutation.mutate({ id: editingId, data: updateData });
     } else {
-      createMutation.mutate(submitData);
+      const createData = {
+        title: formData.title,
+        description: formData.description,
+        categoryId: formData.categoryId,
+        conditionId: formData.conditionId,
+        sizeId: formData.sizeId,
+        quantity: typeof formData.quantity === 'string' ? (formData.quantity === '' ? 1 : Number(formData.quantity)) : formData.quantity,
+        type: formData.type,
+        status: formData.status,
+        imageIds: uploadedImageIds,
+        price: formData.createAuction ? (auctionStartPriceValue || priceValue) : priceValue,
+        createAuction: formData.createAuction,
+        ...(formData.createAuction && {
+          auction: {
+            startPrice: auctionStartPriceValue || priceValue,
+            durationHours: formData.auctionDurationHours,
+          },
+        }),
+      };
+      createMutation.mutate(createData);
     }
   };
 
   const handleEdit = (product: Product) => {
     setEditingId(product.id);
+    const conditionId = typeof product.condition === 'object' && product.condition ? product.condition.id : '';
+    const sizeId = product.size?.id ?? '';
     setFormData({
       title: product.title,
       description: product.description || '',
       price: product.price.toString(),
       categoryId: product.categoryId,
+      conditionId,
+      sizeId,
       quantity: product.quantity.toString(),
       type: product.type,
       status: product.status,
+      createAuction: false,
+      auctionStartPrice: '',
+      auctionDurationHours: 2,
     });
     setImagePreviews(product.images.map(img => img.url || ''));
     setUploadedImageIds(product.images.map(img => img.fileId));
@@ -141,9 +196,14 @@ export default function ProductsPage() {
       description: '',
       price: '',
       categoryId: '',
+      conditionId: '',
+      sizeId: '',
       quantity: '',
       type: 'FRESH',
       status: 'ACTIVE',
+      createAuction: false,
+      auctionStartPrice: '',
+      auctionDurationHours: 2,
     });
     setImageFiles([]);
     setImagePreviews([]);
@@ -363,8 +423,39 @@ export default function ProductsPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Condition</label>
+                  <select
+                    value={formData.conditionId}
+                    onChange={(e) => setFormData({ ...formData, conditionId: e.target.value })}
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500"
+                    required
+                  >
+                    <option value="">Select condition</option>
+                    {(Array.isArray(conditionsData?.data) ? conditionsData.data : []).map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Size</label>
+                  <select
+                    value={formData.sizeId}
+                    onChange={(e) => setFormData({ ...formData, sizeId: e.target.value })}
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500"
+                    required
+                  >
+                    <option value="">Select size</option>
+                    {(Array.isArray(sizesData?.data) ? sizesData.data : []).map((s) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label="Price ($)"
+                  label={formData.createAuction ? 'Price / Start Price ($)' : 'Price ($)'}
                   type="number"
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value === '' ? '' : e.target.value })}
@@ -383,6 +474,45 @@ export default function ProductsPage() {
                   required
                 />
               </div>
+
+              {!editingId && (
+                <div className="space-y-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.createAuction}
+                      onChange={(e) => setFormData({ ...formData, createAuction: e.target.checked })}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="font-bold text-gray-700">Create auction for this product</span>
+                  </label>
+                  {formData.createAuction && (
+                    <div className="grid grid-cols-2 gap-4 pl-7">
+                      <Input
+                        label="Auction start price ($)"
+                        type="number"
+                        value={formData.auctionStartPrice !== '' ? formData.auctionStartPrice : formData.price}
+                        onChange={(e) => setFormData({ ...formData, auctionStartPrice: e.target.value === '' ? '' : e.target.value })}
+                        placeholder="Uses price above if empty"
+                        min="0"
+                        step="0.01"
+                      />
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-2">Duration (hours)</label>
+                        <select
+                          value={formData.auctionDurationHours}
+                          onChange={(e) => setFormData({ ...formData, auctionDurationHours: Number(e.target.value) })}
+                          className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500"
+                        >
+                          {[2, 6, 12, 24, 48, 72, 168].map((h) => (
+                            <option key={h} value={h}>{h} hours</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
