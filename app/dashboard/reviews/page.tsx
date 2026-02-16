@@ -339,10 +339,11 @@ export default function ReviewsPage() {
         isOpen={deleteConfirm.isOpen}
         title="Delete review"
         message="Are you sure you want to delete this review? This cannot be undone."
-        confirmLabel="Delete"
+        confirmText="Delete"
+        cancelText="Cancel"
         onConfirm={() => deleteConfirm.id && deleteMutation.mutate(deleteConfirm.id)}
-        onCancel={() => setDeleteConfirm({ isOpen: false, id: null })}
-        variant="danger"
+        onClose={() => setDeleteConfirm({ isOpen: false, id: null })}
+        type="danger"
       />
     </div>
   );
