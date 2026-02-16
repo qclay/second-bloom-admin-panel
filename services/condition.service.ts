@@ -23,6 +23,14 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export interface CreateConditionDto {
+  name: { en: string; ru?: string; uz?: string };
+}
+
+export interface UpdateConditionDto {
+  name?: { en?: string; ru?: string; uz?: string };
+}
+
 export const conditionService = {
   async getAll(query?: { page?: number; limit?: number }): Promise<PaginatedResponse<Condition>> {
     const response = await apiClient.get<ApiResponse<Condition[] | { data: Condition[]; meta?: { pagination?: Record<string, unknown> } }>>('/conditions', {
@@ -43,5 +51,19 @@ export const conditionService = {
       data,
       meta: { pagination: { ...defaultPagination, ...pagination } },
     };
+  },
+
+  async create(data: CreateConditionDto): Promise<Condition> {
+    const response = await apiClient.post<ApiResponse<Condition>>('/conditions', data);
+    return response.data.data;
+  },
+
+  async update(id: string, data: UpdateConditionDto): Promise<Condition> {
+    const response = await apiClient.patch<ApiResponse<Condition>>(`/conditions/${id}`, data);
+    return response.data.data;
+  },
+
+  async delete(id: string): Promise<void> {
+    await apiClient.delete(`/conditions/${id}`);
   },
 };

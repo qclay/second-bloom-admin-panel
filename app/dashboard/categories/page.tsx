@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { categoryService } from '@/services/category.service';
+import { categoryService, UpdateCategoryDto } from '@/services/category.service';
 import { fileService } from '@/services/file.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,7 +59,7 @@ export default function CategoriesPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<{ name: string; description: string; imageId: string; isActive: boolean }> }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateCategoryDto }) =>
       categoryService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
@@ -95,18 +95,24 @@ export default function CategoriesPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const payload = {
+      name: { en: formData.name },
+      description: formData.description ? { en: formData.description } : undefined,
+      imageId: formData.imageId || undefined,
+      isActive: formData.isActive,
+    };
     if (editingId) {
-      updateMutation.mutate({ id: editingId, data: formData });
+      updateMutation.mutate({ id: editingId, data: payload });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(payload);
     }
   };
 
   const handleEdit = (category: Category) => {
     setEditingId(category.id);
     setFormData({
-      name: category.name,
-      description: category.description || '',
+      name: typeof category.name === 'string' ? category.name : (category.name as { en?: string })?.en ?? '',
+      description: typeof category.description === 'string' ? (category.description || '') : (category.description as { en?: string } | null)?.en ?? '',
       imageId: category.image?.id || '',
       isActive: category.isActive,
     });
@@ -135,14 +141,15 @@ export default function CategoriesPage() {
 
   return (
     <div>
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Categories</h1>
-          <p className="text-gray-600 mt-1">Manage your product categories</p>
+          <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
+          <p className="text-sm text-gray-600 mt-0.5">Manage your product categories</p>
         </div>
         <Button
           onClick={() => setIsModalOpen(true)}
-          className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white"
+          size="sm"
+          className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shrink-0"
         >
           + Add Category
         </Button>
@@ -170,78 +177,74 @@ export default function CategoriesPage() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="w-full min-w-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 min-[1920px]:grid-cols-8 min-[2560px]:grid-cols-10 min-[3440px]:grid-cols-12 gap-3">
           {data?.data.map((category, index) => (
           <div
             key={category.id}
-            className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 card-animate animate-fade-in"
-            style={{ animationDelay: `${index * 0.05}s` }}
+            className="group min-w-0 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-md hover:border-emerald-200 transition-all duration-200 card-animate animate-fade-in"
+            style={{ animationDelay: `${index * 0.03}s` }}
           >
-            {/* Image */}
-            <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-              {category.image ? (
-                // eslint-disable-next-line @next/next/no-img-element -- dynamic API URL, lazy loading used
-                <img
-                  src={category.image.url}
-                  alt={category.name}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-6xl">📁</span>
-                </div>
-              )}
-            </div>
+            {/* Image - square thumbnail for clear visibility */}
+            <button
+              type="button"
+              onClick={() => handleEdit(category)}
+              className="block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-lg overflow-hidden bg-gray-100"
+            >
+              <div className="aspect-square min-h-[140px] w-full overflow-hidden">
+                {category.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- dynamic API URL, lazy loading used
+                  <img
+                    src={category.image.url}
+                    alt={category.name}
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                    decoding="async"
+                    sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <span className="text-4xl">📁</span>
+                  </div>
+                )}
+              </div>
+            </button>
 
-            {/* Content */}
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-bold text-gray-900">
+            {/* Content - compact */}
+            <div className="p-2">
+              <div className="flex items-center justify-between gap-1.5 mb-0.5">
+                <h3 className="text-xs font-bold text-gray-900 truncate flex-1 min-w-0">
                   {category.name}
                 </h3>
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                <span className={`shrink-0 px-1.5 py-0.5 rounded text-[10px] font-medium ${
                   category.isActive
                     ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-100 text-gray-700'
+                    : 'bg-gray-100 text-gray-600'
                 }`}>
-                  {category.isActive ? 'Active' : 'Inactive'}
+                  {category.isActive ? 'On' : 'Off'}
                 </span>
               </div>
-              
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                {category.description || 'No description provided'}
+              <p className="text-[11px] text-gray-500 line-clamp-2 mb-2 min-h-[1.75rem]">
+                {category.description || 'No description'}
               </p>
 
-              {/* Creator Info */}
-              <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-100">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold">
-                  A
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-500">Created by Admin</p>
-                </div>
-                <span className="text-xs text-gray-400">
-                  {new Date(category.createdAt).toLocaleDateString()}
-                </span>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-2">
+              {/* Actions - compact */}
+              <div className="flex gap-1">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleEdit(category)}
-                  className="flex-1 button-animate"
+                  className="flex-1 h-7 text-[11px] button-animate border-emerald-200 text-emerald-700 hover:bg-emerald-50 py-0"
                 >
-                  ✏️ Edit
+                  Edit
                 </Button>
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => setDeleteConfirm({ isOpen: true, categoryId: category.id })}
-                  className="bg-red-500 hover:bg-red-600 button-animate"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDeleteConfirm({ isOpen: true, categoryId: category.id });
+                  }}
+                  className="h-7 px-1.5 min-w-0 button-animate bg-red-500 hover:bg-red-600 text-xs py-0"
                 >
                   🗑️
                 </Button>

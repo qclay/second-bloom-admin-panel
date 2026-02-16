@@ -9,9 +9,15 @@ export interface AuctionOptions {
   extendMinutes?: number;
 }
 
+export interface TranslationDto {
+  en?: string;
+  ru?: string;
+  uz?: string;
+}
+
 export interface CreateProductDto {
-  title: string;
-  description?: string;
+  title: TranslationDto;
+  description?: TranslationDto;
   price?: number;
   currency?: string;
   categoryId: string;

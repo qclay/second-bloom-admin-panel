@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { productService } from '@/services/product.service';
+import { productService, UpdateProductDto } from '@/services/product.service';
 import { categoryService } from '@/services/category.service';
 import { conditionService } from '@/services/condition.service';
 import { sizeService } from '@/services/size.service';
@@ -13,10 +13,29 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
 import { Product } from '@/types';
 
+function toStringValue(value: unknown): string {
+  if (value == null) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+    const obj = value as Record<string, unknown>;
+    if ('en' in obj || 'uz' in obj || 'ru' in obj) {
+      const s = obj.en ?? obj.uz ?? obj.ru;
+      if (typeof s === 'string' && s.trim()) return s;
+    }
+    // Fallback: try first string value in object
+    const firstString = Object.values(obj).find(v => typeof v === 'string' && String(v).trim());
+    if (firstString) return String(firstString);
+  }
+  // Last resort: stringify (shouldn't happen in normal flow)
+  const str = String(value);
+  return str === '[object Object]' ? '' : str;
+}
+
 export default function ProductsPage() {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingProductHasActiveAuction, setEditingProductHasActiveAuction] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -81,17 +100,25 @@ export default function ProductsPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<typeof formData> }) => {
-      const convertedData = {
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: UpdateProductDto & { price?: number; quantity?: number; imageIds?: string[] };
+    }) => {
+      const convertedData: UpdateProductDto = {
         ...data,
         price: typeof data.price === 'string' ? (data.price === '' ? undefined : Number(data.price)) : data.price,
         quantity: typeof data.quantity === 'string' ? (data.quantity === '' ? undefined : Number(data.quantity)) : data.quantity,
+        imageIds: data.imageIds,
       };
       return productService.update(id, convertedData);
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
-      toast.success('Product updated');
+      const hadCreateAuction = variables.data && 'createAuction' in variables.data && variables.data.createAuction;
+      toast.success(hadCreateAuction ? 'Product updated and auction created' : 'Product updated');
       resetForm();
     },
     onError: (error: unknown) => {
@@ -111,13 +138,13 @@ export default function ProductsPage() {
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
-      setImageFiles(files);
-      setImagePreviews(files.map(f => URL.createObjectURL(f)));
-      
+      setImageFiles(prev => [...(prev || []), ...files]);
+      setImagePreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
       for (const file of files) {
         await uploadMutation.mutateAsync(file);
       }
     }
+    e.target.value = '';
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -125,35 +152,54 @@ export default function ProductsPage() {
     const priceValue = typeof formData.price === 'string' ? (formData.price === '' ? 0 : Number(formData.price)) : formData.price;
     const auctionStartPriceValue = typeof formData.auctionStartPrice === 'string' ? (formData.auctionStartPrice === '' ? 0 : Number(formData.auctionStartPrice)) : formData.auctionStartPrice;
 
+    const titleStr = typeof formData.title === 'string' ? formData.title : toStringValue(formData.title);
+    const descriptionStr = typeof formData.description === 'string' ? formData.description : toStringValue(formData.description);
+    const titleI18n = { en: titleStr };
+    const descriptionI18n = descriptionStr ? { en: descriptionStr } : undefined;
+
+    const imageIdsClean = (uploadedImageIds ?? []).filter((id): id is string => id != null && id !== '');
+
     const baseData: Record<string, unknown> = {
-      title: formData.title,
-      description: formData.description,
+      title: titleI18n,
+      description: descriptionI18n,
       categoryId: formData.categoryId,
       quantity: typeof formData.quantity === 'string' ? (formData.quantity === '' ? 1 : Number(formData.quantity)) : formData.quantity,
       type: formData.type,
       status: formData.status,
-      imageIds: uploadedImageIds,
+      imageIds: imageIdsClean,
     };
 
     if (editingId) {
       const updateData = {
         ...baseData,
         price: priceValue,
+        imageIds: imageIdsClean,
         ...(formData.conditionId && { conditionId: formData.conditionId }),
         ...(formData.sizeId && { sizeId: formData.sizeId }),
+        ...(formData.createAuction &&
+          !editingProductHasActiveAuction && {
+            createAuction: true,
+            auction: {
+              startPrice:
+                typeof formData.auctionStartPrice === 'string'
+                  ? (formData.auctionStartPrice === '' ? priceValue : Number(formData.auctionStartPrice))
+                  : (formData.auctionStartPrice || priceValue),
+              durationHours: formData.auctionDurationHours,
+            },
+          }),
       };
       updateMutation.mutate({ id: editingId, data: updateData });
     } else {
       const createData = {
-        title: formData.title,
-        description: formData.description,
+        title: titleI18n,
+        description: descriptionI18n,
         categoryId: formData.categoryId,
         conditionId: formData.conditionId,
         sizeId: formData.sizeId,
         quantity: typeof formData.quantity === 'string' ? (formData.quantity === '' ? 1 : Number(formData.quantity)) : formData.quantity,
         type: formData.type,
         status: formData.status,
-        imageIds: uploadedImageIds,
+        imageIds: imageIdsClean,
         price: formData.createAuction ? (auctionStartPriceValue || priceValue) : priceValue,
         createAuction: formData.createAuction,
         ...(formData.createAuction && {
@@ -169,11 +215,12 @@ export default function ProductsPage() {
 
   const handleEdit = (product: Product) => {
     setEditingId(product.id);
+    setEditingProductHasActiveAuction(!!product.activeAuction?.id);
     const conditionId = typeof product.condition === 'object' && product.condition ? product.condition.id : '';
     const sizeId = product.size?.id ?? '';
     setFormData({
-      title: product.title,
-      description: product.description || '',
+      title: toStringValue(product.title),
+      description: toStringValue(product.description),
       price: product.price.toString(),
       categoryId: product.categoryId,
       conditionId,
@@ -186,7 +233,9 @@ export default function ProductsPage() {
       auctionDurationHours: 2,
     });
     setImagePreviews(product.images.map(img => img.url || ''));
-    setUploadedImageIds(product.images.map(img => img.fileId));
+    setUploadedImageIds(
+      product.images.map(img => img.fileId ?? (img as { id?: string }).id).filter((id): id is string => Boolean(id))
+    );
     setIsModalOpen(true);
   };
 
@@ -206,9 +255,13 @@ export default function ProductsPage() {
       auctionDurationHours: 2,
     });
     setImageFiles([]);
-    setImagePreviews([]);
+    setImagePreviews(prev => {
+      prev.forEach(p => { if (typeof p === 'string' && p.startsWith('blob:')) URL.revokeObjectURL(p); });
+      return [];
+    });
     setUploadedImageIds([]);
     setEditingId(null);
+    setEditingProductHasActiveAuction(false);
     setIsModalOpen(false);
   };
 
@@ -260,56 +313,54 @@ export default function ProductsPage() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {productsData?.data.map((product) => (
+        <div className="w-full min-w-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 min-[1920px]:grid-cols-8 min-[2560px]:grid-cols-10 gap-3">
+          {productsData?.data.map((product, index) => (
           <div
             key={product.id}
-            className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+            className="group min-w-0 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all duration-200"
+            style={{ animationDelay: `${index * 0.03}s` }}
           >
-            <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+            {/* Image - square thumbnail for clear visibility */}
+            <div className="aspect-square min-h-[140px] w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
               {product.images[0] ? (
                 // eslint-disable-next-line @next/next/no-img-element -- dynamic API URL, lazy loading used
                 <img
                   src={product.images[0].url}
-                  alt={product.title}
-                  className="w-full h-full object-cover"
+                  alt={toStringValue(product.title)}
+                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                   loading="lazy"
                   decoding="async"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-6xl">📦</span>
+                <div className="w-full h-full flex items-center justify-center text-gray-400 min-h-[140px]">
+                  <span className="text-4xl">📦</span>
                 </div>
               )}
             </div>
 
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="text-lg font-bold text-gray-900 flex-1 line-clamp-1">
+            <div className="p-2">
+              <div className="flex items-center justify-between gap-1.5 mb-0.5">
+                <h3 className="text-xs font-bold text-gray-900 truncate flex-1 min-w-0 line-clamp-1">
                   {product.title}
                 </h3>
-                <span className="text-xl font-bold text-blue-600 ml-2">
+                <span className="text-sm font-bold text-blue-600 shrink-0">
                   ${product.price}
                 </span>
               </div>
-
-              <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+              <p className="text-[11px] text-gray-500 line-clamp-2 mb-2 min-h-[1.75rem]">
                 {product.description || 'No description'}
               </p>
-
-              <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-100">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">
+              <div className="flex items-center gap-1.5 mb-2">
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
                   {product.seller?.firstName?.[0] || 'S'}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-500">
-                    By {product.seller?.firstName || 'Seller'} {product.seller?.lastName || ''}
-                  </p>
-                </div>
+                <p className="text-[10px] text-gray-500 truncate min-w-0 flex-1">
+                  {product.seller?.firstName || 'Seller'} {product.seller?.lastName || ''}
+                </p>
               </div>
-
-              <div className="flex items-center gap-2 mb-4">
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+              <div className="flex items-center gap-1.5 mb-2 flex-wrap">
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
                   product.status === 'ACTIVE'
                     ? 'bg-green-100 text-green-700'
                     : product.status === 'OUT_OF_STOCK'
@@ -318,25 +369,24 @@ export default function ProductsPage() {
                 }`}>
                   {product.status}
                 </span>
-                <span className="text-xs font-semibold text-gray-600">
-                  📦 {product.quantity} in stock
+                <span className="text-[10px] font-medium text-gray-600">
+                  📦 {product.quantity}
                 </span>
               </div>
-
-              <div className="flex gap-2">
+              <div className="flex gap-1">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleEdit(product)}
-                  className="flex-1"
+                  className="flex-1 h-7 text-[11px] button-animate border-blue-200 text-blue-700 hover:bg-blue-50 py-0"
                 >
-                  ✏️ Edit
+                  Edit
                 </Button>
                 <Button
                   variant="destructive"
                   size="sm"
                   onClick={() => setDeleteConfirm({ isOpen: true, productId: product.id })}
-                  className="bg-red-500 hover:bg-red-600 button-animate"
+                  className="h-7 px-1.5 min-w-0 button-animate bg-red-500 hover:bg-red-600 text-xs py-0"
                 >
                   🗑️
                 </Button>
@@ -369,24 +419,49 @@ export default function ProductsPage() {
                 </label>
                 <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center">
                   {imagePreviews.length > 0 ? (
-                    <div className="grid grid-cols-3 gap-4">
-                      {imagePreviews.map((preview, idx) => (
-                        // eslint-disable-next-line @next/next/no-img-element -- blob URL preview
-                        <img
-                          key={idx}
-                          src={preview}
-                          alt={`Preview ${idx + 1}`}
-                          className="w-full h-32 object-cover rounded-lg"
-                          loading="lazy"
-                          decoding="async"
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-3 gap-4">
+                        {imagePreviews.map((preview, idx) => (
+                          <div key={idx} className="relative group">
+                            {/* eslint-disable-next-line @next/next/no-img-element -- blob URL preview */}
+                            <img
+                              src={preview}
+                              alt={`Preview ${idx + 1}`}
+                              className="w-full h-32 object-cover rounded-lg"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (preview.startsWith('blob:')) URL.revokeObjectURL(preview);
+                                setImagePreviews(p => p.filter((_, i) => i !== idx));
+                                setUploadedImageIds(ids => ids.filter((_, i) => i !== idx));
+                              }}
+                              className="absolute top-1 right-1 w-7 h-7 rounded-full bg-red-500 text-white text-sm font-bold opacity-90 hover:opacity-100 shadow"
+                              aria-label="Remove image"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <label className="inline-flex items-center gap-2 cursor-pointer text-blue-600 font-semibold hover:underline">
+                        <span>Add more images</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleImageChange}
+                          className="hidden"
                         />
-                      ))}
+                      </label>
                     </div>
                   ) : (
                     <div>
                       <div className="text-4xl mb-2">📸</div>
                       <label className="cursor-pointer">
-                        <span className="text-blue-600 font-semibold">Upload images</span>
+                        <span className="text-blue-600 font-semibold">Upload images (multiple)</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -402,7 +477,7 @@ export default function ProductsPage() {
 
               <Input
                 label="Product Name"
-                value={formData.title}
+                value={typeof formData.title === 'string' ? formData.title : toStringValue(formData.title)}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 required
               />
@@ -475,49 +550,55 @@ export default function ProductsPage() {
                 />
               </div>
 
-              {!editingId && (
-                <div className="space-y-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.createAuction}
-                      onChange={(e) => setFormData({ ...formData, createAuction: e.target.checked })}
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="font-bold text-gray-700">Create auction for this product</span>
-                  </label>
-                  {formData.createAuction && (
-                    <div className="grid grid-cols-2 gap-4 pl-7">
-                      <Input
-                        label="Auction start price ($)"
-                        type="number"
-                        value={formData.auctionStartPrice !== '' ? formData.auctionStartPrice : formData.price}
-                        onChange={(e) => setFormData({ ...formData, auctionStartPrice: e.target.value === '' ? '' : e.target.value })}
-                        placeholder="Uses price above if empty"
-                        min="0"
-                        step="0.01"
+              <div className="space-y-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                {editingId && editingProductHasActiveAuction ? (
+                  <p className="text-sm text-amber-700 font-medium">
+                    This product already has an active auction. You cannot create another until it ends.
+                  </p>
+                ) : (
+                  <>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.createAuction}
+                        onChange={(e) => setFormData({ ...formData, createAuction: e.target.checked })}
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       />
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2">Duration (hours)</label>
-                        <select
-                          value={formData.auctionDurationHours}
-                          onChange={(e) => setFormData({ ...formData, auctionDurationHours: Number(e.target.value) })}
-                          className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500"
-                        >
-                          {[2, 6, 12, 24, 48, 72, 168].map((h) => (
-                            <option key={h} value={h}>{h} hours</option>
-                          ))}
-                        </select>
+                      <span className="font-bold text-gray-700">Create auction for this product</span>
+                    </label>
+                    {formData.createAuction && (
+                      <div className="grid grid-cols-2 gap-4 pl-7">
+                        <Input
+                          label="Auction start price ($)"
+                          type="number"
+                          value={formData.auctionStartPrice !== '' ? formData.auctionStartPrice : formData.price}
+                          onChange={(e) => setFormData({ ...formData, auctionStartPrice: e.target.value === '' ? '' : e.target.value })}
+                          placeholder="Uses price above if empty"
+                          min="0"
+                          step="0.01"
+                        />
+                        <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-2">Duration (hours)</label>
+                          <select
+                            value={formData.auctionDurationHours}
+                            onChange={(e) => setFormData({ ...formData, auctionDurationHours: Number(e.target.value) })}
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500"
+                          >
+                            {[2, 6, 12, 24, 48, 72, 168].map((h) => (
+                              <option key={h} value={h}>{h} hours</option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              )}
+                    )}
+                  </>
+                )}
+              </div>
 
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
                 <textarea
-                  value={formData.description}
+                  value={typeof formData.description === 'string' ? formData.description : toStringValue(formData.description)}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
                   className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500"

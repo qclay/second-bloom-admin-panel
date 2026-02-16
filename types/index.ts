@@ -90,6 +90,8 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  /** Set when product has an active auction (from API). */
+  activeAuction?: { id: string };
 }
 
 export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';

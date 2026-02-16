@@ -52,12 +52,15 @@ export default function DashboardLayout({
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: '📊' },
     { name: 'Categories', href: '/dashboard/categories', icon: '📁' },
+    { name: 'Conditions', href: '/dashboard/conditions', icon: '📋' },
+    { name: 'Sizes', href: '/dashboard/sizes', icon: '📐' },
     { name: 'Products', href: '/dashboard/products', icon: '📦' },
     { name: 'Orders', href: '/dashboard/orders', icon: '🛒' },
     { name: 'Users', href: '/dashboard/users', icon: '👥' },
     { name: 'Reports', href: '/dashboard/reports', icon: '🚨' },
     { name: 'Reviews', href: '/dashboard/reviews', icon: '⭐' },
     { name: 'Chat', href: '/dashboard/chat', icon: '💬' },
+    { name: 'Publication Pricing', href: '/dashboard/publication-pricing', icon: '💰' },
     { name: 'Settings', href: '/dashboard/settings', icon: '⚙️' },
   ];
 
@@ -123,10 +126,9 @@ export default function DashboardLayout({
         </div>
         <button
           onClick={() => { closeSidebar(); handleLogout(); }}
-          className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2"
+          className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors flex items-center justify-center"
         >
-          <span>🚪</span>
-          <span>Logout</span>
+          Logout
         </button>
       </div>
     </>

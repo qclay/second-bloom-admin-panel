@@ -80,36 +80,38 @@ export default function FilesPage() {
         </label>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {data?.data.map((file) => (
+      <div className="w-full min-w-0 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 min-[1920px]:grid-cols-12 min-[2560px]:grid-cols-16 gap-3">
+        {data?.data.map((file, index) => (
           <div
             key={file.id}
-            className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow group"
+            className="group min-w-0 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all duration-200"
+            style={{ animationDelay: `${index * 0.02}s` }}
           >
-            <div className="aspect-square bg-gray-100 overflow-hidden">
+            <div className="aspect-square min-h-[120px] w-full overflow-hidden bg-gray-100">
               {file.fileType === 'IMAGE' ? (
                 // eslint-disable-next-line @next/next/no-img-element -- dynamic API URL, lazy loading used
                 <img
                   src={file.url}
                   alt={file.filename}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                   loading="lazy"
                   decoding="async"
+                  sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 12vw"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-4xl">📄</span>
+                <div className="w-full h-full flex items-center justify-center text-gray-400 min-h-[120px]">
+                  <span className="text-3xl">📄</span>
                 </div>
               )}
             </div>
-            <div className="p-3">
-              <p className="text-xs font-semibold text-gray-900 truncate mb-2">
+            <div className="p-2">
+              <p className="text-[11px] font-semibold text-gray-900 truncate mb-1.5">
                 {file.filename}
               </p>
               <Button
                 size="sm"
                 variant="destructive"
-                className="w-full bg-red-500 hover:bg-red-600 text-xs button-animate"
+                className="w-full h-7 bg-red-500 hover:bg-red-600 text-[11px] button-animate py-0"
                 onClick={() => setDeleteConfirm({ isOpen: true, fileId: file.id })}
               >
                 Delete

@@ -1,9 +1,15 @@
 import { apiClient, ApiResponse } from '@/lib/api-client';
 import { Category, PaginatedResponse } from '@/types';
 
+export interface TranslationDto {
+  en?: string;
+  ru?: string;
+  uz?: string;
+}
+
 export interface CreateCategoryDto {
-  name: string;
-  description?: string;
+  name: TranslationDto;
+  description?: TranslationDto;
   imageId?: string;
   parentId?: string;
   isActive?: boolean;
@@ -11,8 +17,8 @@ export interface CreateCategoryDto {
 }
 
 export interface UpdateCategoryDto {
-  name?: string;
-  description?: string;
+  name?: TranslationDto;
+  description?: TranslationDto;
   imageId?: string;
   parentId?: string;
   isActive?: boolean;

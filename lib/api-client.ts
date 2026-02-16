@@ -6,6 +6,9 @@ export const apiClient = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
+    // Backend uses Accept-Language header to resolve translation objects (e.g. { en: "...", ru: "..." })
+    // to a single string. This tells the backend to return English translations.
+    'Accept-Language': 'en',
   },
 });
 

@@ -23,6 +23,14 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export interface CreateSizeDto {
+  name: { en: string; ru?: string; uz?: string };
+}
+
+export interface UpdateSizeDto {
+  name?: { en?: string; ru?: string; uz?: string };
+}
+
 export const sizeService = {
   async getAll(query?: { page?: number; limit?: number }): Promise<PaginatedResponse<Size>> {
     const response = await apiClient.get<ApiResponse<Size[] | { data: Size[]; meta?: { pagination?: Record<string, unknown> } }>>('/sizes', {
@@ -43,5 +51,19 @@ export const sizeService = {
       data,
       meta: { pagination: { ...defaultPagination, ...pagination } },
     };
+  },
+
+  async create(data: CreateSizeDto): Promise<Size> {
+    const response = await apiClient.post<ApiResponse<Size>>('/sizes', data);
+    return response.data.data;
+  },
+
+  async update(id: string, data: UpdateSizeDto): Promise<Size> {
+    const response = await apiClient.patch<ApiResponse<Size>>(`/sizes/${id}`, data);
+    return response.data.data;
+  },
+
+  async delete(id: string): Promise<void> {
+    await apiClient.delete(`/sizes/${id}`);
   },
 };
