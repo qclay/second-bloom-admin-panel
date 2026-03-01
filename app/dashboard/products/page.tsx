@@ -6,6 +6,7 @@ import { productService, UpdateProductDto } from '@/services/product.service';
 import { categoryService } from '@/services/category.service';
 import { conditionService } from '@/services/condition.service';
 import { sizeService } from '@/services/size.service';
+import { locationService } from '@/services/location.service';
 import { fileService } from '@/services/file.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,11 +23,9 @@ function toStringValue(value: unknown): string {
       const s = obj.en ?? obj.uz ?? obj.ru;
       if (typeof s === 'string' && s.trim()) return s;
     }
-    // Fallback: try first string value in object
     const firstString = Object.values(obj).find(v => typeof v === 'string' && String(v).trim());
     if (firstString) return String(firstString);
   }
-  // Last resort: stringify (shouldn't happen in normal flow)
   const str = String(value);
   return str === '[object Object]' ? '' : str;
 }
@@ -49,6 +48,9 @@ export default function ProductsPage() {
     createAuction: false,
     auctionStartPrice: '' as number | string,
     auctionDurationHours: 2 as number,
+    regionId: '',
+    cityId: '',
+    districtId: '',
   });
   const [, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -78,12 +80,25 @@ export default function ProductsPage() {
     queryFn: () => sizeService.getAll({}),
   });
 
+  const { data: regionsData } = useQuery({
+    queryKey: ['locations-regions'],
+    queryFn: () => locationService.getRegions(),
+  });
+
+  const { data: citiesData } = useQuery({
+    queryKey: ['locations-cities', formData.regionId],
+    queryFn: () => locationService.getCities(formData.regionId || undefined),
+    enabled: !!formData.regionId,
+  });
+
+  const { data: districtsData } = useQuery({
+    queryKey: ['locations-districts', formData.cityId],
+    queryFn: () => locationService.getDistricts(formData.cityId || undefined),
+    enabled: !!formData.cityId,
+  });
+
   const uploadMutation = useMutation({
     mutationFn: fileService.upload,
-    onSuccess: (data) => {
-      setUploadedImageIds(prev => [...prev, data.id]);
-      toast.success('Image uploaded');
-    },
   });
 
   const createMutation = useMutation({
@@ -107,11 +122,12 @@ export default function ProductsPage() {
       id: string;
       data: UpdateProductDto & { price?: number; quantity?: number; imageIds?: string[] };
     }) => {
+      const imageIds = Array.isArray(data.imageIds) ? data.imageIds.filter((id): id is string => typeof id === 'string' && id.length > 0) : [];
       const convertedData: UpdateProductDto = {
         ...data,
         price: typeof data.price === 'string' ? (data.price === '' ? undefined : Number(data.price)) : data.price,
         quantity: typeof data.quantity === 'string' ? (data.quantity === '' ? undefined : Number(data.quantity)) : data.quantity,
-        imageIds: data.imageIds,
+        imageIds,
       };
       return productService.update(id, convertedData);
     },
@@ -137,14 +153,27 @@ export default function ProductsPage() {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
-      setImageFiles(prev => [...(prev || []), ...files]);
-      setImagePreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
-      for (const file of files) {
-        await uploadMutation.mutateAsync(file);
+    if (files.length === 0) return;
+    e.target.value = '';
+    setImageFiles(prev => [...(prev || []), ...files]);
+    const newPreviews = files.map(f => URL.createObjectURL(f));
+    const prevLen = imagePreviews.length;
+    setImagePreviews(prev => [...prev, ...newPreviews]);
+    const newIds: string[] = [];
+    for (let i = 0; i < files.length; i++) {
+      try {
+        const data = await uploadMutation.mutateAsync(files[i]);
+        const id = (data as { id?: string; fileId?: string }).id ?? (data as { id?: string; fileId?: string }).fileId;
+        if (id) newIds.push(id);
+      } catch {
+        newPreviews.forEach(p => URL.revokeObjectURL(p));
+        setImagePreviews(prev => prev.slice(0, prevLen));
+        toast.error('Image upload failed');
+        return;
       }
     }
-    e.target.value = '';
+    setUploadedImageIds(prev => [...prev, ...newIds]);
+    if (newIds.length > 0) toast.success(newIds.length === 1 ? 'Image uploaded' : `${newIds.length} images uploaded`);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -167,6 +196,9 @@ export default function ProductsPage() {
       type: formData.type,
       status: formData.status,
       imageIds: imageIdsClean,
+      ...(formData.regionId && { regionId: formData.regionId }),
+      ...(formData.cityId && { cityId: formData.cityId }),
+      ...(formData.districtId && { districtId: formData.districtId }),
     };
 
     if (editingId) {
@@ -202,6 +234,9 @@ export default function ProductsPage() {
         imageIds: imageIdsClean,
         price: formData.createAuction ? (auctionStartPriceValue || priceValue) : priceValue,
         createAuction: formData.createAuction,
+        ...(formData.regionId && { regionId: formData.regionId }),
+        ...(formData.cityId && { cityId: formData.cityId }),
+        ...(formData.districtId && { districtId: formData.districtId }),
         ...(formData.createAuction && {
           auction: {
             startPrice: auctionStartPriceValue || priceValue,
@@ -231,11 +266,17 @@ export default function ProductsPage() {
       createAuction: false,
       auctionStartPrice: '',
       auctionDurationHours: 2,
+      regionId: '',
+      cityId: '',
+      districtId: '',
     });
-    setImagePreviews(product.images.map(img => img.url || ''));
-    setUploadedImageIds(
-      product.images.map(img => img.fileId ?? (img as { id?: string }).id).filter((id): id is string => Boolean(id))
-    );
+    const imageList = Array.isArray(product.images) ? product.images : [];
+    const previews = imageList.map((img: { url?: string }) => img?.url ?? '');
+    const ids = imageList
+      .map((img: { id?: string; fileId?: string }) => img?.id ?? img?.fileId ?? '')
+      .filter((id): id is string => typeof id === 'string' && id.length > 0);
+    setImagePreviews(previews);
+    setUploadedImageIds(ids);
     setIsModalOpen(true);
   };
 
@@ -253,6 +294,9 @@ export default function ProductsPage() {
       createAuction: false,
       auctionStartPrice: '',
       auctionDurationHours: 2,
+      regionId: '',
+      cityId: '',
+      districtId: '',
     });
     setImageFiles([]);
     setImagePreviews(prev => {
@@ -320,10 +364,8 @@ export default function ProductsPage() {
             className="group min-w-0 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all duration-200"
             style={{ animationDelay: `${index * 0.03}s` }}
           >
-            {/* Image - square thumbnail for clear visibility */}
             <div className="aspect-square min-h-[140px] w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
-              {product.images[0] ? (
-                // eslint-disable-next-line @next/next/no-img-element -- dynamic API URL, lazy loading used
+              {product.images?.[0]?.url ? (
                 <img
                   src={product.images[0].url}
                   alt={toStringValue(product.title)}
@@ -342,21 +384,21 @@ export default function ProductsPage() {
             <div className="p-2">
               <div className="flex items-center justify-between gap-1.5 mb-0.5">
                 <h3 className="text-xs font-bold text-gray-900 truncate flex-1 min-w-0 line-clamp-1">
-                  {product.title}
+                  {toStringValue(product.title)}
                 </h3>
                 <span className="text-sm font-bold text-blue-600 shrink-0">
                   ${product.price}
                 </span>
               </div>
               <p className="text-[11px] text-gray-500 line-clamp-2 mb-2 min-h-[1.75rem]">
-                {product.description || 'No description'}
+                {toStringValue(product.description) || 'No description'}
               </p>
               <div className="flex items-center gap-1.5 mb-2">
                 <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
                   {product.seller?.firstName?.[0] || 'S'}
                 </div>
                 <p className="text-[10px] text-gray-500 truncate min-w-0 flex-1">
-                  {product.seller?.firstName || 'Seller'} {product.seller?.lastName || ''}
+                  {product.seller?.firstName ?? 'Seller'} {product.seller?.lastName ?? ''}
                 </p>
               </div>
               <div className="flex items-center gap-1.5 mb-2 flex-wrap">
@@ -423,7 +465,6 @@ export default function ProductsPage() {
                       <div className="grid grid-cols-3 gap-4">
                         {imagePreviews.map((preview, idx) => (
                           <div key={idx} className="relative group">
-                            {/* eslint-disable-next-line @next/next/no-img-element -- blob URL preview */}
                             <img
                               src={preview}
                               alt={`Preview ${idx + 1}`}
@@ -492,7 +533,7 @@ export default function ProductsPage() {
                 >
                   <option value="">Select category</option>
                   {categoriesData?.data.map((cat) => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    <option key={cat.id} value={cat.id}>{toStringValue(cat.name)}</option>
                   ))}
                 </select>
               </div>
@@ -508,7 +549,7 @@ export default function ProductsPage() {
                   >
                     <option value="">Select condition</option>
                     {(Array.isArray(conditionsData?.data) ? conditionsData.data : []).map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
+                      <option key={c.id} value={c.id}>{toStringValue(c.name)}</option>
                     ))}
                   </select>
                 </div>
@@ -522,9 +563,57 @@ export default function ProductsPage() {
                   >
                     <option value="">Select size</option>
                     {(Array.isArray(sizesData?.data) ? sizesData.data : []).map((s) => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
+                      <option key={s.id} value={s.id}>{toStringValue(s.name)}</option>
                     ))}
                   </select>
+                </div>
+              </div>
+
+              <div>
+                <p className="block text-sm font-bold text-gray-700 mb-2">Location (optional)</p>
+                <p className="text-xs text-gray-500 mb-3">Choose region, then city, then district. Used for both new and existing products.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Region</label>
+                    <select
+                      value={formData.regionId}
+                      onChange={(e) => setFormData({ ...formData, regionId: e.target.value, cityId: '', districtId: '' })}
+                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500"
+                    >
+                      <option value="">Select region</option>
+                      {(regionsData ?? []).map((r) => (
+                        <option key={r.id} value={r.id}>{r.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">City</label>
+                    <select
+                      value={formData.cityId}
+                      onChange={(e) => setFormData({ ...formData, cityId: e.target.value, districtId: '' })}
+                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      disabled={!formData.regionId}
+                    >
+                      <option value="">Select city</option>
+                      {(citiesData ?? []).map((c) => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">District</label>
+                    <select
+                      value={formData.districtId}
+                      onChange={(e) => setFormData({ ...formData, districtId: e.target.value })}
+                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      disabled={!formData.cityId}
+                    >
+                      <option value="">Select district</option>
+                      {(districtsData ?? []).map((d) => (
+                        <option key={d.id} value={d.id}>{d.name}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 

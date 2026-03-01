@@ -49,7 +49,6 @@ export default function SettingsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Profile Information Card */}
         <Card>
           <CardHeader>
             <CardTitle>Profile Information</CardTitle>
@@ -96,7 +95,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Account Information Card */}
         <Card>
           <CardHeader>
             <CardTitle>Account Information</CardTitle>
@@ -143,7 +141,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Security Settings Card */}
         <Card>
           <CardHeader>
             <CardTitle>Security</CardTitle>
@@ -176,7 +173,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Preferences Card */}
         <Card>
           <CardHeader>
             <CardTitle>Preferences</CardTitle>

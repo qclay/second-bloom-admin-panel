@@ -34,8 +34,7 @@ export default function ReportsPage() {
     isOpen: false,
     reportId: null,
   });
-  
-  // Mock data - replace with actual API call
+
   const mockReports: Report[] = [
     {
       id: '1',
@@ -77,7 +76,6 @@ export default function ReportsPage() {
         <p className="text-gray-600 mt-1">Review and manage user reports</p>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         {stats.map((stat) => (
           <div key={stat.label} className={`bg-gradient-to-br ${stat.color} rounded-xl p-4 border-2 ${stat.border}`}>
@@ -87,7 +85,6 @@ export default function ReportsPage() {
         ))}
       </div>
 
-      {/* Filters */}
       <div className="mb-6 flex gap-3">
         {['ALL', 'PENDING', 'REVIEWED', 'RESOLVED', 'DISMISSED'].map((status) => (
           <button
@@ -104,7 +101,6 @@ export default function ReportsPage() {
         ))}
       </div>
 
-      {/* Reports List */}
       {mockReports.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16">
           <div className="text-center max-w-md mx-auto">
@@ -147,7 +143,6 @@ export default function ReportsPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-gray-50 rounded-xl mb-4">
-                  {/* Reported User */}
                   <div>
                     <p className="text-xs font-bold text-gray-500 mb-2">REPORTED USER</p>
                     <div className="flex items-center gap-3">
@@ -161,7 +156,6 @@ export default function ReportsPage() {
                     </div>
                   </div>
 
-                  {/* Reporter */}
                   <div>
                     <p className="text-xs font-bold text-gray-500 mb-2">REPORTED BY</p>
                     <div className="flex items-center gap-3">
@@ -176,7 +170,6 @@ export default function ReportsPage() {
                   </div>
                 </div>
 
-                {/* Actions */}
                 <div className="flex gap-3">
                   <Button
                     className="flex-1 bg-blue-500 hover:bg-blue-600 button-animate"
@@ -215,7 +208,6 @@ export default function ReportsPage() {
         </div>
       )}
 
-      {/* Block User Confirmation */}
       <ConfirmDialog
         isOpen={blockConfirm.isOpen}
         onClose={() => setBlockConfirm({ isOpen: false, userId: null, userName: '' })}
@@ -231,7 +223,6 @@ export default function ReportsPage() {
         icon="🚫"
       />
 
-      {/* Resolve Report Confirmation */}
       <ConfirmDialog
         isOpen={resolveConfirm.isOpen}
         onClose={() => setResolveConfirm({ isOpen: false, reportId: null })}

@@ -16,7 +16,7 @@ export interface TranslationDto {
 }
 
 export interface CreateProductDto {
-  title: TranslationDto;
+  title?: TranslationDto;
   description?: TranslationDto;
   price?: number;
   currency?: string;
@@ -28,9 +28,9 @@ export interface CreateProductDto {
   quantity?: number;
   status?: string;
   isFeatured?: boolean;
-  region?: string;
-  city?: string;
-  district?: string;
+  regionId?: string;
+  cityId?: string;
+  districtId?: string;
   imageIds?: string[];
   createAuction?: boolean;
   auction?: AuctionOptions;

@@ -10,6 +10,17 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
 import { Category } from '@/types';
 
+function toStringValue(value: unknown): string {
+  if (value == null) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value !== null && !Array.isArray(value) && ('en' in value || 'uz' in value || 'ru' in value)) {
+    const o = value as Record<string, unknown>;
+    const s = o.en ?? o.uz ?? o.ru;
+    return typeof s === 'string' ? s : '';
+  }
+  return String(value);
+}
+
 export default function CategoriesPage() {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -111,8 +122,8 @@ export default function CategoriesPage() {
   const handleEdit = (category: Category) => {
     setEditingId(category.id);
     setFormData({
-      name: typeof category.name === 'string' ? category.name : (category.name as { en?: string })?.en ?? '',
-      description: typeof category.description === 'string' ? (category.description || '') : (category.description as { en?: string } | null)?.en ?? '',
+      name: toStringValue(category.name),
+      description: toStringValue(category.description),
       imageId: category.image?.id || '',
       isActive: category.isActive,
     });
@@ -184,7 +195,6 @@ export default function CategoriesPage() {
             className="group min-w-0 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-md hover:border-emerald-200 transition-all duration-200 card-animate animate-fade-in"
             style={{ animationDelay: `${index * 0.03}s` }}
           >
-            {/* Image - square thumbnail for clear visibility */}
             <button
               type="button"
               onClick={() => handleEdit(category)}
@@ -192,10 +202,9 @@ export default function CategoriesPage() {
             >
               <div className="aspect-square min-h-[140px] w-full overflow-hidden">
                 {category.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- dynamic API URL, lazy loading used
                   <img
                     src={category.image.url}
-                    alt={category.name}
+                    alt={toStringValue(category.name)}
                     className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                     decoding="async"
@@ -209,11 +218,10 @@ export default function CategoriesPage() {
               </div>
             </button>
 
-            {/* Content - compact */}
             <div className="p-2">
               <div className="flex items-center justify-between gap-1.5 mb-0.5">
                 <h3 className="text-xs font-bold text-gray-900 truncate flex-1 min-w-0">
-                  {category.name}
+                  {toStringValue(category.name)}
                 </h3>
                 <span className={`shrink-0 px-1.5 py-0.5 rounded text-[10px] font-medium ${
                   category.isActive
@@ -224,10 +232,9 @@ export default function CategoriesPage() {
                 </span>
               </div>
               <p className="text-[11px] text-gray-500 line-clamp-2 mb-2 min-h-[1.75rem]">
-                {category.description || 'No description'}
+                {toStringValue(category.description) || 'No description'}
               </p>
 
-              {/* Actions - compact */}
               <div className="flex gap-1">
                 <Button
                   variant="outline"
@@ -278,7 +285,6 @@ export default function CategoriesPage() {
                 <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-purple-400 transition-colors">
                   {imagePreview ? (
                     <div className="relative">
-                      {/* eslint-disable-next-line @next/next/no-img-element -- blob URL preview */}
                       <img
                         src={imagePreview}
                         alt="Preview"

@@ -89,7 +89,6 @@ export default function FilesPage() {
           >
             <div className="aspect-square min-h-[120px] w-full overflow-hidden bg-gray-100">
               {file.fileType === 'IMAGE' ? (
-                // eslint-disable-next-line @next/next/no-img-element -- dynamic API URL, lazy loading used
                 <img
                   src={file.url}
                   alt={file.filename}
@@ -121,7 +120,6 @@ export default function FilesPage() {
         ))}
       </div>
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, fileId: null })}

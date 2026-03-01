@@ -62,24 +62,20 @@ export function ConfirmDialog({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6">
-          {/* Icon */}
           <div className="flex justify-center mb-4">
             <div className={`w-16 h-16 rounded-full ${styles.iconBg} flex items-center justify-center animate-scale-in`}>
               <span className="text-3xl">{styles.icon}</span>
             </div>
           </div>
 
-          {/* Title */}
           <h3 className="text-2xl font-black text-gray-900 text-center mb-2 animate-fade-in">
             {title}
           </h3>
 
-          {/* Message */}
           <p className="text-gray-600 text-center mb-6 font-semibold animate-fade-in">
             {message}
           </p>
 
-          {/* Actions */}
           <div className="flex gap-3">
             <Button
               variant="outline"

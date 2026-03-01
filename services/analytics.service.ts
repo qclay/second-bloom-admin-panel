@@ -1,0 +1,52 @@
+import { apiClient, ApiResponse } from '@/lib/api-client';
+
+export interface PeriodStats {
+  date: string;
+  label: string;
+  usersOnline: number;
+  bouquetsAdded: number;
+  bidsCount: number;
+}
+
+export interface WeekPeriodStats {
+  dateFrom: string;
+  dateTo: string;
+  label: string;
+  usersOnline: number;
+  bouquetsAdded: number;
+  bidsCount: number;
+}
+
+export interface TotalsStats {
+  totalUsers: number;
+  totalBouquets: number;
+}
+
+export interface CustomPeriodStats {
+  dateFrom: string;
+  dateTo: string;
+  label: string;
+  bouquetsAdded: number;
+  bidsCount: number;
+}
+
+export interface AnalyticsDashboard {
+  today: PeriodStats;
+  week: WeekPeriodStats;
+  totals: TotalsStats;
+  customPeriod?: CustomPeriodStats;
+}
+
+export interface AnalyticsQuery {
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export const analyticsService = {
+  async getDashboard(params?: AnalyticsQuery): Promise<AnalyticsDashboard> {
+    const response = await apiClient.get<ApiResponse<AnalyticsDashboard>>('/analytics/dashboard', {
+      params: params?.dateFrom && params?.dateTo ? { dateFrom: params.dateFrom, dateTo: params.dateTo } : undefined,
+    });
+    return response.data.data;
+  },
+};

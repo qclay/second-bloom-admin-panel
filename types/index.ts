@@ -46,10 +46,10 @@ export interface Category {
 
 export interface ProductImage {
   id: string;
-  fileId: string;
-  order: number;
-  createdAt: string;
+  fileId?: string;
   url?: string;
+  order?: number;
+  createdAt?: string;
 }
 
 export interface ProductCondition {
@@ -66,31 +66,30 @@ export interface ProductSize {
 
 export interface Product {
   id: string;
-  title: string;
+  title: string | Record<string, string> | null;
   slug: string;
-  description: string | null;
+  description: string | Record<string, string> | null;
   price: number;
   currency: string;
   categoryId: string;
-  category: Category;
+  category?: Category;
   sellerId: string;
-  seller: User;
+  seller?: User;
   images: ProductImage[];
   tags: string[];
   type: 'FRESH' | 'DRIED' | 'ARTIFICIAL' | 'OTHER';
-  condition?: ProductCondition | 'NEW' | 'USED' | 'REFURBISHED' | null;
-  size?: ProductSize;
+  condition?: ProductCondition | null;
+  size?: ProductSize | null;
   quantity: number;
   status: 'DRAFT' | 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK';
   isFeatured: boolean;
   views: number;
-  region: string | null;
-  city: string | null;
-  district: string | null;
+  region?: string | null;
+  city?: string | null;
+  district?: string | null;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
-  /** Set when product has an active auction (from API). */
   activeAuction?: { id: string };
 }
 

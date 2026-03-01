@@ -7,6 +7,17 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
 import { OrderStatus } from '@/types';
 
+function toStringValue(value: unknown): string {
+  if (value == null) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value !== null && !Array.isArray(value) && ('en' in value || 'uz' in value || 'ru' in value)) {
+    const o = value as Record<string, unknown>;
+    const s = o.en ?? o.uz ?? o.ru;
+    return typeof s === 'string' ? s : '';
+  }
+  return String(value);
+}
+
 export default function OrdersPage() {
   const queryClient = useQueryClient();
   const [statusConfirm, setStatusConfirm] = useState<{ isOpen: boolean; orderId: string | null; newStatus: OrderStatus | null }>({
@@ -88,7 +99,7 @@ export default function OrdersPage() {
                     <td className="px-6 py-4 font-semibold text-gray-900">
                       #{order.orderNumber}
                     </td>
-                    <td className="px-6 py-4 text-gray-700">{order.product.title}</td>
+                    <td className="px-6 py-4 text-gray-700">{toStringValue(order.product?.title)}</td>
                     <td className="px-6 py-4 text-gray-700">
                       {order.buyer.phoneNumber}
                     </td>

@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { useLocaleStore } from '@/lib/locale-store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
 
@@ -6,9 +7,6 @@ export const apiClient = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
-    // Backend uses Accept-Language header to resolve translation objects (e.g. { en: "...", ru: "..." })
-    // to a single string. This tells the backend to return English translations.
-    'Accept-Language': 'en',
   },
 });
 
@@ -19,6 +17,9 @@ apiClient.interceptors.request.use(
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+      const locale = useLocaleStore.getState().locale;
+      const lang = locale === 'ru' || locale === 'uz' ? locale : 'en';
+      config.headers['Accept-Language'] = lang;
     }
     return config;
   },

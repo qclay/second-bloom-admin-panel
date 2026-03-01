@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/lib/auth-store';
+import { useLocaleStore, LOCALES, type AdminLocale } from '@/lib/locale-store';
 
 export default function DashboardLayout({
   children,
@@ -12,11 +14,19 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const locale = useLocaleStore((state) => state.locale);
+  const setLocale = useLocaleStore((state) => state.setLocale);
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLocaleChange = (newLocale: AdminLocale) => {
+    setLocale(newLocale);
+    queryClient.invalidateQueries();
+  };
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -113,6 +123,18 @@ export default function DashboardLayout({
       </nav>
 
       <div className="p-4 border-t border-gray-200">
+        <div className="mb-3">
+          <label className="block text-xs font-medium text-gray-500 mb-1.5">Language</label>
+          <select
+            value={locale}
+            onChange={(e) => handleLocaleChange(e.target.value as AdminLocale)}
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+          >
+            {LOCALES.map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </div>
         <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shrink-0">
             {user?.firstName?.[0] || user?.phoneNumber?.[0] || 'A'}
@@ -177,8 +199,41 @@ export default function DashboardLayout({
         {sidebar}
       </aside>
 
-      <main className="flex-1 overflow-y-auto min-w-0 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        {children}
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <div className="sticky top-0 z-30 flex items-center justify-end gap-3 sm:gap-4 px-4 py-3 sm:px-6 lg:px-8 bg-white/95 backdrop-blur-sm border-b border-gray-200 shrink-0">
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-medium text-gray-500 sm:sr-only" htmlFor="global-locale">Language</label>
+            <select
+              id="global-locale"
+              value={locale}
+              onChange={(e) => handleLocaleChange(e.target.value as AdminLocale)}
+              className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none"
+            >
+              {LOCALES.map(({ value, label }) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-3 border-l border-gray-200">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shrink-0" title={user?.firstName || user?.phoneNumber || 'Admin'}>
+              {user?.firstName?.[0] || user?.phoneNumber?.[0] || 'A'}
+            </div>
+            <div className="min-w-0 hidden sm:block">
+              <p className="text-sm font-semibold text-gray-900 truncate">{user?.firstName || user?.phoneNumber || 'Admin'}</p>
+              <p className="text-xs text-gray-500">{user?.role || 'ADMIN'}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => { closeSidebar(); handleLogout(); }}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            Logout
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          {children}
+        </div>
       </main>
     </div>
   );
