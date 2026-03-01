@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
+import { useTranslations } from '@/lib/translations';
 
 function formatDate(dateStr: string) {
   try {
@@ -37,6 +38,7 @@ function productTitle(p: Review['product']): string {
 }
 
 export default function ReviewsPage() {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [minRating, setMinRating] = useState<string>('');
@@ -122,7 +124,7 @@ export default function ReviewsPage() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-600 mx-auto" />
-        <p className="mt-4 text-gray-600">Loading reviews...</p>
+        <p className="mt-4 text-gray-600">{t('reviews.loading')}</p>
       </div>
     );
   }
@@ -131,8 +133,8 @@ export default function ReviewsPage() {
     <div>
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reviews</h1>
-          <p className="text-sm text-gray-600 mt-0.5">Manage product reviews and ratings</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('reviews.title')}</h1>
+          <p className="text-sm text-gray-600 mt-0.5">{t('reviews.subtitle')}</p>
         </div>
       </div>
 
@@ -187,7 +189,7 @@ export default function ReviewsPage() {
               {reviews.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
-                    No reviews found.
+                    {t('reviews.noReviews')}
                   </td>
                 </tr>
               ) : (

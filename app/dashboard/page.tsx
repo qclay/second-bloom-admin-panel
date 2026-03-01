@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from '@/lib/translations';
 import { categoryService } from '@/services/category.service';
 import { productService } from '@/services/product.service';
 import { orderService } from '@/services/order.service';
@@ -38,6 +39,7 @@ function getDateRange(preset: string): { dateFrom: string; dateTo: string } | nu
 }
 
 export default function DashboardPage() {
+  const t = useTranslations();
   const [datePreset, setDatePreset] = useState<string>('');
   const [customFrom, setCustomFrom] = useState<string>('');
   const [customTo, setCustomTo] = useState<string>('');
@@ -80,11 +82,11 @@ export default function DashboardPage() {
   const pendingOrders = ordersData?.data.filter(o => o.status === 'PENDING').length || 0;
 
   const orderStatusData = [
-    { name: 'Pending', value: ordersData?.data.filter(o => o.status === 'PENDING').length || 0 },
-    { name: 'Confirmed', value: ordersData?.data.filter(o => o.status === 'CONFIRMED').length || 0 },
-    { name: 'Processing', value: ordersData?.data.filter(o => o.status === 'PROCESSING').length || 0 },
-    { name: 'Shipped', value: ordersData?.data.filter(o => o.status === 'SHIPPED').length || 0 },
-    { name: 'Delivered', value: ordersData?.data.filter(o => o.status === 'DELIVERED').length || 0 },
+    { name: t('dashboard.pending'), value: ordersData?.data.filter(o => o.status === 'PENDING').length || 0 },
+    { name: t('dashboard.confirmed'), value: ordersData?.data.filter(o => o.status === 'CONFIRMED').length || 0 },
+    { name: t('dashboard.processing'), value: ordersData?.data.filter(o => o.status === 'PROCESSING').length || 0 },
+    { name: t('dashboard.shipped'), value: ordersData?.data.filter(o => o.status === 'SHIPPED').length || 0 },
+    { name: t('dashboard.delivered'), value: ordersData?.data.filter(o => o.status === 'DELIVERED').length || 0 },
   ];
 
   const monthlyRevenue = [
@@ -104,55 +106,19 @@ export default function DashboardPage() {
   const COLORS = ['#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
 
   const stats = [
-    {
-      title: 'Total Products',
-      value: totalProducts.toString(),
-      icon: '📦',
-      bgColor: 'bg-gradient-to-br from-blue-50 to-blue-100',
-      iconBg: 'bg-blue-500',
-    },
-    {
-      title: 'Total Orders',
-      value: totalOrders.toString(),
-      icon: '🛒',
-      bgColor: 'bg-gradient-to-br from-green-50 to-green-100',
-      iconBg: 'bg-green-500',
-    },
-    {
-      title: 'Total Users',
-      value: totalUsers.toString(),
-      icon: '👥',
-      bgColor: 'bg-gradient-to-br from-purple-50 to-purple-100',
-      iconBg: 'bg-purple-500',
-    },
-    {
-      title: 'Revenue',
-      value: `$${totalRevenue.toLocaleString()}`,
-      icon: '💰',
-      bgColor: 'bg-gradient-to-br from-yellow-50 to-yellow-100',
-      iconBg: 'bg-yellow-500',
-    },
-    {
-      title: 'Categories',
-      value: totalCategories.toString(),
-      icon: '📁',
-      bgColor: 'bg-gradient-to-br from-pink-50 to-pink-100',
-      iconBg: 'bg-pink-500',
-    },
-    {
-      title: 'Pending Orders',
-      value: pendingOrders.toString(),
-      icon: '⏳',
-      bgColor: 'bg-gradient-to-br from-orange-50 to-orange-100',
-      iconBg: 'bg-orange-500',
-    },
+    { title: t('dashboard.totalProducts'), value: totalProducts.toString(), icon: '📦', bgColor: 'bg-gradient-to-br from-blue-50 to-blue-100', iconBg: 'bg-blue-500' },
+    { title: t('dashboard.totalOrders'), value: totalOrders.toString(), icon: '🛒', bgColor: 'bg-gradient-to-br from-green-50 to-green-100', iconBg: 'bg-green-500' },
+    { title: t('dashboard.totalUsers'), value: totalUsers.toString(), icon: '👥', bgColor: 'bg-gradient-to-br from-purple-50 to-purple-100', iconBg: 'bg-purple-500' },
+    { title: t('dashboard.revenue'), value: `$${totalRevenue.toLocaleString()}`, icon: '💰', bgColor: 'bg-gradient-to-br from-yellow-50 to-yellow-100', iconBg: 'bg-yellow-500' },
+    { title: t('dashboard.categories'), value: totalCategories.toString(), icon: '📁', bgColor: 'bg-gradient-to-br from-pink-50 to-pink-100', iconBg: 'bg-pink-500' },
+    { title: t('dashboard.pendingOrders'), value: pendingOrders.toString(), icon: '⏳', bgColor: 'bg-gradient-to-br from-orange-50 to-orange-100', iconBg: 'bg-orange-500' },
   ];
 
   return (
     <div className="page-transition">
       <div className="mb-8 animate-fade-in">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 animate-slide-in">Dashboard</h1>
-        <p className="text-gray-600 animate-slide-in" style={{ animationDelay: '0.1s' }}>Welcome back! Here&apos;s what&apos;s happening today.</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 animate-slide-in">{t('dashboard.title')}</h1>
+        <p className="text-gray-600 animate-slide-in" style={{ animationDelay: '0.1s' }}>{t('dashboard.welcome')}</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -183,20 +149,20 @@ export default function DashboardPage() {
         <section className="mb-8 animate-fade-in">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
             <div className="flex items-center gap-4 flex-wrap">
-              <h2 className="text-lg font-bold text-gray-900">Analytics</h2>
+              <h2 className="text-lg font-bold text-gray-900">{t('dashboard.analytics')}</h2>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-50 border border-purple-100">
-                <span className="text-sm text-gray-600">Users online now</span>
+                <span className="text-sm text-gray-600">{t('dashboard.usersOnlineNow')}</span>
                 <span className="font-bold text-purple-600 tabular-nums text-lg">{analyticsData.today.usersOnline}</span>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm text-gray-500 hidden sm:inline">Period</span>
+              <span className="text-sm text-gray-500 hidden sm:inline">{t('dashboard.period')}</span>
               <div className="inline-flex rounded-xl bg-gray-100 p-1 gap-0.5">
                 {[
-                  { value: '', label: 'None' },
-                  { value: '7d', label: '7 days' },
-                  { value: '30d', label: '30 days' },
-                  { value: 'custom', label: 'Custom' },
+                  { value: '', label: t('dashboard.none') },
+                  { value: '7d', label: t('dashboard.7days') },
+                  { value: '30d', label: t('dashboard.30days') },
+                  { value: 'custom', label: t('dashboard.custom') },
                 ].map(({ value, label }) => (
                   <button
                     key={value || 'none'}
@@ -231,59 +197,59 @@ export default function DashboardPage() {
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-2 mb-4">
                 <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 text-purple-600 text-sm">📅</span>
-                <h3 className="text-sm font-semibold text-gray-800">Today</h3>
+                <h3 className="text-sm font-semibold text-gray-800">{t('dashboard.today')}</h3>
               </div>
               <p className="text-xs text-gray-500 mb-3">{analyticsData.today.label}</p>
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center"><span className="text-gray-600">Users online</span><span className="font-semibold text-purple-600 tabular-nums">{analyticsData.today.usersOnline}</span></div>
-                <div className="flex justify-between items-center"><span className="text-gray-600">Bouquets added</span><span className="font-semibold text-blue-600 tabular-nums">{analyticsData.today.bouquetsAdded}</span></div>
-                <div className="flex justify-between items-center"><span className="text-gray-600">Bids</span><span className="font-semibold text-emerald-600 tabular-nums">{analyticsData.today.bidsCount}</span></div>
+                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.usersOnline')}</span><span className="font-semibold text-purple-600 tabular-nums">{analyticsData.today.usersOnline}</span></div>
+                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.bouquetsAdded')}</span><span className="font-semibold text-blue-600 tabular-nums">{analyticsData.today.bouquetsAdded}</span></div>
+                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.bids')}</span><span className="font-semibold text-emerald-600 tabular-nums">{analyticsData.today.bidsCount}</span></div>
               </div>
             </div>
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-2 mb-4">
                 <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 text-blue-600 text-sm">📆</span>
-                <h3 className="text-sm font-semibold text-gray-800">This week</h3>
+                <h3 className="text-sm font-semibold text-gray-800">{t('dashboard.thisWeek')}</h3>
               </div>
               <p className="text-xs text-gray-500 mb-3">{analyticsData.week.label}</p>
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center"><span className="text-gray-600">Users online</span><span className="font-semibold text-purple-600 tabular-nums">{analyticsData.week.usersOnline}</span></div>
-                <div className="flex justify-between items-center"><span className="text-gray-600">Bouquets added</span><span className="font-semibold text-blue-600 tabular-nums">{analyticsData.week.bouquetsAdded}</span></div>
-                <div className="flex justify-between items-center"><span className="text-gray-600">Bids</span><span className="font-semibold text-emerald-600 tabular-nums">{analyticsData.week.bidsCount}</span></div>
+                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.usersOnline')}</span><span className="font-semibold text-purple-600 tabular-nums">{analyticsData.week.usersOnline}</span></div>
+                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.bouquetsAdded')}</span><span className="font-semibold text-blue-600 tabular-nums">{analyticsData.week.bouquetsAdded}</span></div>
+                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.bids')}</span><span className="font-semibold text-emerald-600 tabular-nums">{analyticsData.week.bidsCount}</span></div>
               </div>
             </div>
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-2 mb-4">
                 <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-100 text-amber-600 text-sm">📊</span>
-                <h3 className="text-sm font-semibold text-gray-800">Totals</h3>
+                <h3 className="text-sm font-semibold text-gray-800">{t('dashboard.totals')}</h3>
               </div>
               <div className="space-y-3 text-sm mt-7">
-                <div className="flex justify-between items-center"><span className="text-gray-600">Total users</span><span className="font-bold text-gray-900 tabular-nums">{analyticsData.totals.totalUsers.toLocaleString()}</span></div>
-                <div className="flex justify-between items-center"><span className="text-gray-600">Total bouquets</span><span className="font-bold text-gray-900 tabular-nums">{analyticsData.totals.totalBouquets.toLocaleString()}</span></div>
+                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.totalUsers')}</span><span className="font-bold text-gray-900 tabular-nums">{analyticsData.totals.totalUsers.toLocaleString()}</span></div>
+                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.totalBouquets')}</span><span className="font-bold text-gray-900 tabular-nums">{analyticsData.totals.totalBouquets.toLocaleString()}</span></div>
               </div>
             </div>
             {analyticsData.customPeriod && (
               <div className="sm:col-span-3 rounded-2xl p-5 shadow-sm border border-purple-100 bg-gradient-to-br from-purple-50/80 to-white">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-200 text-purple-700 text-sm">📆</span>
-                  <h3 className="text-sm font-semibold text-gray-800">Custom range</h3>
+                  <h3 className="text-sm font-semibold text-gray-800">{t('dashboard.customRange')}</h3>
                   <span className="text-xs text-gray-500 font-normal">({analyticsData.customPeriod.label})</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                   <div className="flex justify-between sm:flex-col sm:justify-start gap-1 p-3 rounded-xl bg-white/60">
-                    <span className="text-gray-500 text-xs uppercase tracking-wide">From</span>
+                    <span className="text-gray-500 text-xs uppercase tracking-wide">{t('dashboard.from')}</span>
                     <span className="font-semibold text-gray-900">{analyticsData.customPeriod.dateFrom}</span>
                   </div>
                   <div className="flex justify-between sm:flex-col sm:justify-start gap-1 p-3 rounded-xl bg-white/60">
-                    <span className="text-gray-500 text-xs uppercase tracking-wide">To</span>
+                    <span className="text-gray-500 text-xs uppercase tracking-wide">{t('dashboard.to')}</span>
                     <span className="font-semibold text-gray-900">{analyticsData.customPeriod.dateTo}</span>
                   </div>
                   <div className="flex justify-between sm:flex-col sm:justify-start gap-1 p-3 rounded-xl bg-white/60">
-                    <span className="text-gray-500 text-xs uppercase tracking-wide">Bouquets added</span>
+                    <span className="text-gray-500 text-xs uppercase tracking-wide">{t('dashboard.bouquetsAdded')}</span>
                     <span className="font-semibold text-blue-600 tabular-nums">{analyticsData.customPeriod.bouquetsAdded}</span>
                   </div>
                   <div className="flex justify-between sm:flex-col sm:justify-start gap-1 p-3 rounded-xl bg-white/60">
-                    <span className="text-gray-500 text-xs uppercase tracking-wide">Bids</span>
+                    <span className="text-gray-500 text-xs uppercase tracking-wide">{t('dashboard.bids')}</span>
                     <span className="font-semibold text-emerald-600 tabular-nums">{analyticsData.customPeriod.bidsCount}</span>
                   </div>
                 </div>
@@ -295,11 +261,11 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-animate animate-fade-in">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Monthly Revenue</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-4">{t('dashboard.monthlyRevenue')}</h3>
           {totalRevenue === 0 && monthlyRevenue.every((d) => d.revenue === 0) ? (
             <div className="flex flex-col items-center justify-center h-[300px] text-center px-4 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
-              <p className="text-gray-500 font-medium">No revenue data yet</p>
-              <p className="text-sm text-gray-400 mt-1">Revenue will appear here once orders are completed.</p>
+              <p className="text-gray-500 font-medium">{t('dashboard.noRevenueData')}</p>
+              <p className="text-sm text-gray-400 mt-1">{t('dashboard.revenueWillAppear')}</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
@@ -337,7 +303,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-animate animate-fade-in">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Order Status Distribution</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-4">{t('dashboard.orderStatusDistribution')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -401,16 +367,16 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 card-animate animate-fade-in">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Products by Category</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-4">{t('dashboard.productsByCategory')}</h3>
           <div className="flex flex-col items-center justify-center h-[300px] text-center px-4 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
-            <p className="text-gray-500 font-medium">No categories yet</p>
-            <p className="text-sm text-gray-400 mt-1">Add categories and products to see the breakdown.</p>
+            <p className="text-gray-500 font-medium">{t('dashboard.noCategoriesYet')}</p>
+            <p className="text-sm text-gray-400 mt-1">{t('dashboard.addCategoriesHint')}</p>
           </div>
         </div>
       )}
 
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 animate-fade-in card-animate" style={{ animationDelay: '0.4s' }}>
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-6">{t('dashboard.quickActions')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
             href="/dashboard/categories"
@@ -421,12 +387,11 @@ export default function DashboardPage() {
                 <span className="text-xl">📁</span>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">Manage Categories</h3>
-                <p className="text-sm text-gray-600">Organize products</p>
+                <h3 className="font-semibold text-gray-900">{t('dashboard.manageCategories')}</h3>
+                <p className="text-sm text-gray-600">{t('dashboard.organizeProducts')}</p>
               </div>
             </div>
           </Link>
-          
           <Link
             href="/dashboard/products"
             className="p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all group card-animate"
@@ -436,12 +401,11 @@ export default function DashboardPage() {
                 <span className="text-xl">📦</span>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">Manage Products</h3>
-                <p className="text-sm text-gray-600">Add or edit items</p>
+                <h3 className="font-semibold text-gray-900">{t('dashboard.manageProducts')}</h3>
+                <p className="text-sm text-gray-600">{t('dashboard.addOrEditItems')}</p>
               </div>
             </div>
           </Link>
-          
           <Link
             href="/dashboard/orders"
             className="p-4 border border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50 transition-all group card-animate"
@@ -451,8 +415,8 @@ export default function DashboardPage() {
                 <span className="text-xl">🛒</span>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">View Orders</h3>
-                <p className="text-sm text-gray-600">Track all orders</p>
+                <h3 className="font-semibold text-gray-900">{t('dashboard.viewOrders')}</h3>
+                <p className="text-sm text-gray-600">{t('dashboard.trackOrders')}</p>
               </div>
             </div>
           </Link>
@@ -461,35 +425,35 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-animate animate-fade-in">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Activity</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-4">{t('dashboard.recentActivity')}</h3>
           <div className="space-y-3">
             <div className="flex items-center p-4 bg-gray-50 rounded-xl">
               <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold mr-3">
                 0
               </div>
               <div>
-                <p className="font-medium text-gray-900">No activity yet</p>
-                <p className="text-sm text-gray-600">Start managing your store</p>
+                <p className="font-medium text-gray-900">{t('dashboard.noActivityYet')}</p>
+                <p className="text-sm text-gray-600">{t('dashboard.startManaging')}</p>
               </div>
             </div>
           </div>
         </div>
 
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-animate animate-fade-in">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Stats</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-4">{t('dashboard.quickStats')}</h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-4 bg-blue-50 rounded-xl">
-              <span className="font-medium text-gray-700">Active Products</span>
+              <span className="font-medium text-gray-700">{t('dashboard.activeProducts')}</span>
               <span className="text-2xl font-bold text-blue-600">{totalProducts}</span>
             </div>
             <div className="flex justify-between items-center p-4 bg-green-50 rounded-xl">
-              <span className="font-medium text-gray-700">Completed Orders</span>
+              <span className="font-medium text-gray-700">{t('dashboard.completedOrders')}</span>
               <span className="text-2xl font-bold text-green-600">
                 {ordersData?.data.filter(o => o.status === 'DELIVERED').length || 0}
               </span>
             </div>
             <div className="flex justify-between items-center p-4 bg-purple-50 rounded-xl">
-              <span className="font-medium text-gray-700">Total Categories</span>
+              <span className="font-medium text-gray-700">{t('dashboard.totalCategories')}</span>
               <span className="text-2xl font-bold text-purple-600">{totalCategories}</span>
             </div>
           </div>

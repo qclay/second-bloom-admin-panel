@@ -19,7 +19,7 @@ export interface CreateCategoryDto {
 export interface UpdateCategoryDto {
   name?: TranslationDto;
   description?: TranslationDto;
-  imageId?: string;
+  imageId?: string | null;
   parentId?: string;
   isActive?: boolean;
   order?: number;

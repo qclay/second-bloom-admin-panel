@@ -6,8 +6,10 @@ import { fileService } from '@/services/file.service';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
+import { useTranslations } from '@/lib/translations';
 
 export default function FilesPage() {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   const [, setUploading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; fileId: string | null }>({
@@ -54,7 +56,7 @@ export default function FilesPage() {
       <div>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading files...</p>
+          <p className="mt-4 text-gray-600">{t('files.loading')}</p>
         </div>
       </div>
     );
@@ -64,12 +66,12 @@ export default function FilesPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Files</h1>
-          <p className="text-gray-600 mt-1">Manage uploaded files</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('files.title')}</h1>
+          <p className="text-gray-600 mt-1">{t('files.subtitle')}</p>
         </div>
         <label className="cursor-pointer">
           <Button className="bg-gradient-to-r from-blue-500 to-blue-600">
-            📤 Upload File
+            📤 {t('files.upload')}
           </Button>
           <input
             type="file"
@@ -128,10 +130,10 @@ export default function FilesPage() {
             deleteMutation.mutate(deleteConfirm.fileId);
           }
         }}
-        title="Delete File"
-        message="Are you sure you want to delete this file? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t('common.delete') + ' ' + t('files.title').slice(0, -1)}
+        message={t('files.confirmDelete')}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         type="danger"
         icon="🗑️"
       />

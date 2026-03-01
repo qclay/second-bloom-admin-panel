@@ -15,6 +15,7 @@ export interface UpdateUserDto {
   email?: string;
   role?: 'USER' | 'ADMIN';
   isActive?: boolean;
+  publicationPostsBalance?: number;
 }
 
 export const userService = {

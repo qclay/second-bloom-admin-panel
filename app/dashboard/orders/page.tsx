@@ -6,6 +6,7 @@ import { orderService } from '@/services/order.service';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
 import { OrderStatus } from '@/types';
+import { useTranslations } from '@/lib/translations';
 
 function toStringValue(value: unknown): string {
   if (value == null) return '';
@@ -19,6 +20,7 @@ function toStringValue(value: unknown): string {
 }
 
 export default function OrdersPage() {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   const [statusConfirm, setStatusConfirm] = useState<{ isOpen: boolean; orderId: string | null; newStatus: OrderStatus | null }>({
     isOpen: false,
@@ -59,7 +61,7 @@ export default function OrdersPage() {
       <div>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading orders...</p>
+          <p className="mt-4 text-gray-600">{t('orders.loading')}</p>
         </div>
       </div>
     );
@@ -68,8 +70,8 @@ export default function OrdersPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Orders</h1>
-        <p className="text-gray-600 mt-1">Manage customer orders</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('orders.title')}</h1>
+        <p className="text-gray-600 mt-1">{t('orders.subtitle')}</p>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -77,20 +79,20 @@ export default function OrdersPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Order #</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Product</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Customer</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Total</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Date</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">Actions</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('orders.orderNumber')}</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('orders.product')}</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('orders.customer')}</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('orders.total')}</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('common.status')}</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('orders.date')}</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {data?.data.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
-                    No orders yet
+                    {t('orders.noOrders')}
                   </td>
                 </tr>
               ) : (
@@ -130,13 +132,13 @@ export default function OrdersPage() {
                         }}
                         className="text-sm border-2 border-gray-300 rounded-lg px-3 py-2 font-bold focus:border-purple-500 focus:outline-none transition-all button-animate"
                       >
-                        <option value="PENDING">Pending</option>
-                        <option value="CONFIRMED">Confirmed</option>
-                        <option value="PROCESSING">Processing</option>
-                        <option value="SHIPPED">Shipped</option>
-                        <option value="DELIVERED">Delivered</option>
-                        <option value="CANCELLED">Cancelled</option>
-                        <option value="REFUNDED">Refunded</option>
+                        <option value="PENDING">{t('dashboard.pending')}</option>
+                        <option value="CONFIRMED">{t('dashboard.confirmed')}</option>
+                        <option value="PROCESSING">{t('dashboard.processing')}</option>
+                        <option value="SHIPPED">{t('dashboard.shipped')}</option>
+                        <option value="DELIVERED">{t('dashboard.delivered')}</option>
+                        <option value="CANCELLED">{t('orders.cancelled')}</option>
+                        <option value="REFUNDED">{t('orders.refunded')}</option>
                       </select>
                     </td>
                   </tr>
@@ -161,7 +163,7 @@ export default function OrdersPage() {
         title="Change Order Status"
         message={`Are you sure you want to change this order status to ${statusConfirm.newStatus}? This action ${statusConfirm.newStatus === 'CANCELLED' || statusConfirm.newStatus === 'REFUNDED' ? 'cannot be easily undone' : 'will update the order status'}.`}
         confirmText="Change Status"
-        cancelText="Cancel"
+        cancelText={t('common.cancel')}
         type={statusConfirm.newStatus === 'CANCELLED' || statusConfirm.newStatus === 'REFUNDED' ? "danger" : "warning"}
         icon={statusConfirm.newStatus === 'CANCELLED' ? "🚫" : statusConfirm.newStatus === 'REFUNDED' ? "💰" : "⚠️"}
       />

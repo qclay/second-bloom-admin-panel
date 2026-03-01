@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { categoryService, UpdateCategoryDto } from '@/services/category.service';
 import { fileService } from '@/services/file.service';
@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
 import { Category } from '@/types';
+import { useTranslations } from '@/lib/translations';
 
 function toStringValue(value: unknown): string {
   if (value == null) return '';
@@ -21,7 +22,26 @@ function toStringValue(value: unknown): string {
   return String(value);
 }
 
+function getFileIdFromResponse(data: unknown): string {
+  if (data == null || typeof data !== 'object') return '';
+  const d = data as Record<string, unknown>;
+  const id = d.id ?? d.fileId ?? d._id;
+  if (typeof id === 'string') return id;
+  const file = d.file as Record<string, unknown> | undefined;
+  if (file && typeof file === 'object') {
+    const fid = file.id ?? file.fileId ?? file._id;
+    if (typeof fid === 'string') return fid;
+  }
+  const inner = d.data as Record<string, unknown> | undefined;
+  if (inner && typeof inner === 'object') {
+    const fid = inner.id ?? inner.fileId ?? inner._id;
+    if (typeof fid === 'string') return fid;
+  }
+  return '';
+}
+
 export default function CategoriesPage() {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -37,6 +57,7 @@ export default function CategoriesPage() {
     isOpen: false,
     categoryId: null,
   });
+  const imageIdRef = useRef<string>('');
 
   const { data, isLoading } = useQuery({
     queryKey: ['categories'],
@@ -46,8 +67,13 @@ export default function CategoriesPage() {
   const uploadMutation = useMutation({
     mutationFn: fileService.upload,
     onSuccess: (data) => {
-      setFormData(prev => ({ ...prev, imageId: data.id }));
-      setImagePreview(data.url);
+      const id = getFileIdFromResponse(data);
+      if (id) {
+        imageIdRef.current = id;
+        setFormData(prev => ({ ...prev, imageId: id }));
+      }
+      const url = (data as { url?: string }).url;
+      setImagePreview(typeof url === 'string' ? url : '');
       toast.success('Image uploaded');
     },
     onError: (error: unknown) => {
@@ -97,41 +123,69 @@ export default function CategoriesPage() {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
-      await uploadMutation.mutateAsync(file);
+    if (!file) return;
+    e.target.value = '';
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    try {
+      const result = await uploadMutation.mutateAsync(file);
+      const id = getFileIdFromResponse(result);
+      if (id) {
+        imageIdRef.current = id;
+        setFormData(prev => ({ ...prev, imageId: id }));
+      }
+    } catch {
+      setImagePreview(null);
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = {
-      name: { en: formData.name },
-      description: formData.description ? { en: formData.description } : undefined,
-      imageId: formData.imageId || undefined,
-      isActive: formData.isActive,
-    };
+    if (uploadMutation.isPending) return;
+    let imageId = formData.imageId || imageIdRef.current;
+    if (editingId && !imageId && data?.data) {
+      const cat = data.data.find((c) => c.id === editingId) as { image?: { id?: string; fileId?: string }; imageId?: string } | undefined;
+      if (cat) imageId = cat.image?.id ?? cat.image?.fileId ?? cat.imageId ?? '';
+    }
+    const imageIdFinal = imageId?.trim() || null;
     if (editingId) {
-      updateMutation.mutate({ id: editingId, data: payload });
+      updateMutation.mutate({
+        id: editingId,
+        data: {
+          name: { en: formData.name },
+          description: formData.description ? { en: formData.description } : undefined,
+          isActive: formData.isActive,
+          imageId: imageIdFinal,
+        },
+      });
     } else {
-      createMutation.mutate(payload);
+      createMutation.mutate({
+        name: { en: formData.name },
+        description: formData.description ? { en: formData.description } : undefined,
+        isActive: formData.isActive,
+        ...(imageIdFinal && { imageId: imageIdFinal }),
+      });
     }
   };
 
   const handleEdit = (category: Category) => {
     setEditingId(category.id);
+    const img = category.image as { id?: string; fileId?: string; url?: string } | null | undefined;
+    const cat = category as { imageId?: string };
+    const imageId = (img?.id ?? img?.fileId ?? cat?.imageId ?? '') as string;
+    imageIdRef.current = imageId;
     setFormData({
       name: toStringValue(category.name),
       description: toStringValue(category.description),
-      imageId: category.image?.id || '',
+      imageId,
       isActive: category.isActive,
     });
-    setImagePreview(category.image?.url || null);
+    setImagePreview(img?.url ?? null);
     setIsModalOpen(true);
   };
 
   const resetForm = () => {
+    imageIdRef.current = '';
     setFormData({ name: '', description: '', imageId: '', isActive: true });
     setImageFile(null);
     setImagePreview(null);
@@ -144,7 +198,7 @@ export default function CategoriesPage() {
       <div>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading categories...</p>
+          <p className="mt-4 text-gray-600">{t('categories.loading')}</p>
         </div>
       </div>
     );
@@ -154,15 +208,15 @@ export default function CategoriesPage() {
     <div>
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
-          <p className="text-sm text-gray-600 mt-0.5">Manage your product categories</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('categories.title')}</h1>
+          <p className="text-sm text-gray-600 mt-0.5">{t('categories.subtitle')}</p>
         </div>
         <Button
           onClick={() => setIsModalOpen(true)}
           size="sm"
           className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shrink-0"
         >
-          + Add Category
+          {t('categories.addCategory')}
         </Button>
       </div>
 
@@ -173,7 +227,7 @@ export default function CategoriesPage() {
               <span className="text-5xl">📁</span>
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              No Categories Yet
+              {t('categories.noCategories')}
             </h3>
             <p className="text-gray-600 mb-6">
               Start organizing your marketplace by creating product categories. 
@@ -273,7 +327,7 @@ export default function CategoriesPage() {
           >
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900">
-                {editingId ? 'Edit Category' : 'Add Category'}
+                {editingId ? t('common.edit') + ' ' + t('common.category') : t('categories.addCategory')}
               </h2>
             </div>
 
@@ -362,12 +416,13 @@ export default function CategoriesPage() {
                   onClick={resetForm}
                   className="flex-1"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   type="submit"
                   className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                  isLoading={createMutation.isPending || updateMutation.isPending}
+                  disabled={uploadMutation.isPending}
+                  isLoading={createMutation.isPending || updateMutation.isPending || uploadMutation.isPending}
                 >
                   {editingId ? 'Update' : 'Create'}
                 </Button>
@@ -385,10 +440,10 @@ export default function CategoriesPage() {
             deleteMutation.mutate(deleteConfirm.categoryId);
           }
         }}
-        title="Delete Category"
-        message="Are you sure you want to delete this category? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t('common.delete') + ' ' + t('common.category')}
+        message={t('categories.confirmDelete')}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         type="danger"
         icon="🗑️"
       />

@@ -12,6 +12,8 @@ interface ConfirmDialogProps {
   cancelText?: string;
   type?: 'danger' | 'warning' | 'info';
   icon?: string;
+  closeOnConfirm?: boolean;
+  isLoading?: boolean;
 }
 
 export function ConfirmDialog({
@@ -24,6 +26,8 @@ export function ConfirmDialog({
   cancelText = 'Cancel',
   type = 'danger',
   icon,
+  closeOnConfirm = true,
+  isLoading = false,
 }: ConfirmDialogProps) {
   if (!isOpen) return null;
 
@@ -49,7 +53,7 @@ export function ConfirmDialog({
 
   const handleConfirm = () => {
     onConfirm();
-    onClose();
+    if (closeOnConfirm) onClose();
   };
 
   return (
@@ -86,9 +90,10 @@ export function ConfirmDialog({
             </Button>
             <Button
               onClick={handleConfirm}
+              disabled={isLoading}
               className={`flex-1 ${styles.confirmBg} text-white font-bold button-animate`}
             >
-              {confirmText}
+              {isLoading ? '...' : confirmText}
             </Button>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
+import { useTranslations } from '@/lib/translations';
 
 interface Report {
   id: string;
@@ -24,6 +25,7 @@ interface Report {
 }
 
 export default function ReportsPage() {
+  const t = useTranslations();
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [blockConfirm, setBlockConfirm] = useState<{ isOpen: boolean; userId: string | null; userName: string }>({
     isOpen: false,
@@ -63,23 +65,23 @@ export default function ReportsPage() {
   };
 
   const stats = [
-    { label: 'Total Reports', value: mockReports.length, color: 'from-blue-50 to-blue-100', border: 'border-blue-200' },
-    { label: 'Pending', value: mockReports.filter(r => r.status === 'PENDING').length, color: 'from-yellow-50 to-yellow-100', border: 'border-yellow-200' },
-    { label: 'Resolved', value: mockReports.filter(r => r.status === 'RESOLVED').length, color: 'from-green-50 to-green-100', border: 'border-green-200' },
-    { label: 'Dismissed', value: mockReports.filter(r => r.status === 'DISMISSED').length, color: 'from-gray-50 to-gray-100', border: 'border-gray-200' },
+    { labelKey: 'reports.totalReports' as const, value: mockReports.length, color: 'from-blue-50 to-blue-100', border: 'border-blue-200' },
+    { labelKey: 'reports.pending', value: mockReports.filter(r => r.status === 'PENDING').length, color: 'from-yellow-50 to-yellow-100', border: 'border-yellow-200' },
+    { labelKey: 'reports.resolved', value: mockReports.filter(r => r.status === 'RESOLVED').length, color: 'from-green-50 to-green-100', border: 'border-green-200' },
+    { labelKey: 'reports.dismissed', value: mockReports.filter(r => r.status === 'DISMISSED').length, color: 'from-gray-50 to-gray-100', border: 'border-gray-200' },
   ];
 
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">User Reports</h1>
-        <p className="text-gray-600 mt-1">Review and manage user reports</p>
+        <h1 className="text-3xl font-bold text-gray-900">{t('reports.title')}</h1>
+        <p className="text-gray-600 mt-1">{t('reports.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         {stats.map((stat) => (
-          <div key={stat.label} className={`bg-gradient-to-br ${stat.color} rounded-xl p-4 border-2 ${stat.border}`}>
-            <p className="text-sm font-bold text-gray-600 mb-1">{stat.label}</p>
+          <div key={stat.labelKey} className={`bg-gradient-to-br ${stat.color} rounded-xl p-4 border-2 ${stat.border}`}>
+            <p className="text-sm font-bold text-gray-600 mb-1">{t(stat.labelKey)}</p>
             <p className="text-3xl font-black text-gray-900">{stat.value}</p>
           </div>
         ))}

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/lib/auth-store';
 import { useLocaleStore, LOCALES, type AdminLocale } from '@/lib/locale-store';
+import { useTranslations, type TranslationKey } from '@/lib/translations';
 
 export default function DashboardLayout({
   children,
@@ -20,6 +21,7 @@ export default function DashboardLayout({
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const locale = useLocaleStore((state) => state.locale);
   const setLocale = useLocaleStore((state) => state.setLocale);
+  const t = useTranslations();
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -42,7 +44,7 @@ export default function DashboardLayout({
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -60,18 +62,18 @@ export default function DashboardLayout({
   const closeSidebar = () => setSidebarOpen(false);
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: '📊' },
-    { name: 'Categories', href: '/dashboard/categories', icon: '📁' },
-    { name: 'Conditions', href: '/dashboard/conditions', icon: '📋' },
-    { name: 'Sizes', href: '/dashboard/sizes', icon: '📐' },
-    { name: 'Products', href: '/dashboard/products', icon: '📦' },
-    { name: 'Orders', href: '/dashboard/orders', icon: '🛒' },
-    { name: 'Users', href: '/dashboard/users', icon: '👥' },
-    { name: 'Reports', href: '/dashboard/reports', icon: '🚨' },
-    { name: 'Reviews', href: '/dashboard/reviews', icon: '⭐' },
-    { name: 'Chat', href: '/dashboard/chat', icon: '💬' },
-    { name: 'Publication Pricing', href: '/dashboard/publication-pricing', icon: '💰' },
-    { name: 'Settings', href: '/dashboard/settings', icon: '⚙️' },
+    { nameKey: 'nav.dashboard', href: '/dashboard', icon: '📊' },
+    { nameKey: 'nav.categories', href: '/dashboard/categories', icon: '📁' },
+    { nameKey: 'nav.conditions', href: '/dashboard/conditions', icon: '📋' },
+    { nameKey: 'nav.sizes', href: '/dashboard/sizes', icon: '📐' },
+    { nameKey: 'nav.products', href: '/dashboard/products', icon: '📦' },
+    { nameKey: 'nav.orders', href: '/dashboard/orders', icon: '🛒' },
+    { nameKey: 'nav.users', href: '/dashboard/users', icon: '👥' },
+    { nameKey: 'nav.reports', href: '/dashboard/reports', icon: '🚨' },
+    { nameKey: 'nav.reviews', href: '/dashboard/reviews', icon: '⭐' },
+    { nameKey: 'nav.chat', href: '/dashboard/chat', icon: '💬' },
+    { nameKey: 'nav.publicationPricing', href: '/dashboard/publication-pricing', icon: '💰' },
+    { nameKey: 'nav.settings', href: '/dashboard/settings', icon: '⚙️' },
   ];
 
   const sidebar = (
@@ -83,14 +85,14 @@ export default function DashboardLayout({
           </div>
           <div className="min-w-0">
             <h1 className="text-lg font-bold text-gray-900 truncate">Second Bloom</h1>
-            <p className="text-xs text-gray-500">Admin Panel</p>
+            <p className="text-xs text-gray-500">{t('common.adminPanel')}</p>
           </div>
         </div>
         <button
           type="button"
           onClick={closeSidebar}
           className="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-600"
-          aria-label="Close menu"
+          aria-label={t('common.closeMenu')}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -104,7 +106,7 @@ export default function DashboardLayout({
             const isActive = pathname === item.href;
             return (
               <Link
-                key={item.name}
+                key={item.nameKey}
                 href={item.href}
                 onClick={closeSidebar}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
@@ -115,7 +117,7 @@ export default function DashboardLayout({
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
                 <span className="text-xl">{item.icon}</span>
-                <span className="text-sm">{item.name}</span>
+                <span className="text-sm">{t(item.nameKey as TranslationKey)}</span>
               </Link>
             );
           })}
@@ -124,7 +126,7 @@ export default function DashboardLayout({
 
       <div className="p-4 border-t border-gray-200">
         <div className="mb-3">
-          <label className="block text-xs font-medium text-gray-500 mb-1.5">Language</label>
+          <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('common.language')}</label>
           <select
             value={locale}
             onChange={(e) => handleLocaleChange(e.target.value as AdminLocale)}
@@ -150,7 +152,7 @@ export default function DashboardLayout({
           onClick={() => { closeSidebar(); handleLogout(); }}
           className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors flex items-center justify-center"
         >
-          Logout
+          {t('common.logout')}
         </button>
       </div>
     </>
@@ -163,7 +165,7 @@ export default function DashboardLayout({
           type="button"
           onClick={() => setSidebarOpen(true)}
           className="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100"
-          aria-label="Open menu"
+          aria-label={t('common.openMenu')}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -202,7 +204,7 @@ export default function DashboardLayout({
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <div className="sticky top-0 z-30 flex items-center justify-end gap-3 sm:gap-4 px-4 py-3 sm:px-6 lg:px-8 bg-white/95 backdrop-blur-sm border-b border-gray-200 shrink-0">
           <div className="flex items-center gap-2">
-            <label className="text-xs font-medium text-gray-500 sm:sr-only" htmlFor="global-locale">Language</label>
+            <label className="text-xs font-medium text-gray-500 sm:sr-only" htmlFor="global-locale">{t('common.language')}</label>
             <select
               id="global-locale"
               value={locale}
@@ -228,7 +230,7 @@ export default function DashboardLayout({
             onClick={() => { closeSidebar(); handleLogout(); }}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
           >
-            Logout
+            {t('common.logout')}
           </button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8">

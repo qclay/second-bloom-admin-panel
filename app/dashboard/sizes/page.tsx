@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
+import { useTranslations } from '@/lib/translations';
 
 function toStringName(value: unknown): string {
   if (value == null) return '';
@@ -20,6 +21,7 @@ function toStringName(value: unknown): string {
 }
 
 export default function SizesPage() {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -105,7 +107,7 @@ export default function SizesPage() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto" />
-        <p className="mt-4 text-gray-600">Loading sizes...</p>
+        <p className="mt-4 text-gray-600">{t('sizes.loading')}</p>
       </div>
     );
   }
@@ -116,15 +118,15 @@ export default function SizesPage() {
     <div>
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Sizes</h1>
-          <p className="text-sm text-gray-600 mt-0.5">Manage product sizes (e.g. Small, Large)</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('sizes.title')}</h1>
+          <p className="text-sm text-gray-600 mt-0.5">{t('sizes.subtitle')}</p>
         </div>
         <Button
           onClick={() => setIsModalOpen(true)}
           size="sm"
           className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white shrink-0"
         >
-          + Add Size
+          {t('sizes.add')}
         </Button>
       </div>
 
@@ -134,7 +136,7 @@ export default function SizesPage() {
             <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-teal-50 flex items-center justify-center">
               <span className="text-5xl">📐</span>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">No Sizes Yet</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('sizes.noSizes')}</h3>
             <p className="text-gray-600 mb-6">
               Add sizes so products can be categorized (e.g. Small, Medium, Large). Used in product forms.
             </p>
@@ -142,7 +144,7 @@ export default function SizesPage() {
               onClick={() => setIsModalOpen(true)}
               className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700"
             >
-              + Create First Size
+              {t('sizes.add')}
             </Button>
           </div>
         </div>
@@ -165,7 +167,7 @@ export default function SizesPage() {
                     onClick={() => handleEdit(size)}
                     className="flex-1 h-8 text-xs border-teal-200 text-teal-700 hover:bg-teal-50"
                   >
-                    Edit
+                    {t('common.edit')}
                   </Button>
                   <Button
                     variant="destructive"
@@ -193,12 +195,12 @@ export default function SizesPage() {
           >
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-900">
-                {editingId ? 'Edit Size' : 'Add Size'}
+                {editingId ? t('common.edit') : t('sizes.add')}
               </h2>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <Input
-                label="Name"
+                label={t('common.name')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Small, Medium, Large"
@@ -206,14 +208,14 @@ export default function SizesPage() {
               />
               <div className="flex gap-3 pt-2">
                 <Button type="button" variant="outline" onClick={resetForm} className="flex-1">
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   type="submit"
                   className="flex-1 bg-gradient-to-r from-teal-500 to-teal-600"
                   isLoading={createMutation.isPending || updateMutation.isPending}
                 >
-                  {editingId ? 'Update' : 'Create'}
+                  {editingId ? t('common.save') : t('common.save')}
                 </Button>
               </div>
             </form>
@@ -227,10 +229,10 @@ export default function SizesPage() {
         onConfirm={() => {
           if (deleteConfirm.sizeId) deleteMutation.mutate(deleteConfirm.sizeId);
         }}
-        title="Delete Size"
-        message="Are you sure you want to delete this size? Products using it may need to be updated."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t('common.delete') + ' ' + t('common.size')}
+        message={t('sizes.confirmDelete')}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         type="danger"
         icon="🗑️"
       />

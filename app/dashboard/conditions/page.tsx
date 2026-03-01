@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
+import { useTranslations } from '@/lib/translations';
 
 function toStringName(value: unknown): string {
   if (value == null) return '';
@@ -20,6 +21,7 @@ function toStringName(value: unknown): string {
 }
 
 export default function ConditionsPage() {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -105,7 +107,7 @@ export default function ConditionsPage() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto" />
-        <p className="mt-4 text-gray-600">Loading conditions...</p>
+        <p className="mt-4 text-gray-600">{t('conditions.loading')}</p>
       </div>
     );
   }
@@ -116,15 +118,15 @@ export default function ConditionsPage() {
     <div>
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Conditions</h1>
-          <p className="text-sm text-gray-600 mt-0.5">Manage product conditions (e.g. Like New, Good)</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('conditions.title')}</h1>
+          <p className="text-sm text-gray-600 mt-0.5">{t('conditions.subtitle')}</p>
         </div>
         <Button
           onClick={() => setIsModalOpen(true)}
           size="sm"
           className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shrink-0"
         >
-          + Add Condition
+          {t('conditions.add')}
         </Button>
       </div>
 
@@ -134,7 +136,7 @@ export default function ConditionsPage() {
             <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-amber-50 flex items-center justify-center">
               <span className="text-5xl">📋</span>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">No Conditions Yet</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('conditions.noConditions')}</h3>
             <p className="text-gray-600 mb-6">
               Add conditions so products can be labeled (e.g. Like New, Good condition). Used in product forms.
             </p>
@@ -142,7 +144,7 @@ export default function ConditionsPage() {
               onClick={() => setIsModalOpen(true)}
               className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700"
             >
-              + Create First Condition
+              {t('conditions.add')}
             </Button>
           </div>
         </div>
@@ -165,7 +167,7 @@ export default function ConditionsPage() {
                     onClick={() => handleEdit(condition)}
                     className="flex-1 h-8 text-xs border-amber-200 text-amber-700 hover:bg-amber-50"
                   >
-                    Edit
+                    {t('common.edit')}
                   </Button>
                   <Button
                     variant="destructive"
@@ -193,12 +195,12 @@ export default function ConditionsPage() {
           >
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-900">
-                {editingId ? 'Edit Condition' : 'Add Condition'}
+                {editingId ? t('common.edit') : t('conditions.add')}
               </h2>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <Input
-                label="Name"
+                label={t('common.name')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Like New, Good condition"
@@ -206,14 +208,14 @@ export default function ConditionsPage() {
               />
               <div className="flex gap-3 pt-2">
                 <Button type="button" variant="outline" onClick={resetForm} className="flex-1">
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   type="submit"
                   className="flex-1 bg-gradient-to-r from-amber-500 to-amber-600"
                   isLoading={createMutation.isPending || updateMutation.isPending}
                 >
-                  {editingId ? 'Update' : 'Create'}
+                  {editingId ? t('common.save') : t('common.save')}
                 </Button>
               </div>
             </form>
@@ -227,10 +229,10 @@ export default function ConditionsPage() {
         onConfirm={() => {
           if (deleteConfirm.conditionId) deleteMutation.mutate(deleteConfirm.conditionId);
         }}
-        title="Delete Condition"
-        message="Are you sure you want to delete this condition? Products using it may need to be updated."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t('common.delete') + ' ' + t('common.condition')}
+        message={t('conditions.confirmDelete')}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         type="danger"
         icon="🗑️"
       />

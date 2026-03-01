@@ -8,8 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthStore } from '@/lib/auth-store';
 import { userService } from '@/services/user.service';
 import { toast } from 'sonner';
+import { useTranslations } from '@/lib/translations';
 
 export default function SettingsPage() {
+  const t = useTranslations();
   const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
   
@@ -44,52 +46,49 @@ export default function SettingsPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your account preferences</p>
+        <h1 className="text-3xl font-bold text-gray-900">{t('settings.title')}</h1>
+        <p className="text-gray-600 mt-1">{t('settings.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
+            <CardTitle>{t('settings.profileInfo')}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <Input
-                label="Phone Number"
+                label={t('settings.phoneNumber')}
                 value={user?.phoneNumber || ''}
                 disabled
                 className="bg-gray-50"
               />
               
               <Input
-                label="First Name"
+                label={t('settings.firstName')}
                 value={formData.firstName}
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                placeholder="Enter your first name"
+                placeholder={t('settings.placeholderFirstName')}
               />
-              
               <Input
-                label="Last Name"
+                label={t('settings.lastName')}
                 value={formData.lastName}
                 onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                placeholder="Enter your last name"
+                placeholder={t('settings.placeholderLastName')}
               />
-              
               <Input
-                label="Email Address"
+                label={t('settings.email')}
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="your.email@example.com"
               />
-
-              <Button 
+              <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold"
                 isLoading={updateMutation.isPending}
               >
-                {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+                {updateMutation.isPending ? t('common.saving') : t('settings.saveChanges')}
               </Button>
             </form>
           </CardContent>
@@ -97,12 +96,12 @@ export default function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Account Information</CardTitle>
+            <CardTitle>{t('settings.accountInfo')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between py-4 border-b border-gray-100">
               <div>
-                <p className="text-sm font-bold text-gray-600">Role</p>
+                <p className="text-sm font-bold text-gray-600">{t('users.role')}</p>
                 <p className="text-base font-bold text-gray-900 mt-1">{user?.role}</p>
               </div>
               <span className={`px-4 py-2 rounded-full text-sm font-bold ${
@@ -116,8 +115,8 @@ export default function SettingsPage() {
 
             <div className="flex items-center justify-between py-4 border-b border-gray-100">
               <div>
-                <p className="text-sm font-bold text-gray-600">Account Status</p>
-                <p className="text-base font-bold text-green-600 mt-1">Active</p>
+                <p className="text-sm font-bold text-gray-600">{t('settings.accountStatus')}</p>
+                <p className="text-base font-bold text-green-600 mt-1">{t('users.active')}</p>
               </div>
               <span className="px-4 py-2 rounded-full text-sm font-bold bg-green-100 text-green-700">
                 ✓ Active

@@ -6,6 +6,7 @@ export interface User {
   email: string | null;
   role: 'USER' | 'ADMIN';
   isActive: boolean;
+  publicationPostsBalance?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -81,7 +82,7 @@ export interface Product {
   condition?: ProductCondition | null;
   size?: ProductSize | null;
   quantity: number;
-  status: 'DRAFT' | 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK';
+  status: 'DRAFT' | 'PENDING_APPROVAL' | 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK';
   isFeatured: boolean;
   views: number;
   region?: string | null;

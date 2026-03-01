@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productService, UpdateProductDto } from '@/services/product.service';
 import { categoryService } from '@/services/category.service';
@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
 import { Product } from '@/types';
+import { useTranslations } from '@/lib/translations';
 
 function toStringValue(value: unknown): string {
   if (value == null) return '';
@@ -31,6 +32,7 @@ function toStringValue(value: unknown): string {
 }
 
 export default function ProductsPage() {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -44,7 +46,7 @@ export default function ProductsPage() {
     sizeId: '',
     quantity: '' as number | string,
     type: 'FRESH' as 'FRESH' | 'DRIED' | 'ARTIFICIAL' | 'OTHER',
-    status: 'ACTIVE' as 'DRAFT' | 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK',
+    status: 'ACTIVE' as 'DRAFT' | 'PENDING_APPROVAL' | 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK',
     createAuction: false,
     auctionStartPrice: '' as number | string,
     auctionDurationHours: 2 as number,
@@ -59,10 +61,16 @@ export default function ProductsPage() {
     isOpen: false,
     productId: null,
   });
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [moderationConfirm, setModerationConfirm] = useState<{ isOpen: boolean; productId: string | null; action: 'approve' | 'reject' } | null>(null);
+  const imageIdsRef = useRef<string[]>([]);
+
+  const isPendingFilter = statusFilter === 'PENDING_APPROVAL';
 
   const { data: productsData, isLoading } = useQuery({
-    queryKey: ['products'],
-    queryFn: () => productService.getAll({}),
+    queryKey: ['products', isPendingFilter ? 'pending' : statusFilter],
+    queryFn: () =>
+      isPendingFilter ? productService.getAll({}) : productService.getAll(statusFilter ? { status: statusFilter } : {}),
   });
 
   const { data: categoriesData } = useQuery({
@@ -151,6 +159,20 @@ export default function ProductsPage() {
     },
   });
 
+  const moderationMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: 'ACTIVE' | 'INACTIVE' }) =>
+      productService.update(id, { status }),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success(variables.status === 'ACTIVE' ? 'Product approved' : 'Product rejected');
+      setModerationConfirm(null);
+    },
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { error?: { message?: string } } } };
+      toast.error(err.response?.data?.error?.message || 'Failed to update status');
+    },
+  });
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
@@ -172,12 +194,17 @@ export default function ProductsPage() {
         return;
       }
     }
-    setUploadedImageIds(prev => [...prev, ...newIds]);
+    setUploadedImageIds(prev => {
+      const nextIds = [...prev, ...newIds];
+      imageIdsRef.current = nextIds;
+      return nextIds;
+    });
     if (newIds.length > 0) toast.success(newIds.length === 1 ? 'Image uploaded' : `${newIds.length} images uploaded`);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (uploadMutation.isPending) return;
     const priceValue = typeof formData.price === 'string' ? (formData.price === '' ? 0 : Number(formData.price)) : formData.price;
     const auctionStartPriceValue = typeof formData.auctionStartPrice === 'string' ? (formData.auctionStartPrice === '' ? 0 : Number(formData.auctionStartPrice)) : formData.auctionStartPrice;
 
@@ -186,7 +213,8 @@ export default function ProductsPage() {
     const titleI18n = { en: titleStr };
     const descriptionI18n = descriptionStr ? { en: descriptionStr } : undefined;
 
-    const imageIdsClean = (uploadedImageIds ?? []).filter((id): id is string => id != null && id !== '');
+    const imageIdsSource = (uploadedImageIds?.length ? uploadedImageIds : imageIdsRef.current) ?? [];
+    const imageIdsClean = imageIdsSource.filter((id): id is string => typeof id === 'string' && id.length > 0);
 
     const baseData: Record<string, unknown> = {
       title: titleI18n,
@@ -275,6 +303,7 @@ export default function ProductsPage() {
     const ids = imageList
       .map((img: { id?: string; fileId?: string }) => img?.id ?? img?.fileId ?? '')
       .filter((id): id is string => typeof id === 'string' && id.length > 0);
+    imageIdsRef.current = ids;
     setImagePreviews(previews);
     setUploadedImageIds(ids);
     setIsModalOpen(true);
@@ -303,6 +332,7 @@ export default function ProductsPage() {
       prev.forEach(p => { if (typeof p === 'string' && p.startsWith('blob:')) URL.revokeObjectURL(p); });
       return [];
     });
+    imageIdsRef.current = [];
     setUploadedImageIds([]);
     setEditingId(null);
     setEditingProductHasActiveAuction(false);
@@ -314,51 +344,83 @@ export default function ProductsPage() {
       <div>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading products...</p>
+          <p className="mt-4 text-gray-600">{t('products.loadingProducts')}</p>
         </div>
       </div>
     );
   }
 
+  const allProducts = productsData?.data ?? [];
+  const displayProducts = isPendingFilter
+    ? allProducts.filter(p => p.status === 'PENDING_APPROVAL' || p.status === 'DRAFT')
+    : allProducts;
+  const pendingCount = allProducts.filter(p => p.status === 'PENDING_APPROVAL' || p.status === 'DRAFT').length;
+
   return (
     <div>
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Products</h1>
-          <p className="text-gray-600 mt-1">Manage your product inventory</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('products.title')}</h1>
+          <p className="text-gray-600 mt-1">{t('products.subtitle')}</p>
         </div>
         <Button
           onClick={() => setIsModalOpen(true)}
           className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
         >
-          + Add Product
+          {t('products.addProduct')}
         </Button>
       </div>
 
-      {productsData?.data.length === 0 ? (
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        {[
+          { value: '', label: t('products.all') },
+          { value: 'PENDING_APPROVAL', label: t('products.pendingApproval') },
+          { value: 'ACTIVE', label: t('products.active') },
+          { value: 'DRAFT', label: t('products.draft') },
+          { value: 'INACTIVE', label: t('products.inactive') },
+          { value: 'OUT_OF_STOCK', label: t('products.outOfStock') },
+        ].map(({ value, label }) => (
+          <button
+            key={value || 'all'}
+            type="button"
+            onClick={() => setStatusFilter(value)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              statusFilter === value ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {label}
+            {value === 'PENDING_APPROVAL' && pendingCount > 0 && (
+              <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-amber-400 text-white text-xs">{pendingCount}</span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {displayProducts.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16">
           <div className="text-center max-w-md mx-auto">
             <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
               <span className="text-5xl">📦</span>
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              No Products Yet
+              {statusFilter ? t('products.noMatchFilter') : t('products.noProductsYet')}
             </h3>
             <p className="text-gray-600 mb-6">
-              Your marketplace is empty. Start by adding products that sellers can list. 
-              Each product should have images, pricing, and category information.
+              {statusFilter ? t('products.tryAnotherFilter') : t('products.emptyHint')}
             </p>
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
-            >
-              + Add First Product
-            </Button>
+            {!statusFilter && (
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+              >
+                {t('products.addFirst')}
+              </Button>
+            )}
           </div>
         </div>
       ) : (
         <div className="w-full min-w-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 min-[1920px]:grid-cols-8 min-[2560px]:grid-cols-10 gap-3">
-          {productsData?.data.map((product, index) => (
+          {displayProducts.map((product, index) => (
           <div
             key={product.id}
             className="group min-w-0 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all duration-200"
@@ -391,38 +453,59 @@ export default function ProductsPage() {
                 </span>
               </div>
               <p className="text-[11px] text-gray-500 line-clamp-2 mb-2 min-h-[1.75rem]">
-                {toStringValue(product.description) || 'No description'}
+                {toStringValue(product.description) || t('products.noDescription')}
               </p>
               <div className="flex items-center gap-1.5 mb-2">
                 <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
                   {product.seller?.firstName?.[0] || 'S'}
                 </div>
                 <p className="text-[10px] text-gray-500 truncate min-w-0 flex-1">
-                  {product.seller?.firstName ?? 'Seller'} {product.seller?.lastName ?? ''}
+                  {product.seller?.firstName ?? t('products.seller')} {product.seller?.lastName ?? ''}
                 </p>
               </div>
               <div className="flex items-center gap-1.5 mb-2 flex-wrap">
                 <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
                   product.status === 'ACTIVE'
                     ? 'bg-green-100 text-green-700'
+                    : product.status === 'PENDING_APPROVAL' || product.status === 'DRAFT'
+                    ? 'bg-amber-100 text-amber-700'
                     : product.status === 'OUT_OF_STOCK'
                     ? 'bg-red-100 text-red-700'
                     : 'bg-gray-100 text-gray-700'
                 }`}>
-                  {product.status}
+                  {product.status === 'PENDING_APPROVAL' ? t('products.pending') : product.status}
                 </span>
                 <span className="text-[10px] font-medium text-gray-600">
                   📦 {product.quantity}
                 </span>
               </div>
-              <div className="flex gap-1">
+              <div className="flex gap-1 flex-wrap">
+                {(product.status === 'PENDING_APPROVAL' || product.status === 'DRAFT') && (
+                  <>
+                    <Button
+                      size="sm"
+                      onClick={() => setModerationConfirm({ isOpen: true, productId: product.id, action: 'approve' })}
+                      className="h-7 text-[11px] button-animate bg-green-600 hover:bg-green-700 text-white py-0 flex-1 min-w-0"
+                    >
+                      ✓ {t('products.approve')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setModerationConfirm({ isOpen: true, productId: product.id, action: 'reject' })}
+                      className="h-7 text-[11px] button-animate border-red-200 text-red-700 hover:bg-red-50 py-0 flex-1 min-w-0"
+                    >
+                      ✗ {t('products.reject')}
+                    </Button>
+                  </>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleEdit(product)}
-                  className="flex-1 h-7 text-[11px] button-animate border-blue-200 text-blue-700 hover:bg-blue-50 py-0"
+                  className="h-7 text-[11px] button-animate border-blue-200 text-blue-700 hover:bg-blue-50 py-0 flex-1 min-w-0"
                 >
-                  Edit
+                  {t('common.edit')}
                 </Button>
                 <Button
                   variant="destructive"
@@ -477,7 +560,11 @@ export default function ProductsPage() {
                               onClick={() => {
                                 if (preview.startsWith('blob:')) URL.revokeObjectURL(preview);
                                 setImagePreviews(p => p.filter((_, i) => i !== idx));
-                                setUploadedImageIds(ids => ids.filter((_, i) => i !== idx));
+                                setUploadedImageIds(ids => {
+                                  const next = ids.filter((_, i) => i !== idx);
+                                  imageIdsRef.current = next;
+                                  return next;
+                                });
                               }}
                               className="absolute top-1 right-1 w-7 h-7 rounded-full bg-red-500 text-white text-sm font-bold opacity-90 hover:opacity-100 shadow"
                               aria-label="Remove image"
@@ -701,14 +788,15 @@ export default function ProductsPage() {
                   onClick={resetForm}
                   className="flex-1"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   type="submit"
                   className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600"
-                  isLoading={createMutation.isPending || updateMutation.isPending}
+                  disabled={uploadMutation.isPending}
+                  isLoading={createMutation.isPending || updateMutation.isPending || uploadMutation.isPending}
                 >
-                  {editingId ? 'Update' : 'Create'}
+                  {editingId ? t('common.save') : t('common.save')}
                 </Button>
               </div>
             </form>
@@ -724,13 +812,36 @@ export default function ProductsPage() {
             deleteMutation.mutate(deleteConfirm.productId);
           }
         }}
-        title="Delete Product"
-        message="Are you sure you want to delete this product? This action cannot be undone and will remove the product from your marketplace."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t('common.delete') + ' ' + t('common.product')}
+        message={t('products.confirmDelete')}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         type="danger"
         icon="🗑️"
       />
+
+      {moderationConfirm && (
+        <ConfirmDialog
+          isOpen={moderationConfirm.isOpen}
+          onClose={() => setModerationConfirm(null)}
+          onConfirm={() => {
+            if (moderationConfirm.productId) {
+              moderationMutation.mutate({
+                id: moderationConfirm.productId,
+                status: moderationConfirm.action === 'approve' ? 'ACTIVE' : 'INACTIVE',
+              });
+            }
+          }}
+          title={moderationConfirm.action === 'approve' ? t('products.approveProduct') : t('products.rejectProduct')}
+          message={moderationConfirm.action === 'approve' ? t('products.approveConfirm') : t('products.rejectConfirm')}
+          confirmText={moderationConfirm.action === 'approve' ? t('products.approve') : t('products.reject')}
+          cancelText={t('common.cancel')}
+          type={moderationConfirm.action === 'approve' ? 'info' : 'danger'}
+          icon={moderationConfirm.action === 'approve' ? '✓' : '✗'}
+          closeOnConfirm={false}
+          isLoading={moderationMutation.isPending}
+        />
+      )}
     </div>
   );
 }

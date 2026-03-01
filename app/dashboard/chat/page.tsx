@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { chatService, type Conversation, type ChatMessage } from '@/services/chat.service';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useTranslations } from '@/lib/translations';
 
 function formatDate(dateStr: string) {
   try {
@@ -37,6 +38,7 @@ function senderLabel(m: ChatMessage): string {
 }
 
 export default function ChatPage() {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [archived, setArchived] = useState(false);
@@ -80,7 +82,7 @@ export default function ChatPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Chat</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('chat.title')}</h1>
         <p className="text-sm text-gray-600 mt-0.5">
           View your conversations. Only conversations you participate in are shown.
         </p>
@@ -89,7 +91,7 @@ export default function ChatPage() {
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
           <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <p className="text-sm text-gray-500">Conversations</p>
+            <p className="text-sm text-gray-500">{t('chat.conversations')}</p>
             <p className="text-2xl font-bold text-gray-900">{stats.totalConversations}</p>
           </div>
           <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
@@ -121,7 +123,7 @@ export default function ChatPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1 rounded-xl border-2 border-gray-200 bg-white shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
-            <h2 className="font-semibold text-gray-900">Conversations</h2>
+            <h2 className="font-semibold text-gray-900">{t('chat.conversations')}</h2>
           </div>
           <div className="max-h-[400px] overflow-y-auto">
             {loadingList ? (
@@ -166,7 +168,7 @@ export default function ChatPage() {
         <div className="lg:col-span-2 rounded-xl border-2 border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col min-h-[400px]">
           {!selectedId ? (
             <div className="flex-1 flex items-center justify-center text-gray-500 p-8">
-              Select a conversation to view messages.
+              {t('chat.noConversation')}
             </div>
           ) : (
             <>
