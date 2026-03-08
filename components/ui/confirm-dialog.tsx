@@ -14,6 +14,10 @@ interface ConfirmDialogProps {
   icon?: string;
   closeOnConfirm?: boolean;
   isLoading?: boolean;
+  /** Renders after the message (e.g. textarea for rejection reason) */
+  extraContent?: React.ReactNode;
+  /** When true, confirm button is disabled */
+  confirmDisabled?: boolean;
 }
 
 export function ConfirmDialog({
@@ -28,6 +32,8 @@ export function ConfirmDialog({
   icon,
   closeOnConfirm = true,
   isLoading = false,
+  extraContent,
+  confirmDisabled = false,
 }: ConfirmDialogProps) {
   if (!isOpen) return null;
 
@@ -80,6 +86,8 @@ export function ConfirmDialog({
             {message}
           </p>
 
+          {extraContent && <div className="mb-6">{extraContent}</div>}
+
           <div className="flex gap-3">
             <Button
               variant="outline"
@@ -90,7 +98,7 @@ export function ConfirmDialog({
             </Button>
             <Button
               onClick={handleConfirm}
-              disabled={isLoading}
+              disabled={isLoading || confirmDisabled}
               className={`flex-1 ${styles.confirmBg} text-white font-bold button-animate`}
             >
               {isLoading ? '...' : confirmText}

@@ -70,8 +70,6 @@ export default function DashboardLayout({
     { nameKey: 'nav.orders', href: '/dashboard/orders', icon: '🛒' },
     { nameKey: 'nav.users', href: '/dashboard/users', icon: '👥' },
     { nameKey: 'nav.reports', href: '/dashboard/reports', icon: '🚨' },
-    { nameKey: 'nav.reviews', href: '/dashboard/reviews', icon: '⭐' },
-    { nameKey: 'nav.chat', href: '/dashboard/chat', icon: '💬' },
     { nameKey: 'nav.publicationPricing', href: '/dashboard/publication-pricing', icon: '💰' },
     { nameKey: 'nav.settings', href: '/dashboard/settings', icon: '⚙️' },
   ];
@@ -124,37 +122,6 @@ export default function DashboardLayout({
         </div>
       </nav>
 
-      <div className="p-4 border-t border-gray-200">
-        <div className="mb-3">
-          <label className="block text-xs font-medium text-gray-500 mb-1.5">{t('common.language')}</label>
-          <select
-            value={locale}
-            onChange={(e) => handleLocaleChange(e.target.value as AdminLocale)}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-          >
-            {LOCALES.map(({ value, label }) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
-        </div>
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shrink-0">
-            {user?.firstName?.[0] || user?.phoneNumber?.[0] || 'A'}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 truncate">
-              {user?.firstName || user?.phoneNumber || 'Admin'}
-            </p>
-            <p className="text-xs text-gray-500">{user?.role || 'ADMIN'}</p>
-          </div>
-        </div>
-        <button
-          onClick={() => { closeSidebar(); handleLogout(); }}
-          className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors flex items-center justify-center"
-        >
-          {t('common.logout')}
-        </button>
-      </div>
     </>
   );
 
@@ -217,9 +184,6 @@ export default function DashboardLayout({
             </select>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-3 border-l border-gray-200">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shrink-0" title={user?.firstName || user?.phoneNumber || 'Admin'}>
-              {user?.firstName?.[0] || user?.phoneNumber?.[0] || 'A'}
-            </div>
             <div className="min-w-0 hidden sm:block">
               <p className="text-sm font-semibold text-gray-900 truncate">{user?.firstName || user?.phoneNumber || 'Admin'}</p>
               <p className="text-xs text-gray-500">{user?.role || 'ADMIN'}</p>

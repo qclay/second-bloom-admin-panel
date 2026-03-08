@@ -7,6 +7,7 @@ import { fileService } from '@/services/file.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { Category } from '@/types';
 import { useTranslations } from '@/lib/translations';
@@ -58,10 +59,12 @@ export default function CategoriesPage() {
     categoryId: null,
   });
   const imageIdRef = useRef<string>('');
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => categoryService.getAll({ includeChildren: true }),
+    queryKey: ['categories', page, limit],
+    queryFn: () => categoryService.getAll({ includeChildren: true, page, limit }),
   });
 
   const uploadMutation = useMutation({
@@ -242,6 +245,7 @@ export default function CategoriesPage() {
           </div>
         </div>
       ) : (
+        <>
         <div className="w-full min-w-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 min-[1920px]:grid-cols-8 min-[2560px]:grid-cols-10 min-[3440px]:grid-cols-12 gap-3">
           {data?.data.map((category, index) => (
           <div
@@ -314,6 +318,17 @@ export default function CategoriesPage() {
           </div>
           ))}
         </div>
+        {data?.meta?.pagination ? (
+          <div className="mt-4">
+            <Pagination
+              meta={data.meta.pagination}
+              onPageChange={setPage}
+              limit={limit}
+              onLimitChange={(l) => { setLimit(l); setPage(1); }}
+            />
+          </div>
+        ) : null}
+      </>
       )}
 
       {isModalOpen && (

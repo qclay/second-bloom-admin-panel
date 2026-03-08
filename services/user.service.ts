@@ -15,7 +15,6 @@ export interface UpdateUserDto {
   email?: string;
   role?: 'USER' | 'ADMIN';
   isActive?: boolean;
-  publicationPostsBalance?: number;
 }
 
 export const userService = {
@@ -46,6 +45,14 @@ export const userService = {
 
   async update(id: string, data: UpdateUserDto): Promise<User> {
     const response = await apiClient.patch<ApiResponse<User>>(`/users/${id}`, data);
+    return response.data.data;
+  },
+
+  async addPublicationCredits(userId: string, quantity: number): Promise<User> {
+    const response = await apiClient.post<ApiResponse<User>>(
+      `/users/${userId}/publication-credits`,
+      { quantity }
+    );
     return response.data.data;
   },
 

@@ -47,24 +47,23 @@ export interface ProductQuery {
   isFeatured?: boolean;
 }
 
+export interface ModerateProductDto {
+  action: 'approve' | 'reject';
+  rejectionReason?: string;
+}
+
+const PRODUCT_STATUSES = ['DRAFT', 'PENDING', 'PUBLISHED', 'REJECTED'] as const;
+export type ProductStatus = (typeof PRODUCT_STATUSES)[number];
+
 export const productService = {
   async getAll(query?: ProductQuery): Promise<PaginatedResponse<Product>> {
-    const response = await apiClient.get<ApiResponse<Product[]>>('/products', {
-      params: query,
-    });
-    const defaultPagination = { 
-      page: 1, 
-      limit: 20, 
-      total: 0, 
-      totalPages: 0, 
-      hasNextPage: false, 
-      hasPreviousPage: false 
-    };
+    const params = { ...query };
+    if (query?.status && !PRODUCT_STATUSES.includes(query.status as ProductStatus)) delete params.status;
+    const response = await apiClient.get<ApiResponse<Product[]>>('/products', { params });
+    const defaultPagination = { page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false };
     return {
-      data: response.data.data,
-      meta: {
-        pagination: response.data.meta?.pagination || defaultPagination,
-      },
+      data: response.data.data ?? [],
+      meta: { pagination: response.data.meta?.pagination || defaultPagination },
     };
   },
 
@@ -85,5 +84,10 @@ export const productService = {
 
   async delete(id: string): Promise<void> {
     await apiClient.delete(`/products/${id}`);
+  },
+
+  async moderate(id: string, dto: ModerateProductDto): Promise<Product> {
+    const response = await apiClient.patch<ApiResponse<Product>>(`/products/${id}/moderate`, dto);
+    return response.data.data;
   },
 };

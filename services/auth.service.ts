@@ -4,6 +4,7 @@ import { User } from '@/types';
 export interface SendOtpRequest {
   countryCode: string;
   phoneNumber: string;
+  forAdminPanel?: boolean;
 }
 
 export interface VerifyOtpRequest {

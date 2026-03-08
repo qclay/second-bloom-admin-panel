@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fileService } from '@/services/file.service';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { useTranslations } from '@/lib/translations';
 
@@ -16,10 +17,12 @@ export default function FilesPage() {
     isOpen: false,
     fileId: null,
   });
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(24);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['files'],
-    queryFn: () => fileService.getAll({}),
+    queryKey: ['files', page, limit],
+    queryFn: () => fileService.getAll({ page, limit }),
   });
 
   const uploadMutation = useMutation({
@@ -121,6 +124,16 @@ export default function FilesPage() {
           </div>
         ))}
       </div>
+      {data?.meta?.pagination && (
+        <div className="mt-4">
+          <Pagination
+            meta={data.meta.pagination}
+            onPageChange={setPage}
+            limit={limit}
+            onLimitChange={(l) => { setLimit(l); setPage(1); }}
+          />
+        </div>
+      )}
 
       <ConfirmDialog
         isOpen={deleteConfirm.isOpen}

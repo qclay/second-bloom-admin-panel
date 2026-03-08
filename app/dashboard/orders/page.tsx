@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orderService } from '@/services/order.service';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { OrderStatus } from '@/types';
 import { useTranslations } from '@/lib/translations';
@@ -27,10 +28,12 @@ export default function OrdersPage() {
     orderId: null,
     newStatus: null,
   });
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['orders'],
-    queryFn: () => orderService.getAll({}),
+    queryKey: ['orders', page, limit],
+    queryFn: () => orderService.getAll({ page, limit }),
   });
 
   const updateStatusMutation = useMutation({
@@ -147,6 +150,14 @@ export default function OrdersPage() {
             </tbody>
           </table>
         </div>
+        {data?.meta?.pagination && (
+          <Pagination
+            meta={data.meta.pagination}
+            onPageChange={setPage}
+            limit={limit}
+            onLimitChange={(l) => { setLimit(l); setPage(1); }}
+          />
+        )}
       </div>
 
       <ConfirmDialog

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from '@/lib/translations';
 import { categoryService } from '@/services/category.service';
@@ -375,90 +374,6 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 animate-fade-in card-animate" style={{ animationDelay: '0.4s' }}>
-        <h2 className="text-xl font-bold text-gray-900 mb-6">{t('dashboard.quickActions')}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link
-            href="/dashboard/categories"
-            className="p-4 border border-gray-200 rounded-xl hover:border-purple-300 hover:bg-purple-50 transition-all group card-animate"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-                <span className="text-xl">📁</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">{t('dashboard.manageCategories')}</h3>
-                <p className="text-sm text-gray-600">{t('dashboard.organizeProducts')}</p>
-              </div>
-            </div>
-          </Link>
-          <Link
-            href="/dashboard/products"
-            className="p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all group card-animate"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                <span className="text-xl">📦</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">{t('dashboard.manageProducts')}</h3>
-                <p className="text-sm text-gray-600">{t('dashboard.addOrEditItems')}</p>
-              </div>
-            </div>
-          </Link>
-          <Link
-            href="/dashboard/orders"
-            className="p-4 border border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50 transition-all group card-animate"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                <span className="text-xl">🛒</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">{t('dashboard.viewOrders')}</h3>
-                <p className="text-sm text-gray-600">{t('dashboard.trackOrders')}</p>
-              </div>
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-animate animate-fade-in">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">{t('dashboard.recentActivity')}</h3>
-          <div className="space-y-3">
-            <div className="flex items-center p-4 bg-gray-50 rounded-xl">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold mr-3">
-                0
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">{t('dashboard.noActivityYet')}</p>
-                <p className="text-sm text-gray-600">{t('dashboard.startManaging')}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-animate animate-fade-in">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">{t('dashboard.quickStats')}</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center p-4 bg-blue-50 rounded-xl">
-              <span className="font-medium text-gray-700">{t('dashboard.activeProducts')}</span>
-              <span className="text-2xl font-bold text-blue-600">{totalProducts}</span>
-            </div>
-            <div className="flex justify-between items-center p-4 bg-green-50 rounded-xl">
-              <span className="font-medium text-gray-700">{t('dashboard.completedOrders')}</span>
-              <span className="text-2xl font-bold text-green-600">
-                {ordersData?.data.filter(o => o.status === 'DELIVERED').length || 0}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-4 bg-purple-50 rounded-xl">
-              <span className="font-medium text-gray-700">{t('dashboard.totalCategories')}</span>
-              <span className="text-2xl font-bold text-purple-600">{totalCategories}</span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { sizeService, type Size, type UpdateSizeDto } from '@/services/size.serv
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { useTranslations } from '@/lib/translations';
 
@@ -30,10 +31,12 @@ export default function SizesPage() {
     isOpen: false,
     sizeId: null,
   });
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['sizes'],
-    queryFn: () => sizeService.getAll({ limit: 100 }),
+    queryKey: ['sizes', page, limit],
+    queryFn: () => sizeService.getAll({ page, limit }),
   });
 
   const createMutation = useMutation({
@@ -149,6 +152,7 @@ export default function SizesPage() {
           </div>
         </div>
       ) : (
+        <>
         <div className="w-full min-w-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
           {sizes.map((size) => (
             <div
@@ -182,6 +186,17 @@ export default function SizesPage() {
             </div>
           ))}
         </div>
+        {data?.meta?.pagination ? (
+          <div className="mt-4">
+            <Pagination
+              meta={data.meta.pagination}
+              onPageChange={setPage}
+              limit={limit}
+              onLimitChange={(l) => { setLimit(l); setPage(1); }}
+            />
+          </div>
+        ) : null}
+      </>
       )}
 
       {isModalOpen && (

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productService, UpdateProductDto } from '@/services/product.service';
 import { categoryService } from '@/services/category.service';
@@ -11,6 +12,7 @@ import { fileService } from '@/services/file.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { Product } from '@/types';
 import { useTranslations } from '@/lib/translations';
@@ -46,7 +48,7 @@ export default function ProductsPage() {
     sizeId: '',
     quantity: '' as number | string,
     type: 'FRESH' as 'FRESH' | 'DRIED' | 'ARTIFICIAL' | 'OTHER',
-    status: 'ACTIVE' as 'DRAFT' | 'PENDING_APPROVAL' | 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK',
+    status: 'PUBLISHED' as 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED',
     createAuction: false,
     auctionStartPrice: '' as number | string,
     auctionDurationHours: 2 as number,
@@ -62,15 +64,27 @@ export default function ProductsPage() {
     productId: null,
   });
   const [statusFilter, setStatusFilter] = useState<string>('');
-  const [moderationConfirm, setModerationConfirm] = useState<{ isOpen: boolean; productId: string | null; action: 'approve' | 'reject' } | null>(null);
+  const [moderationConfirm, setModerationConfirm] = useState<{ isOpen: boolean; productId: string | null; action: 'approve' | 'reject'; rejectionReason?: string } | null>(null);
   const imageIdsRef = useRef<string[]>([]);
-
-  const isPendingFilter = statusFilter === 'PENDING_APPROVAL';
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const effectiveFilter = searchParams.get('moderation') === '1' ? 'PENDING' : statusFilter;
+  const isPendingFilter = effectiveFilter === 'PENDING';
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
 
   const { data: productsData, isLoading } = useQuery({
-    queryKey: ['products', isPendingFilter ? 'pending' : statusFilter],
+    queryKey: ['products', effectiveFilter, page, limit],
     queryFn: () =>
-      isPendingFilter ? productService.getAll({}) : productService.getAll(statusFilter ? { status: statusFilter } : {}),
+      productService.getAll(
+        effectiveFilter ? { status: effectiveFilter, page, limit } : { page, limit }
+      ),
+  });
+
+  const { data: pendingCountData } = useQuery({
+    queryKey: ['products', 'pending-count'],
+    queryFn: () => productService.getAll({ status: 'PENDING', page: 1, limit: 1 }),
+    enabled: effectiveFilter !== 'PENDING',
   });
 
   const { data: categoriesData } = useQuery({
@@ -160,16 +174,16 @@ export default function ProductsPage() {
   });
 
   const moderationMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: 'ACTIVE' | 'INACTIVE' }) =>
-      productService.update(id, { status }),
+    mutationFn: ({ id, action, rejectionReason }: { id: string; action: 'approve' | 'reject'; rejectionReason?: string }) =>
+      productService.moderate(id, { action, rejectionReason }),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
-      toast.success(variables.status === 'ACTIVE' ? 'Product approved' : 'Product rejected');
+      toast.success(variables.action === 'approve' ? 'Product approved' : 'Product rejected');
       setModerationConfirm(null);
     },
     onError: (error: unknown) => {
       const err = error as { response?: { data?: { error?: { message?: string } } } };
-      toast.error(err.response?.data?.error?.message || 'Failed to update status');
+      toast.error(err.response?.data?.error?.message || 'Failed to moderate');
     },
   });
 
@@ -319,7 +333,7 @@ export default function ProductsPage() {
       sizeId: '',
       quantity: '',
       type: 'FRESH',
-      status: 'ACTIVE',
+      status: 'PUBLISHED',
       createAuction: false,
       auctionStartPrice: '',
       auctionDurationHours: 2,
@@ -351,10 +365,17 @@ export default function ProductsPage() {
   }
 
   const allProducts = productsData?.data ?? [];
-  const displayProducts = isPendingFilter
-    ? allProducts.filter(p => p.status === 'PENDING_APPROVAL' || p.status === 'DRAFT')
-    : allProducts;
-  const pendingCount = allProducts.filter(p => p.status === 'PENDING_APPROVAL' || p.status === 'DRAFT').length;
+  const displayProducts = isPendingFilter ? allProducts : allProducts;
+  const pendingCount = isPendingFilter
+    ? (productsData?.data?.length ?? 0)
+    : (pendingCountData?.meta?.pagination?.total ?? 0);
+
+  const setFilter = (value: string) => {
+    setStatusFilter(value);
+    setPage(1);
+    if (value === 'PENDING') router.replace('/dashboard/products?moderation=1');
+    else router.replace('/dashboard/products');
+  };
 
   return (
     <div>
@@ -374,22 +395,21 @@ export default function ProductsPage() {
       <div className="flex flex-wrap items-center gap-2 mb-6">
         {[
           { value: '', label: t('products.all') },
-          { value: 'PENDING_APPROVAL', label: t('products.pendingApproval') },
-          { value: 'ACTIVE', label: t('products.active') },
+          { value: 'PENDING', label: t('products.pendingApproval') },
+          { value: 'PUBLISHED', label: t('products.active') },
           { value: 'DRAFT', label: t('products.draft') },
-          { value: 'INACTIVE', label: t('products.inactive') },
-          { value: 'OUT_OF_STOCK', label: t('products.outOfStock') },
+          { value: 'REJECTED', label: t('products.rejected') },
         ].map(({ value, label }) => (
           <button
             key={value || 'all'}
             type="button"
-            onClick={() => setStatusFilter(value)}
+            onClick={() => setFilter(value)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              statusFilter === value ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              effectiveFilter === value ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
             {label}
-            {value === 'PENDING_APPROVAL' && pendingCount > 0 && (
+            {value === 'PENDING' && pendingCount > 0 && (
               <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-amber-400 text-white text-xs">{pendingCount}</span>
             )}
           </button>
@@ -403,12 +423,12 @@ export default function ProductsPage() {
               <span className="text-5xl">📦</span>
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              {statusFilter ? t('products.noMatchFilter') : t('products.noProductsYet')}
+              {effectiveFilter ? t('products.noMatchFilter') : t('products.noProductsYet')}
             </h3>
             <p className="text-gray-600 mb-6">
-              {statusFilter ? t('products.tryAnotherFilter') : t('products.emptyHint')}
+              {effectiveFilter ? t('products.tryAnotherFilter') : t('products.emptyHint')}
             </p>
-            {!statusFilter && (
+            {!effectiveFilter && (
               <Button
                 onClick={() => setIsModalOpen(true)}
                 className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
@@ -419,6 +439,7 @@ export default function ProductsPage() {
           </div>
         </div>
       ) : (
+        <>
         <div className="w-full min-w-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 min-[1920px]:grid-cols-8 min-[2560px]:grid-cols-10 gap-3">
           {displayProducts.map((product, index) => (
           <div
@@ -465,22 +486,30 @@ export default function ProductsPage() {
               </div>
               <div className="flex items-center gap-1.5 mb-2 flex-wrap">
                 <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                  product.status === 'ACTIVE'
+                  product.status === 'PUBLISHED'
                     ? 'bg-green-100 text-green-700'
-                    : product.status === 'PENDING_APPROVAL' || product.status === 'DRAFT'
+                    : product.status === 'PENDING' || product.status === 'DRAFT'
                     ? 'bg-amber-100 text-amber-700'
-                    : product.status === 'OUT_OF_STOCK'
+                    : product.status === 'REJECTED'
                     ? 'bg-red-100 text-red-700'
                     : 'bg-gray-100 text-gray-700'
                 }`}>
-                  {product.status === 'PENDING_APPROVAL' ? t('products.pending') : product.status}
+                  {product.status === 'PENDING'
+                    ? t('products.pending')
+                    : product.status === 'PUBLISHED'
+                    ? t('products.active')
+                    : product.status === 'DRAFT'
+                    ? t('products.draft')
+                    : product.status === 'REJECTED'
+                    ? t('products.rejected')
+                    : product.status}
                 </span>
                 <span className="text-[10px] font-medium text-gray-600">
                   📦 {product.quantity}
                 </span>
               </div>
               <div className="flex gap-1 flex-wrap">
-                {(product.status === 'PENDING_APPROVAL' || product.status === 'DRAFT') && (
+                {(product.status === 'PENDING' || product.status === 'DRAFT') && (
                   <>
                     <Button
                       size="sm"
@@ -492,7 +521,7 @@ export default function ProductsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setModerationConfirm({ isOpen: true, productId: product.id, action: 'reject' })}
+                      onClick={() => setModerationConfirm({ isOpen: true, productId: product.id, action: 'reject', rejectionReason: '' })}
                       className="h-7 text-[11px] button-animate border-red-200 text-red-700 hover:bg-red-50 py-0 flex-1 min-w-0"
                     >
                       ✗ {t('products.reject')}
@@ -520,6 +549,17 @@ export default function ProductsPage() {
           </div>
           ))}
         </div>
+        {productsData?.meta?.pagination ? (
+          <div className="mt-4">
+            <Pagination
+              meta={productsData.meta.pagination}
+              onPageChange={setPage}
+              limit={limit}
+              onLimitChange={(l) => { setLimit(l); setPage(1); }}
+            />
+          </div>
+        ) : null}
+      </>
       )}
 
       {isModalOpen && (
@@ -828,7 +868,8 @@ export default function ProductsPage() {
             if (moderationConfirm.productId) {
               moderationMutation.mutate({
                 id: moderationConfirm.productId,
-                status: moderationConfirm.action === 'approve' ? 'ACTIVE' : 'INACTIVE',
+                action: moderationConfirm.action,
+                rejectionReason: moderationConfirm.action === 'reject' ? (moderationConfirm.rejectionReason?.trim() ?? '') : undefined,
               });
             }
           }}
@@ -840,6 +881,19 @@ export default function ProductsPage() {
           icon={moderationConfirm.action === 'approve' ? '✓' : '✗'}
           closeOnConfirm={false}
           isLoading={moderationMutation.isPending}
+          confirmDisabled={moderationConfirm.action === 'reject' && !(moderationConfirm.rejectionReason?.trim())}
+          extraContent={moderationConfirm.action === 'reject' ? (
+            <label className="block text-left">
+              <span className="block text-sm font-semibold text-gray-700 mb-1">{t('products.rejectionReason')}</span>
+              <textarea
+                value={moderationConfirm.rejectionReason ?? ''}
+                onChange={(e) => setModerationConfirm(prev => prev ? { ...prev, rejectionReason: e.target.value } : null)}
+                placeholder={t('products.rejectionReasonPlaceholder')}
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-red-500 min-h-[80px]"
+                rows={3}
+              />
+            </label>
+          ) : undefined}
         />
       )}
     </div>

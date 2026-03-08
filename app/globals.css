@@ -240,10 +240,20 @@ body {
   }
 }
 
+/* Very fast loading spin so UI feels snappy */
+.animate-spin,
+[class*="animate-spin"] {
+  animation-duration: 0.4s !important;
+}
+
+.loading-spinner {
+  animation-duration: 0.4s !important;
+}
+
 .skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 0.8s infinite;
 }
 
 input[type="text"],
@@ -471,7 +481,7 @@ button:active {
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.4s linear infinite;
 }
 
 @keyframes spin {
