@@ -114,30 +114,30 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="page-transition">
-      <div className="mb-8 animate-fade-in">
+    <div className="page-transition w-full max-w-full min-w-0">
+      <div className="mb-6 sm:mb-8 animate-fade-in">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 animate-slide-in">{t('dashboard.title')}</h1>
-        <p className="text-gray-600 animate-slide-in" style={{ animationDelay: '0.1s' }}>{t('dashboard.welcome')}</p>
+        <p className="text-gray-600 text-sm sm:text-base animate-slide-in" style={{ animationDelay: '0.1s' }}>{t('dashboard.welcome')}</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8">
         {stats.map((stat, index) => (
           <div
             key={stat.title}
-            className={`stats-card rounded-2xl p-6 ${stat.bgColor} animate-fade-in`}
+            className={`stats-card rounded-xl sm:rounded-2xl p-4 sm:p-6 ${stat.bgColor} animate-fade-in`}
             style={{ animationDelay: `${index * 0.1}s` }}
           >
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-2">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2 truncate">
                   {stat.title}
                 </p>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 truncate tabular-nums">
                   {stat.value}
                 </p>
               </div>
-              <div className={`w-12 h-12 rounded-xl ${stat.iconBg} flex items-center justify-center shadow-sm`}>
-                <span className="text-2xl">{stat.icon}</span>
+              <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl ${stat.iconBg} flex items-center justify-center shadow-sm shrink-0`}>
+                <span className="text-lg sm:text-2xl">{stat.icon}</span>
               </div>
             </div>
           </div>
@@ -258,9 +258,9 @@ export default function DashboardPage() {
         </section>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-animate animate-fade-in">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">{t('dashboard.monthlyRevenue')}</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 card-animate animate-fade-in min-w-0">
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">{t('dashboard.monthlyRevenue')}</h3>
           {totalRevenue === 0 && monthlyRevenue.every((d) => d.revenue === 0) ? (
             <div className="flex flex-col items-center justify-center h-[300px] text-center px-4 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
               <p className="text-gray-500 font-medium">{t('dashboard.noRevenueData')}</p>
@@ -301,8 +301,8 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 card-animate animate-fade-in">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">{t('dashboard.orderStatusDistribution')}</h3>
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 card-animate animate-fade-in min-w-0">
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">{t('dashboard.orderStatusDistribution')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -342,8 +342,8 @@ export default function DashboardPage() {
       </div>
 
       {productCategoryData.length > 0 ? (
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 card-animate animate-fade-in">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Products by Category</h3>
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 mb-6 sm:mb-8 card-animate animate-fade-in min-w-0">
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Products by Category</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={productCategoryData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="20%" barGap={8}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
@@ -365,8 +365,8 @@ export default function DashboardPage() {
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 card-animate animate-fade-in">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">{t('dashboard.productsByCategory')}</h3>
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 mb-6 sm:mb-8 card-animate animate-fade-in min-w-0">
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">{t('dashboard.productsByCategory')}</h3>
           <div className="flex flex-col items-center justify-center h-[300px] text-center px-4 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
             <p className="text-gray-500 font-medium">{t('dashboard.noCategoriesYet')}</p>
             <p className="text-sm text-gray-400 mt-1">{t('dashboard.addCategoriesHint')}</p>

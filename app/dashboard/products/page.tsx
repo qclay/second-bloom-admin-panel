@@ -378,21 +378,21 @@ export default function ProductsPage() {
   };
 
   return (
-    <div>
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('products.title')}</h1>
-          <p className="text-gray-600 mt-1">{t('products.subtitle')}</p>
+    <div className="w-full max-w-full min-w-0">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{t('products.title')}</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">{t('products.subtitle')}</p>
         </div>
         <Button
           onClick={() => setIsModalOpen(true)}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 hover:scale-[1.02] active:scale-[0.98] text-white transition-transform duration-200 shadow-md hover:shadow-lg"
         >
           {t('products.addProduct')}
         </Button>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 mb-6">
+      <div className="flex flex-wrap items-center gap-2 mb-4 sm:mb-6">
         {[
           { value: '', label: t('products.all') },
           { value: 'PENDING', label: t('products.pendingApproval') },
@@ -404,28 +404,30 @@ export default function ProductsPage() {
             key={value || 'all'}
             type="button"
             onClick={() => setFilter(value)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              effectiveFilter === value ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            className={`relative px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
+              effectiveFilter === value
+                ? 'bg-purple-600 text-white shadow-md ring-2 ring-purple-400 ring-offset-2 ring-offset-gray-50 scale-[1.02]'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-[1.02] active:scale-[0.98]'
             }`}
           >
             {label}
             {value === 'PENDING' && pendingCount > 0 && (
-              <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-amber-400 text-white text-xs">{pendingCount}</span>
+              <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-amber-400 text-white text-xs font-bold animate-pulse">{pendingCount}</span>
             )}
           </button>
         ))}
       </div>
 
       {displayProducts.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-16 animate-fade-in">
           <div className="text-center max-w-md mx-auto">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center animate-float">
               <span className="text-5xl">📦</span>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">
               {effectiveFilter ? t('products.noMatchFilter') : t('products.noProductsYet')}
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
               {effectiveFilter ? t('products.tryAnotherFilter') : t('products.emptyHint')}
             </p>
             {!effectiveFilter && (
@@ -444,21 +446,21 @@ export default function ProductsPage() {
           {displayProducts.map((product, index) => (
           <div
             key={product.id}
-            className="group min-w-0 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all duration-200"
-            style={{ animationDelay: `${index * 0.03}s` }}
+            className="group/card min-w-0 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:border-blue-300 hover:-translate-y-1 focus-within:ring-2 focus-within:ring-purple-400 focus-within:ring-offset-2 focus-within:border-transparent transition-all duration-200 ease-out animate-fade-in"
+            style={{ animationDelay: `${Math.min(index * 50, 400)}ms` }}
           >
             <div className="aspect-square min-h-[140px] w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
               {product.images?.[0]?.url ? (
                 <img
                   src={product.images[0].url}
                   alt={toStringValue(product.title)}
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover object-center group-hover/card:scale-110 transition-transform duration-300 ease-out"
                   loading="lazy"
                   decoding="async"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400 min-h-[140px]">
+                <div className="w-full h-full flex items-center justify-center text-gray-400 min-h-[140px] group-hover/card:scale-105 transition-transform duration-300">
                   <span className="text-4xl">📦</span>
                 </div>
               )}
@@ -485,7 +487,7 @@ export default function ProductsPage() {
                 </p>
               </div>
               <div className="flex items-center gap-1.5 mb-2 flex-wrap">
-                <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${
                   product.status === 'PUBLISHED'
                     ? 'bg-green-100 text-green-700'
                     : product.status === 'PENDING' || product.status === 'DRAFT'
@@ -514,7 +516,7 @@ export default function ProductsPage() {
                     <Button
                       size="sm"
                       onClick={() => setModerationConfirm({ isOpen: true, productId: product.id, action: 'approve' })}
-                      className="h-7 text-[11px] button-animate bg-green-600 hover:bg-green-700 text-white py-0 flex-1 min-w-0"
+                      className="h-7 text-[11px] transition-transform duration-150 active:scale-95 bg-green-600 hover:bg-green-700 hover:shadow-md text-white py-0 flex-1 min-w-0"
                     >
                       ✓ {t('products.approve')}
                     </Button>
@@ -522,7 +524,7 @@ export default function ProductsPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => setModerationConfirm({ isOpen: true, productId: product.id, action: 'reject', rejectionReason: '' })}
-                      className="h-7 text-[11px] button-animate border-red-200 text-red-700 hover:bg-red-50 py-0 flex-1 min-w-0"
+                      className="h-7 text-[11px] transition-transform duration-150 active:scale-95 border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300 py-0 flex-1 min-w-0"
                     >
                       ✗ {t('products.reject')}
                     </Button>
@@ -532,7 +534,7 @@ export default function ProductsPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleEdit(product)}
-                  className="h-7 text-[11px] button-animate border-blue-200 text-blue-700 hover:bg-blue-50 py-0 flex-1 min-w-0"
+                  className="h-7 text-[11px] transition-transform duration-150 active:scale-95 border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 py-0 flex-1 min-w-0"
                 >
                   {t('common.edit')}
                 </Button>
@@ -540,7 +542,7 @@ export default function ProductsPage() {
                   variant="destructive"
                   size="sm"
                   onClick={() => setDeleteConfirm({ isOpen: true, productId: product.id })}
-                  className="h-7 px-1.5 min-w-0 button-animate bg-red-500 hover:bg-red-600 text-xs py-0"
+                  className="h-7 px-1.5 min-w-0 transition-transform duration-150 active:scale-95 bg-red-500 hover:bg-red-600 hover:shadow-md text-xs py-0"
                 >
                   🗑️
                 </Button>
@@ -564,20 +566,20 @@ export default function ProductsPage() {
 
       {isModalOpen && (
         <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 animate-fade-in overflow-y-auto"
           onClick={resetForm}
         >
           <div 
-            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slide-in"
+            className="bg-white rounded-xl sm:rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slide-in my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900">
+            <div className="p-4 sm:p-6 border-b border-gray-200">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                 {editingId ? 'Edit Product' : 'Add Product'}
               </h2>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
                   Product Images

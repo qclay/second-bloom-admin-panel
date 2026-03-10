@@ -2,21 +2,21 @@
 
 export default function NotificationsPage() {
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
-        <p className="text-gray-600 mt-1">Manage system notifications</p>
+    <div className="w-full max-w-full min-w-0">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Notifications</h1>
+        <p className="text-gray-600 mt-1 text-sm sm:text-base">Manage system notifications</p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-16">
         <div className="text-center max-w-md mx-auto">
-          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
-            <span className="text-5xl">🔔</span>
+          <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+            <span className="text-4xl sm:text-5xl">🔔</span>
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-3">
+          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">
             Notification Center
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
             Send and manage push notifications to users. 
             Keep customers informed about orders, promotions, and updates.
           </p>

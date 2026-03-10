@@ -66,14 +66,14 @@ export default function FilesPage() {
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('files.title')}</h1>
-          <p className="text-gray-600 mt-1">{t('files.subtitle')}</p>
+    <div className="w-full max-w-full min-w-0">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{t('files.title')}</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">{t('files.subtitle')}</p>
         </div>
-        <label className="cursor-pointer">
-          <Button className="bg-gradient-to-r from-blue-500 to-blue-600">
+        <label className="cursor-pointer shrink-0">
+          <Button className="bg-gradient-to-r from-blue-500 to-blue-600 w-full sm:w-auto">
             📤 {t('files.upload')}
           </Button>
           <input

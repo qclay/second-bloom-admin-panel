@@ -118,10 +118,10 @@ export default function SizesPage() {
   const sizes = Array.isArray(data?.data) ? data.data : [];
 
   return (
-    <div>
-      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('sizes.title')}</h1>
+    <div className="w-full max-w-full min-w-0">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{t('sizes.title')}</h1>
           <p className="text-sm text-gray-600 mt-0.5">{t('sizes.subtitle')}</p>
         </div>
         <Button
@@ -134,13 +134,13 @@ export default function SizesPage() {
       </div>
 
       {sizes.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-16">
           <div className="text-center max-w-md mx-auto">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-teal-50 flex items-center justify-center">
-              <span className="text-5xl">📐</span>
+            <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-teal-50 flex items-center justify-center">
+              <span className="text-4xl sm:text-5xl">📐</span>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('sizes.noSizes')}</h3>
-            <p className="text-gray-600 mb-6">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">{t('sizes.noSizes')}</h3>
+            <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
               Add sizes so products can be categorized (e.g. Small, Medium, Large). Used in product forms.
             </p>
             <Button
@@ -153,7 +153,7 @@ export default function SizesPage() {
         </div>
       ) : (
         <>
-        <div className="w-full min-w-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+        <div className="w-full min-w-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4">
           {sizes.map((size) => (
             <div
               key={size.id}
@@ -201,11 +201,11 @@ export default function SizesPage() {
 
       {isModalOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto"
           onClick={resetForm}
         >
           <div
-            className="bg-white rounded-2xl max-w-md w-full shadow-2xl"
+            className="bg-white rounded-xl sm:rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl my-auto mx-3 sm:mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 border-b border-gray-200">

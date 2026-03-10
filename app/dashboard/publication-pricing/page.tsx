@@ -70,13 +70,13 @@ export default function PublicationPricingPage() {
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">{t('publicationPricing.title')}</h1>
+    <div className="w-full max-w-full min-w-0">
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('publicationPricing.title')}</h1>
         <p className="text-sm text-gray-600 mt-0.5">{t('publicationPricing.subtitle')}</p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
         <div className="rounded-xl border-2 border-gray-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-2">{t('publicationPricing.currentPrice')}</h2>
           {currentPricing ? (

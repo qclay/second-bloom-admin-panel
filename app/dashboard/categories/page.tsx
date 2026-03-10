@@ -208,10 +208,10 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div>
-      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('categories.title')}</h1>
+    <div className="w-full max-w-full min-w-0">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{t('categories.title')}</h1>
           <p className="text-sm text-gray-600 mt-0.5">{t('categories.subtitle')}</p>
         </div>
         <Button
@@ -224,15 +224,15 @@ export default function CategoriesPage() {
       </div>
 
       {data?.data.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-16">
           <div className="text-center max-w-md mx-auto">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center">
-              <span className="text-5xl">📁</span>
+            <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center">
+              <span className="text-4xl sm:text-5xl">📁</span>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">
               {t('categories.noCategories')}
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
               Start organizing your marketplace by creating product categories. 
               Categories help buyers find what they&apos;re looking for.
             </p>
@@ -333,20 +333,20 @@ export default function CategoriesPage() {
 
       {isModalOpen && (
         <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 modal-backdrop"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 modal-backdrop overflow-y-auto"
           onClick={resetForm}
         >
           <div 
-            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl modal-content"
+            className="bg-white rounded-xl sm:rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl modal-content my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900">
+            <div className="p-4 sm:p-6 border-b border-gray-200">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                 {editingId ? t('common.edit') + ' ' + t('common.category') : t('categories.addCategory')}
               </h2>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6">
               <div className="mb-6">
                 <label className="block text-sm font-bold text-gray-700 mb-2">
                   Category Image

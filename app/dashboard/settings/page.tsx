@@ -44,13 +44,13 @@ export default function SettingsPage() {
   };
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">{t('settings.title')}</h1>
-        <p className="text-gray-600 mt-1">{t('settings.subtitle')}</p>
+    <div className="w-full max-w-full min-w-0">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('settings.title')}</h1>
+        <p className="text-gray-600 mt-1 text-sm sm:text-base">{t('settings.subtitle')}</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card>
           <CardHeader>
             <CardTitle>{t('settings.profileInfo')}</CardTitle>

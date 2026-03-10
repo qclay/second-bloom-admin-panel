@@ -71,55 +71,53 @@ export default function OrdersPage() {
   }
 
   return (
-    <div>
-      <div className="mb-8">
+    <div className="w-full max-w-full min-w-0">
+      <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('orders.title')}</h1>
-        <p className="text-gray-600 mt-1">{t('orders.subtitle')}</p>
+        <p className="text-gray-600 mt-1 text-sm sm:text-base">{t('orders.subtitle')}</p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto -mx-px">
+          <table className="w-full min-w-[640px]">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('orders.orderNumber')}</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('orders.product')}</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('orders.customer')}</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('orders.total')}</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('common.status')}</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('orders.date')}</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('common.actions')}</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">{t('orders.orderNumber')}</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('orders.product')}</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('orders.customer')}</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">{t('orders.total')}</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('common.status')}</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">{t('orders.date')}</th>
+                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {data?.data.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={7} className="px-4 sm:px-6 py-12 text-center text-gray-500 text-sm sm:text-base">
                     {t('orders.noOrders')}
                   </td>
                 </tr>
               ) : (
                 data?.data.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-semibold text-gray-900">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 font-semibold text-gray-900 text-sm whitespace-nowrap">
                       #{order.orderNumber}
                     </td>
-                    <td className="px-6 py-4 text-gray-700">{toStringValue(order.product?.title)}</td>
-                    <td className="px-6 py-4 text-gray-700">
-                      {order.buyer.phoneNumber}
-                    </td>
-                    <td className="px-6 py-4 font-bold text-gray-900">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700 text-sm max-w-[120px] sm:max-w-[200px] truncate">{toStringValue(order.product?.title)}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700 text-sm">{order.buyer.phoneNumber}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 font-bold text-gray-900 text-sm whitespace-nowrap">
                       ${order.totalPrice}
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_COLORS[order.status]}`}>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4">
+                      <span className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${STATUS_COLORS[order.status]}`}>
                         {order.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm text-gray-500 whitespace-nowrap">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4">
                       <select
                         value={order.status}
                         onChange={(e) => {
@@ -133,7 +131,7 @@ export default function OrdersPage() {
                             });
                           }
                         }}
-                        className="text-sm border-2 border-gray-300 rounded-lg px-3 py-2 font-bold focus:border-purple-500 focus:outline-none transition-all button-animate"
+                        className="text-xs sm:text-sm border-2 border-gray-300 rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 font-bold focus:border-purple-500 focus:outline-none transition-all button-animate min-w-0"
                       >
                         <option value="PENDING">{t('dashboard.pending')}</option>
                         <option value="CONFIRMED">{t('dashboard.confirmed')}</option>

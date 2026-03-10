@@ -72,27 +72,27 @@ export default function ReportsPage() {
   ];
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">{t('reports.title')}</h1>
-        <p className="text-gray-600 mt-1">{t('reports.subtitle')}</p>
+    <div className="w-full max-w-full min-w-0">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('reports.title')}</h1>
+        <p className="text-gray-600 mt-1 text-sm sm:text-base">{t('reports.subtitle')}</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
         {stats.map((stat) => (
-          <div key={stat.labelKey} className={`bg-gradient-to-br ${stat.color} rounded-xl p-4 border-2 ${stat.border}`}>
-            <p className="text-sm font-bold text-gray-600 mb-1">{t(stat.labelKey)}</p>
-            <p className="text-3xl font-black text-gray-900">{stat.value}</p>
+          <div key={stat.labelKey} className={`bg-gradient-to-br ${stat.color} rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 ${stat.border}`}>
+            <p className="text-xs sm:text-sm font-bold text-gray-600 mb-0.5 sm:mb-1">{t(stat.labelKey)}</p>
+            <p className="text-xl sm:text-3xl font-black text-gray-900 tabular-nums">{stat.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="mb-6 flex gap-3">
+      <div className="mb-4 sm:mb-6 flex flex-wrap gap-2 sm:gap-3">
         {['ALL', 'PENDING', 'REVIEWED', 'RESOLVED', 'DISMISSED'].map((status) => (
           <button
             key={status}
             onClick={() => setSelectedStatus(status)}
-            className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-bold text-xs sm:text-sm transition-all ${
               selectedStatus === status
                 ? 'bg-purple-600 text-white shadow-lg'
                 : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-purple-300'
@@ -104,15 +104,15 @@ export default function ReportsPage() {
       </div>
 
       {mockReports.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-16">
           <div className="text-center max-w-md mx-auto">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
-              <span className="text-5xl">✓</span>
+            <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
+              <span className="text-4xl sm:text-5xl">✓</span>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">
               No Reports
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 text-sm sm:text-base">
               Great! There are no user reports at the moment. 
               Your community is safe and well-behaved.
             </p>
