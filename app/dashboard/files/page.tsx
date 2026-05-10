@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fileService } from '@/services/file.service';
 import { Button } from '@/components/ui/button';
@@ -94,13 +95,13 @@ export default function FilesPage() {
           >
             <div className="aspect-square min-h-[120px] w-full overflow-hidden bg-gray-100">
               {file.fileType === 'IMAGE' ? (
-                <img
+                <Image
                   src={file.url}
                   alt={file.filename}
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                   loading="lazy"
-                  decoding="async"
                   sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 12vw"
+                  fill
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400 min-h-[120px]">

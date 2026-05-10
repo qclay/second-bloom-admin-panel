@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productService, UpdateProductDto } from '@/services/product.service';
@@ -378,21 +379,21 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="w-full max-w-full min-w-0">
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6">
+    <div className="w-full max-w-full min-w-0 animate-slide-up">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8">
         <div className="min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{t('products.title')}</h1>
-          <p className="text-gray-600 mt-1 text-sm sm:text-base">{t('products.subtitle')}</p>
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-1">{t('products.title')}</h1>
+          <p className="text-slate-500 font-medium">{t('products.subtitle')}</p>
         </div>
         <Button
           onClick={() => setIsModalOpen(true)}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 hover:scale-[1.02] active:scale-[0.98] text-white transition-transform duration-200 shadow-md hover:shadow-lg"
+          className="btn-premium px-8 py-6 rounded-2xl font-black text-sm uppercase tracking-widest"
         >
           {t('products.addProduct')}
         </Button>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 mb-4 sm:mb-6">
+      <div className="flex flex-wrap items-center gap-2 mb-8">
         {[
           { value: '', label: t('products.all') },
           { value: 'PENDING', label: t('products.pendingApproval') },
@@ -404,15 +405,15 @@ export default function ProductsPage() {
             key={value || 'all'}
             type="button"
             onClick={() => setFilter(value)}
-            className={`relative px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
+            className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-all duration-300 ${
               effectiveFilter === value
-                ? 'bg-purple-600 text-white shadow-md ring-2 ring-purple-400 ring-offset-2 ring-offset-gray-50 scale-[1.02]'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-[1.02] active:scale-[0.98]'
+                ? 'bg-slate-900 text-white shadow-xl scale-105'
+                : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-200'
             }`}
           >
             {label}
             {value === 'PENDING' && pendingCount > 0 && (
-              <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-amber-400 text-white text-xs font-bold animate-pulse">{pendingCount}</span>
+              <span className="ml-2 px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black animate-pulse">{pendingCount}</span>
             )}
           </button>
         ))}
@@ -442,22 +443,22 @@ export default function ProductsPage() {
         </div>
       ) : (
         <>
-        <div className="w-full min-w-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 min-[1920px]:grid-cols-8 min-[2560px]:grid-cols-10 gap-3">
+        <div className="w-full min-w-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
           {displayProducts.map((product, index) => (
           <div
             key={product.id}
-            className="group/card min-w-0 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:border-blue-300 hover:-translate-y-1 focus-within:ring-2 focus-within:ring-purple-400 focus-within:ring-offset-2 focus-within:border-transparent transition-all duration-200 ease-out animate-fade-in"
+            className="glass-card group/card rounded-3xl overflow-hidden border border-slate-200/50"
             style={{ animationDelay: `${Math.min(index * 50, 400)}ms` }}
           >
             <div className="aspect-square min-h-[140px] w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
               {product.images?.[0]?.url ? (
-                <img
+                <Image
                   src={product.images[0].url}
                   alt={toStringValue(product.title)}
                   className="w-full h-full object-cover object-center group-hover/card:scale-110 transition-transform duration-300 ease-out"
                   loading="lazy"
-                  decoding="async"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+                  fill
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400 min-h-[140px] group-hover/card:scale-105 transition-transform duration-300">
@@ -590,12 +591,13 @@ export default function ProductsPage() {
                       <div className="grid grid-cols-3 gap-4">
                         {imagePreviews.map((preview, idx) => (
                           <div key={idx} className="relative group">
-                            <img
+                            <Image
                               src={preview}
                               alt={`Preview ${idx + 1}`}
                               className="w-full h-32 object-cover rounded-lg"
                               loading="lazy"
-                              decoding="async"
+                              width={200}
+                              height={128}
                             />
                             <button
                               type="button"

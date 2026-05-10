@@ -107,15 +107,15 @@ export default function DashboardLayout({
                 key={item.nameKey}
                 href={item.href}
                 onClick={closeSidebar}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${
                   isActive
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold shadow-lg'
-                    : 'text-gray-700 hover:bg-gray-100 font-medium'
+                    ? 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600 font-bold border-r-4 border-purple-500 shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-purple-600 font-medium'
                 }`}
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
-                <span className="text-xl">{item.icon}</span>
-                <span className="text-sm">{t(item.nameKey as TranslationKey)}</span>
+                <span className={`text-xl transition-transform duration-300 group-hover:scale-110 ${isActive ? 'scale-110' : ''}`}>{item.icon}</span>
+                <span className="text-sm tracking-tight">{t(item.nameKey as TranslationKey)}</span>
               </Link>
             );
           })}
@@ -157,11 +157,11 @@ export default function DashboardLayout({
 
       <aside
         className={`
-          w-64 bg-white border-r border-gray-200 flex flex-col shrink-0
+          w-64 bg-white/80 backdrop-blur-xl border-r border-slate-200 flex flex-col shrink-0
           fixed lg:static inset-y-0 left-0 z-[70] lg:z-auto
           top-0 lg:top-auto
-          transform transition-transform duration-200 ease-out
-          lg:shadow-[2px_0_8px_rgba(0,0,0,0.04)]
+          transform transition-transform duration-300 ease-in-out
+          lg:shadow-[4px_0_24px_rgba(0,0,0,0.02)]
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
@@ -169,30 +169,33 @@ export default function DashboardLayout({
       </aside>
 
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <div className="sticky top-0 z-30 flex items-center justify-end gap-3 sm:gap-4 px-4 py-3 sm:px-6 lg:px-8 bg-white/95 backdrop-blur-sm border-b border-gray-200 shrink-0">
+        <div className="sticky top-0 z-30 flex items-center justify-end gap-3 sm:gap-4 px-4 py-3 sm:px-6 lg:px-8 bg-white/70 backdrop-blur-md border-b border-slate-200 shrink-0">
           <div className="flex items-center gap-2">
-            <label className="text-xs font-medium text-gray-500 sm:sr-only" htmlFor="global-locale">{t('common.language')}</label>
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider sm:sr-only" htmlFor="global-locale">{t('common.language')}</label>
             <select
               id="global-locale"
               value={locale}
               onChange={(e) => handleLocaleChange(e.target.value as AdminLocale)}
-              className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none"
+              className="px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-full bg-white/50 text-slate-700 focus:ring-4 focus:ring-purple-500/10 focus:border-purple-400 outline-none transition-all cursor-pointer hover:bg-white"
             >
               {LOCALES.map(({ value, label }) => (
                 <option key={value} value={value}>{label}</option>
               ))}
             </select>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-3 border-l border-gray-200">
-            <div className="min-w-0 hidden sm:block">
-              <p className="text-sm font-semibold text-gray-900 truncate">{user?.firstName || user?.phoneNumber || 'Admin'}</p>
-              <p className="text-xs text-gray-500">{user?.role || 'ADMIN'}</p>
+          <div className="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-3 border-l border-slate-200">
+            <div className="min-w-0 hidden sm:block text-right">
+              <p className="text-xs font-black text-slate-900 truncate uppercase tracking-tighter">{user?.firstName || user?.phoneNumber || 'Admin'}</p>
+              <p className="text-[10px] font-bold text-purple-500 uppercase tracking-widest">{user?.role || 'ADMIN'}</p>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white font-black text-xs shadow-sm ai-glow">
+              {(user?.firstName?.[0] || 'A').toUpperCase()}
             </div>
           </div>
           <button
             type="button"
             onClick={() => { closeSidebar(); handleLogout(); }}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+            className="px-4 py-1.5 text-xs font-black text-white bg-slate-900 hover:bg-slate-800 rounded-full transition-all shadow-md active:scale-95 uppercase tracking-widest"
           >
             {t('common.logout')}
           </button>

@@ -12,7 +12,7 @@ const DEFAULT_COUNTRY_CODE = '+998';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [countryCode, setCountryCode] = useState(DEFAULT_COUNTRY_CODE);
+  const countryCode = DEFAULT_COUNTRY_CODE;
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
@@ -79,21 +79,25 @@ export default function LoginPage() {
   };
   const inputClass =
     'h-11 w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all';
-  const labelClass = 'block text-sm font-bold text-gray-700 mb-2';
+  const labelClass = 'block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1';
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-purple-50/80 p-4 sm:p-6">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-              <span className="text-3xl" aria-hidden>🌸</span>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden p-4 sm:p-6">
+      {/* Background Decorations */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px] animate-float" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px] animate-float" style={{ animationDelay: '-2s' }} />
+
+      <div className="w-full max-w-md animate-slide-up">
+        <div className="glass-panel rounded-[2.5rem] p-8 sm:p-10 border border-white/50 relative">
+          <div className="text-center mb-10">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-2xl ai-glow">
+              <span className="text-4xl" aria-hidden>🌸</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Welcome Back
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">
+              Second Bloom
             </h1>
-            <p className="text-gray-600 text-sm">
-              Sign in to access the admin panel
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">
+              Admin Portal • Secure Access
             </p>
           </div>
 
@@ -109,7 +113,7 @@ export default function LoginPage() {
                   value={countryCode}
                   readOnly
                   tabIndex={-1}
-                  className={`${inputClass} bg-gray-100 cursor-not-allowed border-gray-200`}
+                  className="input-premium bg-slate-100/50 cursor-not-allowed border-slate-200 !font-black !text-slate-400"
                   placeholder="+998"
                   autoComplete="tel-country-code"
                   aria-readonly="true"
@@ -124,14 +128,14 @@ export default function LoginPage() {
                   type="tel"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                  className={inputClass}
+                  className="input-premium !font-black !text-slate-900"
                   placeholder="904440041"
                   autoComplete="tel-national"
                 />
               </div>
               <Button
                 type="submit"
-                className="w-full h-11 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold focus:ring-purple-500 border-0"
+                className="btn-premium w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest mt-2"
                 isLoading={sendOtpMutation.isPending}
                 disabled={!localNumber.length}
               >

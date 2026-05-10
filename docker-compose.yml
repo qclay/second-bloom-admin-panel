@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   admin-panel:
@@ -12,9 +12,10 @@ services:
     container_name: second-bloom-admin-panel
     restart: unless-stopped
     ports:
-      - "${PORT:-4000}:4000"
+      - "${HOST_PORT:-4000}:${CONTAINER_PORT:-4000}"
     env_file:
       - .env
+      - .env.production
     environment:
       - NODE_ENV=${NODE_ENV:-production}
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
