@@ -114,7 +114,7 @@ jobs:
           NODE_ENV=production
           NEXT_PUBLIC_API_URL=${{ secrets.PROD_API_URL }}
           API_BASE_URL=${{ secrets.PROD_API_URL }}
-          HOST_PORT=3001
+          HOST_PORT=4000
           CONTAINER_PORT=4000
           PORT=4000
           EOF
@@ -154,7 +154,7 @@ jobs:
             echo "Waiting for application to be healthy..."
             sleep 20
             
-            if curl -f http://localhost:3001/api/health; then
+            if curl -f http://localhost:4000/api/health; then
               echo "✅ Health check passed!"
             else
               echo "❌ Health check failed! Rolling back..."
