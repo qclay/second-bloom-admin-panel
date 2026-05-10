@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userService } from '@/services/user.service';
 import { Button } from '@/components/ui/button';
@@ -32,9 +32,7 @@ export default function UsersPage() {
     queryFn: () => userService.getAll({ search: searchTerm, page, limit }),
   });
 
-  useEffect(() => {
-    setPage(1);
-  }, [searchTerm]);
+
 
   const toggleActiveMutation = useMutation({
     mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
@@ -114,79 +112,79 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="w-full max-w-full min-w-0">
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8">
+    <div className="w-full max-w-full min-w-0 animate-slide-up">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8">
         <div className="min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{t('users.title')}</h1>
-          <p className="text-gray-600 mt-1 text-sm sm:text-base">{t('users.subtitle')}</p>
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-1">
+            {t('users.title')}
+          </h1>
+          <p className="text-slate-500 font-medium">{t('users.subtitle')}</p>
         </div>
-        <div className="flex gap-3 w-full sm:w-auto sm:min-w-[200px]">
-          <input
-            type="text"
-            placeholder={'🔍 ' + t('users.searchPlaceholder')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full sm:w-auto min-w-0 px-3 py-2 sm:px-4 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none font-bold text-sm sm:text-base"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 border-blue-200">
-          <p className="text-xs sm:text-sm font-bold text-blue-600 mb-0.5 sm:mb-1">{t('users.totalUsers')}</p>
-          <p className="text-xl sm:text-2xl font-black text-blue-900 tabular-nums">{data?.meta?.pagination?.total ?? data?.data?.length ?? 0}</p>
-        </div>
-        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 border-green-200">
-          <p className="text-xs sm:text-sm font-bold text-green-600 mb-0.5 sm:mb-1">{t('users.activeUsers')}</p>
-          <p className="text-xl sm:text-2xl font-black text-green-900 tabular-nums">
-            {data?.data.filter(u => u.isActive).length || 0}
-          </p>
-        </div>
-        <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 border-red-200">
-          <p className="text-xs sm:text-sm font-bold text-red-600 mb-0.5 sm:mb-1">{t('users.blockedUsers')}</p>
-          <p className="text-xl sm:text-2xl font-black text-red-900 tabular-nums">
-            {data?.data.filter(u => !u.isActive).length || 0}
-          </p>
-        </div>
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg sm:rounded-xl p-3 sm:p-4 border-2 border-purple-200">
-          <p className="text-xs sm:text-sm font-bold text-purple-600 mb-0.5 sm:mb-1">{t('users.admins')}</p>
-          <p className="text-xl sm:text-2xl font-black text-purple-900 tabular-nums">
-            {data?.data.filter(u => u.role === 'ADMIN').length || 0}
-          </p>
+        <div className="flex gap-3 w-full sm:w-auto sm:min-w-[300px]">
+          <div className="relative w-full">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+            <input
+              type="text"
+              placeholder={t('users.searchPlaceholder')}
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
+              className="input-premium pl-11 !font-bold"
+            />
+          </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto -mx-px">
-          <table className="w-full min-w-[720px]">
-            <thead className="bg-gray-50 border-b border-gray-200">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        {[
+          { label: t('users.totalUsers'), value: data?.meta?.pagination?.total ?? data?.data?.length ?? 0, color: 'from-blue-500 to-cyan-400' },
+          { label: t('users.activeUsers'), value: data?.data.filter(u => u.isActive).length || 0, color: 'from-emerald-500 to-teal-400' },
+          { label: t('users.blockedUsers'), value: data?.data.filter(u => !u.isActive).length || 0, color: 'from-rose-500 to-pink-400' },
+          { label: t('users.admins'), value: data?.data.filter(u => u.role === 'ADMIN').length || 0, color: 'from-purple-500 to-indigo-400' },
+        ].map((stat, i) => (
+          <div key={i} className="glass-card p-5 rounded-2xl relative overflow-hidden group">
+            <div className={`absolute top-0 left-0 w-1 h-full bg-gradient-to-b ${stat.color}`} />
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+            <p className="text-3xl font-black text-slate-900 tabular-nums group-hover:scale-110 transition-transform duration-300 origin-left">
+              {stat.value}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="glass-panel rounded-3xl overflow-hidden shadow-2xl border border-slate-200/50">
+        <div className="overflow-x-auto">
+          <table className="premium-table">
+            <thead>
               <tr>
-                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('users.user')}</th>
-                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('users.contact')}</th>
-                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('users.role')}</th>
-                <th className="px-3 py-3 sm:px-6 sm:py-4 text-right text-xs font-bold text-gray-700 uppercase">{t('users.publicationPosts')}</th>
-                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('common.status')}</th>
-                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">{t('users.joined')}</th>
-                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('common.actions')}</th>
+                <th>{t('users.user')}</th>
+                <th>{t('users.contact')}</th>
+                <th>{t('users.role')}</th>
+                <th className="text-right">{t('users.publicationPosts')}</th>
+                <th>{t('common.status')}</th>
+                <th>{t('users.joined')}</th>
+                <th>{t('common.actions')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-slate-100">
               {data?.data.map((user, index) => (
                 <tr 
                   key={user.id} 
                   className={`table-row-animate ${!user.isActive ? 'bg-red-50' : ''} animate-fade-in`}
                   style={{ animationDelay: `${index * 0.03}s` }}
                 >
-                  <td className="px-3 py-3 sm:px-6 sm:py-4">
-                    <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                  <td className="!bg-transparent">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white font-black text-sm shadow-sm transition-transform group-hover:rotate-12 group-hover:scale-110">
                         {user.firstName?.[0] || user.phoneNumber[0]}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-bold text-gray-900 text-sm truncate">
+                        <p className="font-black text-slate-900 text-sm tracking-tight truncate">
                           {user.firstName || t('users.na')} {user.lastName || ''}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">ID: {user.id.slice(0, 8)}...</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID: {user.id.slice(0, 8)}</p>
                       </div>
                     </div>
                   </td>
@@ -194,14 +192,14 @@ export default function UsersPage() {
                     <p className="font-semibold text-gray-900 text-sm">{user.phoneNumber}</p>
                     <p className="text-xs sm:text-sm text-gray-600 truncate max-w-[140px] sm:max-w-none">{user.email || 'No email'}</p>
                   </td>
-                  <td className="px-3 py-3 sm:px-6 sm:py-4">
+                  <td className="!bg-transparent">
                     <select
                       value={user.role}
                       onChange={(e) => handleRoleChange(user, e.target.value as 'USER' | 'ADMIN')}
-                      className={`px-2 sm:px-3 py-1 rounded-full text-xs font-bold border-2 min-w-0 ${
+                      className={`px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border-2 transition-all ${
                         user.role === 'ADMIN'
-                          ? 'bg-purple-100 text-purple-700 border-purple-300'
-                          : 'bg-gray-100 text-gray-700 border-gray-300'
+                          ? 'bg-purple-100 text-purple-700 border-purple-200'
+                          : 'bg-slate-100 text-slate-700 border-slate-200'
                       }`}
                     >
                       <option value="USER">USER</option>
@@ -241,10 +239,10 @@ export default function UsersPage() {
                         size="sm"
                         variant={user.isActive ? "destructive" : "default"}
                         onClick={() => handleToggleBlock(user)}
-                        className={`button-animate ${user.isActive 
-                          ? "bg-red-500 hover:bg-red-600" 
-                          : "bg-green-500 hover:bg-green-600"
-                        }`}
+                        className={`rounded-xl font-black text-[10px] tracking-widest uppercase px-4 h-8 transition-all active:scale-95 ${user.isActive 
+                          ? "bg-rose-500 hover:bg-rose-600 shadow-rose-200" 
+                          : "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-200"
+                        } shadow-lg`}
                       >
                         {user.isActive ? '🚫 ' + t('users.block') : '✓ ' + t('users.unblock')}
                       </Button>

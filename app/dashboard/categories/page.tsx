@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { categoryService, UpdateCategoryDto } from '@/services/category.service';
 import { fileService } from '@/services/file.service';
@@ -208,16 +209,15 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="w-full max-w-full min-w-0">
-      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6">
+    <div className="w-full max-w-full min-w-0 animate-slide-up">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8">
         <div className="min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{t('categories.title')}</h1>
-          <p className="text-sm text-gray-600 mt-0.5">{t('categories.subtitle')}</p>
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-1">{t('categories.title')}</h1>
+          <p className="text-slate-500 font-medium">{t('categories.subtitle')}</p>
         </div>
         <Button
           onClick={() => setIsModalOpen(true)}
-          size="sm"
-          className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shrink-0"
+          className="btn-premium px-8 py-6 rounded-2xl font-black text-sm uppercase tracking-widest"
         >
           {t('categories.addCategory')}
         </Button>
@@ -246,11 +246,11 @@ export default function CategoriesPage() {
         </div>
       ) : (
         <>
-        <div className="w-full min-w-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 min-[1920px]:grid-cols-8 min-[2560px]:grid-cols-10 min-[3440px]:grid-cols-12 gap-3">
+        <div className="w-full min-w-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
           {data?.data.map((category, index) => (
           <div
             key={category.id}
-            className="group min-w-0 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-md hover:border-emerald-200 transition-all duration-200 card-animate animate-fade-in"
+            className="glass-card group/card rounded-3xl overflow-hidden border border-slate-200/50"
             style={{ animationDelay: `${index * 0.03}s` }}
           >
             <button
@@ -260,13 +260,13 @@ export default function CategoriesPage() {
             >
               <div className="aspect-square min-h-[140px] w-full overflow-hidden">
                 {category.image ? (
-                  <img
+                  <Image
                     src={category.image.url}
                     alt={toStringValue(category.name)}
                     className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
-                    decoding="async"
                     sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
+                    fill
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -278,7 +278,7 @@ export default function CategoriesPage() {
 
             <div className="p-2">
               <div className="flex items-center justify-between gap-1.5 mb-0.5">
-                <h3 className="text-xs font-bold text-gray-900 truncate flex-1 min-w-0">
+                <h3 className="text-sm font-black text-slate-900 truncate flex-1 min-w-0 tracking-tight">
                   {toStringValue(category.name)}
                 </h3>
                 <span className={`shrink-0 px-1.5 py-0.5 rounded text-[10px] font-medium ${
@@ -354,12 +354,13 @@ export default function CategoriesPage() {
                 <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-purple-400 transition-colors">
                   {imagePreview ? (
                     <div className="relative">
-                      <img
+                      <Image
                         src={imagePreview}
                         alt="Preview"
-                        className="max-h-48 mx-auto rounded-lg"
+                        className="max-h-48 mx-auto rounded-lg object-contain"
                         loading="lazy"
-                        decoding="async"
+                        width={400}
+                        height={300}
                       />
                       <button
                         type="button"
