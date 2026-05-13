@@ -144,7 +144,7 @@ export const translations: TranslationMap = {
 
   'users.title': { en: 'Users', ru: 'Пользователи', uz: 'Foydalanuvchilar' },
   'users.subtitle': { en: 'Manage user accounts and permissions', ru: 'Управление аккаунтами и правами', uz: "Foydalanuvchi hisoblari va ruxsatlarni boshqarish" },
-  'users.searchPlaceholder': { en: 'Search users...', ru: 'Поиск пользователей...', uz: "Foydalanuvchilarni qidirish..." },
+  'users.searchPlaceholder': { en: 'Search by name, phone, email or ID...', ru: 'Поиск по имени, телефону, email или ID...', uz: "Ism, telefon, email yoki ID bo'yicha qidirish..." },
   'users.totalUsers': { en: 'Total Users', ru: 'Всего пользователей', uz: "Jami foydalanuvchilar" },
   'users.activeUsers': { en: 'Active Users', ru: 'Активные', uz: 'Faol' },
   'users.blockedUsers': { en: 'Blocked Users', ru: 'Заблокированные', uz: 'Bloklangan' },

@@ -9,11 +9,19 @@ import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { User as UserType } from '@/types';
 import { useTranslations } from '@/lib/translations';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function UsersPage() {
   const t = useTranslations();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState<'USER' | 'ADMIN' | ''>('');
+  const [statusFilter, setStatusFilter] = useState<'active' | 'blocked' | ''>('');
+  const rawDebounced = useDebounce(searchTerm, 400);
+  // normalize phone input: strip spaces, dashes, parentheses so "+7 (999) 123-45-67" → "+79991234567"
+  const debouncedSearch = /^[+\d\s\-()]+$/.test(rawDebounced) && rawDebounced.replace(/\D/g, '').length >= 3
+    ? rawDebounced.replace(/[\s\-()]/g, '')
+    : rawDebounced;
   const [blockConfirm, setBlockConfirm] = useState<{ isOpen: boolean; user: UserType | null }>({
     isOpen: false,
     user: null,
@@ -28,8 +36,14 @@ export default function UsersPage() {
   const [limit, setLimit] = useState(20);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['users', searchTerm, page, limit],
-    queryFn: () => userService.getAll({ search: searchTerm, page, limit }),
+    queryKey: ['users', debouncedSearch, roleFilter, statusFilter, page, limit],
+    queryFn: () => userService.getAll({
+      search: debouncedSearch || undefined,
+      role: roleFilter || undefined,
+      isActive: statusFilter === 'active' ? true : statusFilter === 'blocked' ? false : undefined,
+      page,
+      limit,
+    }),
   });
 
 
@@ -113,15 +127,17 @@ export default function UsersPage() {
 
   return (
     <div className="w-full max-w-full min-w-0 animate-slide-up">
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8">
-        <div className="min-w-0">
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-1">
-            {t('users.title')}
-          </h1>
-          <p className="text-slate-500 font-medium">{t('users.subtitle')}</p>
+      <div className="flex flex-col gap-4 mb-8">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-1">
+              {t('users.title')}
+            </h1>
+            <p className="text-slate-500 font-medium">{t('users.subtitle')}</p>
+          </div>
         </div>
-        <div className="flex gap-3 w-full sm:w-auto sm:min-w-[300px]">
-          <div className="relative w-full">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
             <input
               type="text"
@@ -131,9 +147,43 @@ export default function UsersPage() {
                 setSearchTerm(e.target.value);
                 setPage(1);
               }}
-              className="input-premium pl-11 !font-bold"
+              className="input-premium pl-11 !font-bold w-full"
             />
+            {searchTerm && (
+              <button
+                onClick={() => { setSearchTerm(''); setPage(1); }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-lg leading-none"
+              >
+                ×
+              </button>
+            )}
           </div>
+          <select
+            value={roleFilter}
+            onChange={(e) => { setRoleFilter(e.target.value as 'USER' | 'ADMIN' | ''); setPage(1); }}
+            className="input-premium !font-bold sm:w-40"
+          >
+            <option value="">All roles</option>
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+          <select
+            value={statusFilter}
+            onChange={(e) => { setStatusFilter(e.target.value as 'active' | 'blocked' | ''); setPage(1); }}
+            className="input-premium !font-bold sm:w-44"
+          >
+            <option value="">All statuses</option>
+            <option value="active">✓ Active</option>
+            <option value="blocked">🚫 Blocked</option>
+          </select>
+          {(searchTerm || roleFilter || statusFilter) && (
+            <button
+              onClick={() => { setSearchTerm(''); setRoleFilter(''); setStatusFilter(''); setPage(1); }}
+              className="px-4 py-2 rounded-xl border-2 border-slate-200 text-slate-500 hover:border-rose-300 hover:text-rose-500 font-bold text-sm transition-all whitespace-nowrap"
+            >
+              Clear filters
+            </button>
+          )}
         </div>
       </div>
 
