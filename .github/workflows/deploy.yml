@@ -94,6 +94,8 @@ jobs:
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
           build-args: |
             NODE_ENV=production
+            NEXT_PUBLIC_API_URL=${{ secrets.PROD_API_URL }}
+            API_BASE_URL=${{ secrets.PROD_API_URL }}
 
   deploy-production:
     name: Deploy to Production
