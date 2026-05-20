@@ -93,7 +93,7 @@ export default function FilesPage() {
             className="group min-w-0 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all duration-200"
             style={{ animationDelay: `${index * 0.02}s` }}
           >
-            <div className="aspect-square min-h-[120px] w-full overflow-hidden bg-gray-100">
+            <div className="relative aspect-square min-h-[120px] w-full overflow-hidden bg-gray-100">
               {file.fileType === 'IMAGE' ? (
                 <Image
                   src={file.url}

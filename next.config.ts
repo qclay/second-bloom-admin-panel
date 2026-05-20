@@ -5,6 +5,15 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-avatar'],
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.digitaloceanspaces.com',
+        pathname: '/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

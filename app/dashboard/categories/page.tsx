@@ -258,7 +258,7 @@ export default function CategoriesPage() {
               onClick={() => handleEdit(category)}
               className="block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-lg overflow-hidden bg-gray-100"
             >
-              <div className="aspect-square min-h-[140px] w-full overflow-hidden">
+              <div className="relative aspect-square min-h-[140px] w-full overflow-hidden">
                 {category.image ? (
                   <Image
                     src={category.image.url}

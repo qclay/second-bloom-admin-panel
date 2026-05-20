@@ -450,7 +450,7 @@ export default function ProductsPage() {
             className="glass-card group/card rounded-3xl overflow-hidden border border-slate-200/50"
             style={{ animationDelay: `${Math.min(index * 50, 400)}ms` }}
           >
-            <div className="aspect-square min-h-[140px] w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+            <div className="relative aspect-square min-h-[140px] w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
               {product.images?.[0]?.url ? (
                 <Image
                   src={product.images[0].url}
