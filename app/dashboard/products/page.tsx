@@ -369,7 +369,7 @@ export default function ProductsPage() {
   const allProducts = productsData?.data ?? [];
   const displayProducts = isPendingFilter ? allProducts : allProducts;
   const pendingCount = isPendingFilter
-    ? (productsData?.data?.length ?? 0)
+    ? (productsData?.meta?.pagination?.total ?? 0)
     : (pendingCountData?.meta?.pagination?.total ?? 0);
 
   const setFilter = (value: string) => {
@@ -518,17 +518,19 @@ export default function ProductsPage() {
                     <Button
                       size="sm"
                       onClick={() => setModerationConfirm({ isOpen: true, productId: product.id, action: 'approve' })}
-                      className="h-7 text-[11px] transition-transform duration-150 active:scale-95 bg-green-600 hover:bg-green-700 hover:shadow-md text-white py-0 flex-1 min-w-0 flex items-center justify-center gap-1"
+                      title={t('products.approve')}
+                      className="h-7 w-7 p-0 transition-transform duration-150 active:scale-95 bg-green-600 hover:bg-green-700 hover:shadow-md text-white flex items-center justify-center shrink-0"
                     >
-                      <Check className="w-3 h-3" /> {t('products.approve')}
+                      <Check className="w-4 h-4" />
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setModerationConfirm({ isOpen: true, productId: product.id, action: 'reject', rejectionReason: '' })}
-                      className="h-7 text-[11px] transition-transform duration-150 active:scale-95 border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300 py-0 flex-1 min-w-0 flex items-center justify-center gap-1"
+                      title={t('products.reject')}
+                      className="h-7 w-7 p-0 transition-transform duration-150 active:scale-95 border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300 flex items-center justify-center shrink-0"
                     >
-                      <XIcon className="w-3 h-3" /> {t('products.reject')}
+                      <XIcon className="w-4 h-4" />
                     </Button>
                   </>
                 )}
@@ -544,7 +546,7 @@ export default function ProductsPage() {
                   variant="destructive"
                   size="sm"
                   onClick={() => setDeleteConfirm({ isOpen: true, productId: product.id })}
-                  className="h-7 px-1.5 min-w-0 transition-transform duration-150 active:scale-95 bg-red-500 hover:bg-red-600 hover:shadow-md flex items-center justify-center py-0"
+                  className="h-7 w-7 p-0 transition-transform duration-150 active:scale-95 bg-red-500 hover:bg-red-600 hover:shadow-md flex items-center justify-center shrink-0"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -567,12 +569,12 @@ export default function ProductsPage() {
       )}
 
       {isModalOpen && (
-        <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 animate-fade-in overflow-y-auto"
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-start justify-center z-[80] p-4 sm:p-6 animate-fade-in"
           onClick={resetForm}
         >
-          <div 
-            className="bg-white rounded-xl sm:rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slide-in my-auto"
+          <div
+            className="bg-white rounded-xl sm:rounded-2xl max-w-2xl w-full max-h-[calc(100vh-2rem)] overflow-y-auto shadow-2xl animate-slide-in mt-auto mb-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4 sm:p-6 border-b border-gray-200">

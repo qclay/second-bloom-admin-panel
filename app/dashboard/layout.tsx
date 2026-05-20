@@ -7,22 +7,20 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/lib/auth-store';
 import { useLocaleStore, LOCALES, type AdminLocale } from '@/lib/locale-store';
 import { useTranslations, type TranslationKey } from '@/lib/translations';
-import { 
-  LayoutDashboard, 
-  Folder, 
-  ClipboardList, 
-  Ruler, 
-  Package, 
-  ShoppingCart, 
-  Users, 
-  AlertTriangle, 
-  DollarSign, 
+import {
+  LayoutDashboard,
+  Folder,
+  ClipboardList,
+  Ruler,
+  Package,
+  ShoppingCart,
+  Users,
+  AlertTriangle,
+  DollarSign,
   Settings,
   Sparkles,
   Menu,
-  X,
-  Bell,
-  File
+  X
 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -83,7 +81,6 @@ export default function DashboardLayout({
       title: 'Main',
       items: [
         { nameKey: 'nav.dashboard', href: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-        { nameKey: 'nav.notifications', href: '/dashboard/notifications', icon: <Bell className="w-5 h-5" /> },
       ]
     },
     {
@@ -111,7 +108,6 @@ export default function DashboardLayout({
     {
       title: 'System & Settings',
       items: [
-        { nameKey: 'nav.files', href: '/dashboard/files', icon: <File className="w-5 h-5" /> },
         { nameKey: 'nav.publicationPricing', href: '/dashboard/publication-pricing', icon: <DollarSign className="w-5 h-5" /> },
         { nameKey: 'nav.settings', href: '/dashboard/settings', icon: <Settings className="w-5 h-5" /> },
       ]
