@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { User as UserType } from '@/types';
 import { useTranslations } from '@/lib/translations';
 import { useDebounce } from '@/hooks/useDebounce';
+import { Search, X } from 'lucide-react';
 
 export default function UsersPage() {
   const t = useTranslations();
@@ -137,8 +138,8 @@ export default function UsersPage() {
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+          <div className="relative flex-1 min-w-[200px] md:min-w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
             <input
               type="text"
               placeholder={t('users.searchPlaceholder')}
@@ -147,14 +148,15 @@ export default function UsersPage() {
                 setSearchTerm(e.target.value);
                 setPage(1);
               }}
-              className="input-premium pl-11 !font-bold w-full"
+              className="input-premium pl-10 pr-10 !font-bold w-full"
             />
             {searchTerm && (
               <button
                 onClick={() => { setSearchTerm(''); setPage(1); }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-lg leading-none"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors"
+                title="Clear search"
               >
-                ×
+                <X className="w-4 h-4" />
               </button>
             )}
           </div>
