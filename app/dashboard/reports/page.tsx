@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
 import { useTranslations } from '@/lib/translations';
+import { Check, AlertTriangle, Eye, Ban, X as XIcon } from 'lucide-react';
 
 interface Report {
   id: string;
@@ -107,7 +108,7 @@ export default function ReportsPage() {
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-16">
           <div className="text-center max-w-md mx-auto">
             <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
-              <span className="text-4xl sm:text-5xl">✓</span>
+              <Check className="w-10 h-10 text-green-500" />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">
               No Reports
@@ -137,8 +138,8 @@ export default function ReportsPage() {
                         {new Date(report.createdAt).toLocaleString()}
                       </span>
                     </div>
-                    <h3 className="text-lg font-black text-gray-900 mb-2">
-                      🚨 {report.reason}
+                    <h3 className="text-lg font-black text-gray-900 mb-2 flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-red-500" /> {report.reason}
                     </h3>
                     <p className="text-gray-700 font-semibold mb-4">{report.description}</p>
                   </div>
@@ -174,34 +175,34 @@ export default function ReportsPage() {
 
                 <div className="flex gap-3">
                   <Button
-                    className="flex-1 bg-blue-500 hover:bg-blue-600 button-animate"
+                    className="flex-1 bg-blue-500 hover:bg-blue-600 button-animate flex items-center justify-center gap-1"
                     onClick={() => toast.info('Review feature coming soon')}
                   >
-                    👁️ Review Report
+                    <Eye className="w-4 h-4" /> Review Report
                   </Button>
                   <Button
-                    className="flex-1 bg-red-500 hover:bg-red-600 button-animate"
+                    className="flex-1 bg-red-500 hover:bg-red-600 button-animate flex items-center justify-center gap-1"
                     onClick={() => setBlockConfirm({ 
                       isOpen: true, 
                       userId: report.reportedUser.id, 
                       userName: report.reportedUser.name 
                     })}
                   >
-                    🚫 Block User
+                    <Ban className="w-4 h-4" /> Block User
                   </Button>
                   <Button
                     variant="outline"
-                    className="flex-1 button-animate"
+                    className="flex-1 button-animate flex items-center justify-center gap-1"
                     onClick={() => setResolveConfirm({ isOpen: true, reportId: report.id })}
                   >
-                    ✓ Resolve
+                    <Check className="w-4 h-4" /> Resolve
                   </Button>
                   <Button
                     variant="outline"
-                    className="flex-1 button-animate"
+                    className="flex-1 button-animate flex items-center justify-center gap-1"
                     onClick={() => toast.success('Report dismissed')}
                   >
-                    ✕ Dismiss
+                    <XIcon className="w-4 h-4" /> Dismiss
                   </Button>
                 </div>
               </div>
@@ -222,7 +223,7 @@ export default function ReportsPage() {
         confirmText="Block User"
         cancelText="Cancel"
         type="danger"
-        icon="🚫"
+        icon={<Ban className="w-8 h-8 text-red-600" />}
       />
 
       <ConfirmDialog
@@ -237,7 +238,7 @@ export default function ReportsPage() {
         confirmText="Resolve"
         cancelText="Cancel"
         type="info"
-        icon="✓"
+        icon={<Check className="w-8 h-8 text-green-600" />}
       />
     </div>
   );

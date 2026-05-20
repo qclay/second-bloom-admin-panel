@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from './button';
+import { Trash2, AlertTriangle, Info } from 'lucide-react';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -11,7 +12,7 @@ interface ConfirmDialogProps {
   confirmText?: string;
   cancelText?: string;
   type?: 'danger' | 'warning' | 'info';
-  icon?: string;
+  icon?: React.ReactNode;
   closeOnConfirm?: boolean;
   isLoading?: boolean;
   /** Renders after the message (e.g. textarea for rejection reason) */
@@ -39,17 +40,17 @@ export function ConfirmDialog({
 
   const typeStyles = {
     danger: {
-      icon: icon || '🗑️',
+      icon: icon || <Trash2 className="w-8 h-8 text-red-600" />,
       confirmBg: 'bg-red-500 hover:bg-red-600',
       iconBg: 'bg-red-100',
     },
     warning: {
-      icon: icon || '⚠️',
+      icon: icon || <AlertTriangle className="w-8 h-8 text-yellow-600" />,
       confirmBg: 'bg-yellow-500 hover:bg-yellow-600',
       iconBg: 'bg-yellow-100',
     },
     info: {
-      icon: icon || 'ℹ️',
+      icon: icon || <Info className="w-8 h-8 text-blue-600" />,
       confirmBg: 'bg-blue-500 hover:bg-blue-600',
       iconBg: 'bg-blue-100',
     },
@@ -74,7 +75,7 @@ export function ConfirmDialog({
         <div className="p-4 sm:p-6">
           <div className="flex justify-center mb-3 sm:mb-4">
             <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full ${styles.iconBg} flex items-center justify-center animate-scale-in shrink-0`}>
-              <span className="text-2xl sm:text-3xl">{styles.icon}</span>
+              <span className="flex items-center justify-center">{styles.icon}</span>
             </div>
           </div>
 

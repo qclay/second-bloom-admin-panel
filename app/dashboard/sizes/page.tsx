@@ -9,6 +9,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { useTranslations } from '@/lib/translations';
+import { Ruler, Trash2 } from 'lucide-react';
 
 function toStringName(value: unknown): string {
   if (value == null) return '';
@@ -137,7 +138,7 @@ export default function SizesPage() {
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-16">
           <div className="text-center max-w-md mx-auto">
             <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-teal-50 flex items-center justify-center">
-              <span className="text-4xl sm:text-5xl">📐</span>
+              <Ruler className="w-10 h-10 text-teal-500" />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">{t('sizes.noSizes')}</h3>
             <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
@@ -177,9 +178,9 @@ export default function SizesPage() {
                     variant="destructive"
                     size="sm"
                     onClick={() => setDeleteConfirm({ isOpen: true, sizeId: size.id })}
-                    className="h-8 px-2 min-w-0 bg-red-500 hover:bg-red-600"
+                    className="h-8 px-2 min-w-0 bg-red-500 hover:bg-red-600 flex items-center justify-center"
                   >
-                    🗑️
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
@@ -249,7 +250,7 @@ export default function SizesPage() {
         confirmText={t('common.delete')}
         cancelText={t('common.cancel')}
         type="danger"
-        icon="🗑️"
+        icon={<Trash2 className="w-8 h-8 text-red-600" />}
       />
     </div>
   );

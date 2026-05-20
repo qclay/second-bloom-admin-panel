@@ -9,6 +9,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { useTranslations } from '@/lib/translations';
+import { Upload, File, Trash2 } from 'lucide-react';
 
 export default function FilesPage() {
   const t = useTranslations();
@@ -74,8 +75,8 @@ export default function FilesPage() {
           <p className="text-gray-600 mt-1 text-sm sm:text-base">{t('files.subtitle')}</p>
         </div>
         <label className="cursor-pointer shrink-0">
-          <Button className="bg-gradient-to-r from-blue-500 to-blue-600 w-full sm:w-auto">
-            📤 {t('files.upload')}
+          <Button className="bg-gradient-to-r from-blue-500 to-blue-600 w-full sm:w-auto flex items-center justify-center gap-2">
+            <Upload className="w-4 h-4" /> {t('files.upload')}
           </Button>
           <input
             type="file"
@@ -105,7 +106,7 @@ export default function FilesPage() {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400 min-h-[120px]">
-                  <span className="text-3xl">📄</span>
+                  <File className="w-8 h-8" />
                 </div>
               )}
             </div>
@@ -149,7 +150,7 @@ export default function FilesPage() {
         confirmText={t('common.delete')}
         cancelText={t('common.cancel')}
         type="danger"
-        icon="🗑️"
+        icon={<Trash2 className="w-8 h-8 text-red-600" />}
       />
     </div>
   );

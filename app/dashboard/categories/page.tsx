@@ -12,6 +12,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { Category } from '@/types';
 import { useTranslations } from '@/lib/translations';
+import { Folder, Camera, Trash2 } from 'lucide-react';
 
 function toStringValue(value: unknown): string {
   if (value == null) return '';
@@ -227,7 +228,7 @@ export default function CategoriesPage() {
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-16">
           <div className="text-center max-w-md mx-auto">
             <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center">
-              <span className="text-4xl sm:text-5xl">📁</span>
+              <Folder className="w-10 h-10 text-emerald-500" />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">
               {t('categories.noCategories')}
@@ -269,8 +270,8 @@ export default function CategoriesPage() {
                     fill
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <span className="text-4xl">📁</span>
+                  <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50">
+                    <Folder className="w-10 h-10" />
                   </div>
                 )}
               </div>
@@ -309,9 +310,9 @@ export default function CategoriesPage() {
                     e.stopPropagation();
                     setDeleteConfirm({ isOpen: true, categoryId: category.id });
                   }}
-                  className="h-7 px-1.5 min-w-0 button-animate bg-red-500 hover:bg-red-600 text-xs py-0"
+                  className="h-7 px-1.5 min-w-0 button-animate bg-red-500 hover:bg-red-600 flex items-center justify-center"
                 >
-                  🗑️
+                  <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
             </div>
@@ -375,7 +376,7 @@ export default function CategoriesPage() {
                     </div>
                   ) : (
                     <div>
-                      <div className="text-4xl mb-2">📸</div>
+                      <div className="flex justify-center mb-2"><Camera className="w-10 h-10 text-gray-400" /></div>
                       <label className="cursor-pointer">
                         <span className="text-purple-600 font-semibold">Upload image</span>
                         <input
@@ -461,7 +462,7 @@ export default function CategoriesPage() {
         confirmText={t('common.delete')}
         cancelText={t('common.cancel')}
         type="danger"
-        icon="🗑️"
+        icon={<Trash2 className="w-8 h-8 text-red-600" />}
       />
     </div>
   );

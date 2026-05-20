@@ -17,6 +17,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { Product } from '@/types';
 import { useTranslations } from '@/lib/translations';
+import { Package, Check, X as XIcon, Trash2, Camera } from 'lucide-react';
 
 function toStringValue(value: unknown): string {
   if (value == null) return '';
@@ -423,7 +424,7 @@ export default function ProductsPage() {
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-16 animate-fade-in">
           <div className="text-center max-w-md mx-auto">
             <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center animate-float">
-              <span className="text-5xl">📦</span>
+              <Package className="w-10 h-10 text-blue-500" />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">
               {effectiveFilter ? t('products.noMatchFilter') : t('products.noProductsYet')}
@@ -462,7 +463,7 @@ export default function ProductsPage() {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400 min-h-[140px] group-hover/card:scale-105 transition-transform duration-300">
-                  <span className="text-4xl">📦</span>
+                  <Package className="w-10 h-10" />
                 </div>
               )}
             </div>
@@ -507,8 +508,8 @@ export default function ProductsPage() {
                     ? t('products.rejected')
                     : product.status}
                 </span>
-                <span className="text-[10px] font-medium text-gray-600">
-                  📦 {product.quantity}
+                <span className="text-[10px] font-medium text-gray-600 flex items-center gap-1">
+                  <Package className="w-3 h-3" /> {product.quantity}
                 </span>
               </div>
               <div className="flex gap-1 flex-wrap">
@@ -517,17 +518,17 @@ export default function ProductsPage() {
                     <Button
                       size="sm"
                       onClick={() => setModerationConfirm({ isOpen: true, productId: product.id, action: 'approve' })}
-                      className="h-7 text-[11px] transition-transform duration-150 active:scale-95 bg-green-600 hover:bg-green-700 hover:shadow-md text-white py-0 flex-1 min-w-0"
+                      className="h-7 text-[11px] transition-transform duration-150 active:scale-95 bg-green-600 hover:bg-green-700 hover:shadow-md text-white py-0 flex-1 min-w-0 flex items-center justify-center gap-1"
                     >
-                      ✓ {t('products.approve')}
+                      <Check className="w-3 h-3" /> {t('products.approve')}
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setModerationConfirm({ isOpen: true, productId: product.id, action: 'reject', rejectionReason: '' })}
-                      className="h-7 text-[11px] transition-transform duration-150 active:scale-95 border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300 py-0 flex-1 min-w-0"
+                      className="h-7 text-[11px] transition-transform duration-150 active:scale-95 border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300 py-0 flex-1 min-w-0 flex items-center justify-center gap-1"
                     >
-                      ✗ {t('products.reject')}
+                      <XIcon className="w-3 h-3" /> {t('products.reject')}
                     </Button>
                   </>
                 )}
@@ -543,9 +544,9 @@ export default function ProductsPage() {
                   variant="destructive"
                   size="sm"
                   onClick={() => setDeleteConfirm({ isOpen: true, productId: product.id })}
-                  className="h-7 px-1.5 min-w-0 transition-transform duration-150 active:scale-95 bg-red-500 hover:bg-red-600 hover:shadow-md text-xs py-0"
+                  className="h-7 px-1.5 min-w-0 transition-transform duration-150 active:scale-95 bg-red-500 hover:bg-red-600 hover:shadow-md flex items-center justify-center py-0"
                 >
-                  🗑️
+                  <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
             </div>
@@ -631,7 +632,7 @@ export default function ProductsPage() {
                     </div>
                   ) : (
                     <div>
-                      <div className="text-4xl mb-2">📸</div>
+                      <div className="flex justify-center mb-2"><Camera className="w-10 h-10 text-gray-400" /></div>
                       <label className="cursor-pointer">
                         <span className="text-blue-600 font-semibold">Upload images (multiple)</span>
                         <input
@@ -861,7 +862,7 @@ export default function ProductsPage() {
         confirmText={t('common.delete')}
         cancelText={t('common.cancel')}
         type="danger"
-        icon="🗑️"
+        icon={<Trash2 className="w-8 h-8 text-red-600" />}
       />
 
       {moderationConfirm && (
@@ -882,7 +883,7 @@ export default function ProductsPage() {
           confirmText={moderationConfirm.action === 'approve' ? t('products.approve') : t('products.reject')}
           cancelText={t('common.cancel')}
           type={moderationConfirm.action === 'approve' ? 'info' : 'danger'}
-          icon={moderationConfirm.action === 'approve' ? '✓' : '✗'}
+          icon={moderationConfirm.action === 'approve' ? <Check className="w-8 h-8 text-green-600" /> : <XIcon className="w-8 h-8 text-red-600" />}
           closeOnConfirm={false}
           isLoading={moderationMutation.isPending}
           confirmDisabled={moderationConfirm.action === 'reject' && !(moderationConfirm.rejectionReason?.trim())}

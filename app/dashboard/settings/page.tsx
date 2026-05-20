@@ -9,6 +9,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import { userService } from '@/services/user.service';
 import { toast } from 'sonner';
 import { useTranslations } from '@/lib/translations';
+import { Check, PartyPopper } from 'lucide-react';
 
 export default function SettingsPage() {
   const t = useTranslations();
@@ -118,8 +119,8 @@ export default function SettingsPage() {
                 <p className="text-sm font-bold text-gray-600">{t('settings.accountStatus')}</p>
                 <p className="text-base font-bold text-green-600 mt-1">{t('users.active')}</p>
               </div>
-              <span className="px-4 py-2 rounded-full text-sm font-bold bg-green-100 text-green-700">
-                ✓ Active
+              <span className="px-4 py-2 rounded-full text-sm font-bold bg-green-100 text-green-700 flex items-center gap-2">
+                <Check className="w-4 h-4" /> Active
               </span>
             </div>
 
@@ -135,7 +136,7 @@ export default function SettingsPage() {
                 <p className="text-sm font-bold text-gray-600">Member Since</p>
                 <p className="text-base font-bold text-gray-900 mt-1">Jan 6, 2026</p>
               </div>
-              <span className="text-2xl">🎉</span>
+              <span className="text-2xl text-purple-500"><PartyPopper className="w-8 h-8" /></span>
             </div>
           </CardContent>
         </Card>

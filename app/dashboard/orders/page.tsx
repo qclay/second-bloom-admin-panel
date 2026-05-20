@@ -8,6 +8,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { OrderStatus } from '@/types';
 import { useTranslations } from '@/lib/translations';
+import { Ban, DollarSign, AlertTriangle } from 'lucide-react';
 
 function toStringValue(value: unknown): string {
   if (value == null) return '';
@@ -174,7 +175,7 @@ export default function OrdersPage() {
         confirmText="Change Status"
         cancelText={t('common.cancel')}
         type={statusConfirm.newStatus === 'CANCELLED' || statusConfirm.newStatus === 'REFUNDED' ? "danger" : "warning"}
-        icon={statusConfirm.newStatus === 'CANCELLED' ? "🚫" : statusConfirm.newStatus === 'REFUNDED' ? "💰" : "⚠️"}
+        icon={statusConfirm.newStatus === 'CANCELLED' ? <Ban className="w-8 h-8 text-red-600" /> : statusConfirm.newStatus === 'REFUNDED' ? <DollarSign className="w-8 h-8 text-gray-600" /> : <AlertTriangle className="w-8 h-8 text-yellow-600" />}
       />
     </div>
   );

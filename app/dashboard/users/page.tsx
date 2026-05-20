@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { User as UserType } from '@/types';
 import { useTranslations } from '@/lib/translations';
 import { useDebounce } from '@/hooks/useDebounce';
-import { Search, X } from 'lucide-react';
+import { Search, X, Check, Ban, Crown } from 'lucide-react';
 
 export default function UsersPage() {
   const t = useTranslations();
@@ -175,8 +175,8 @@ export default function UsersPage() {
             className="input-premium !font-bold sm:w-44"
           >
             <option value="">All statuses</option>
-            <option value="active">✓ Active</option>
-            <option value="blocked">🚫 Blocked</option>
+            <option value="active">Active</option>
+            <option value="blocked">Blocked</option>
           </select>
           {(searchTerm || roleFilter || statusFilter) && (
             <button
@@ -274,12 +274,12 @@ export default function UsersPage() {
                     </div>
                   </td>
                   <td className="px-3 py-3 sm:px-6 sm:py-4">
-                    <span className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs font-bold ${
+                    <span className={`inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs font-bold ${
                       user.isActive
                         ? 'bg-green-100 text-green-700'
                         : 'bg-red-100 text-red-700'
                     }`}>
-                      {user.isActive ? '✓ ' + t('users.active') : '🚫 ' + t('users.blocked')}
+                      {user.isActive ? <><Check className="w-3 h-3"/> {t('users.active')}</> : <><Ban className="w-3 h-3"/> {t('users.blocked')}</>}
                     </span>
                   </td>
                   <td className="px-3 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm text-gray-500 font-semibold whitespace-nowrap">
@@ -291,12 +291,12 @@ export default function UsersPage() {
                         size="sm"
                         variant={user.isActive ? "destructive" : "default"}
                         onClick={() => handleToggleBlock(user)}
-                        className={`rounded-xl font-black text-[10px] tracking-widest uppercase px-4 h-8 transition-all active:scale-95 ${user.isActive 
+                        className={`rounded-xl font-black text-[10px] tracking-widest uppercase px-4 h-8 transition-all active:scale-95 flex items-center gap-1 ${user.isActive 
                           ? "bg-rose-500 hover:bg-rose-600 shadow-rose-200" 
                           : "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-200"
                         } shadow-lg`}
                       >
-                        {user.isActive ? '🚫 ' + t('users.block') : '✓ ' + t('users.unblock')}
+                        {user.isActive ? <><Ban className="w-3 h-3" /> {t('users.block')}</> : <><Check className="w-3 h-3" /> {t('users.unblock')}</>}
                       </Button>
                     </div>
                   </td>
@@ -324,7 +324,7 @@ export default function UsersPage() {
         confirmText={blockConfirm.user?.isActive ? t('users.block') : t('users.unblock')}
         cancelText={t('common.cancel')}
         type={blockConfirm.user?.isActive ? "danger" : "info"}
-        icon={blockConfirm.user?.isActive ? "🚫" : "✓"}
+        icon={blockConfirm.user?.isActive ? <Ban className="w-8 h-8 text-red-600" /> : <Check className="w-8 h-8 text-emerald-600" />}
       />
 
       <ConfirmDialog
@@ -336,7 +336,7 @@ export default function UsersPage() {
         confirmText="Change Role"
         cancelText={t('common.cancel')}
         type="warning"
-        icon="👑"
+        icon={<Crown className="w-8 h-8 text-yellow-600" />}
       />
 
       {addCreditsModal && (

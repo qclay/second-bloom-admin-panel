@@ -1,5 +1,7 @@
 'use client';
 
+import { Bell, Clock } from 'lucide-react';
+
 export default function NotificationsPage() {
   return (
     <div className="w-full max-w-full min-w-0">
@@ -11,7 +13,7 @@ export default function NotificationsPage() {
       <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-16">
         <div className="text-center max-w-md mx-auto">
           <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
-            <span className="text-4xl sm:text-5xl">🔔</span>
+            <Bell className="w-10 h-10 text-red-500" />
           </div>
           <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">
             Notification Center
@@ -21,7 +23,7 @@ export default function NotificationsPage() {
             Keep customers informed about orders, promotions, and updates.
           </p>
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 rounded-lg text-sm text-red-700 font-semibold">
-            🔜 Coming Soon
+            <Clock className="w-4 h-4" /> Coming Soon
           </div>
         </div>
       </div>

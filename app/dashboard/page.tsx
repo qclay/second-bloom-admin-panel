@@ -9,6 +9,7 @@ import { orderService } from '@/services/order.service';
 import { userService } from '@/services/user.service';
 import { analyticsService } from '@/services/analytics.service';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { Package, ShoppingCart, Users, DollarSign, Folder, Hourglass, ArrowRight, Calendar, CalendarDays, BarChart3 } from 'lucide-react';
 
 function toStringValue(value: unknown): string {
   if (value == null) return '';
@@ -105,12 +106,12 @@ export default function DashboardPage() {
   const COLORS = ['#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
 
   const stats = [
-    { title: t('dashboard.totalProducts'), value: totalProducts.toString(), icon: '📦', bgColor: 'bg-gradient-to-br from-blue-50 to-blue-100', iconBg: 'bg-blue-500' },
-    { title: t('dashboard.totalOrders'), value: totalOrders.toString(), icon: '🛒', bgColor: 'bg-gradient-to-br from-green-50 to-green-100', iconBg: 'bg-green-500' },
-    { title: t('dashboard.totalUsers'), value: totalUsers.toString(), icon: '👥', bgColor: 'bg-gradient-to-br from-purple-50 to-purple-100', iconBg: 'bg-purple-500' },
-    { title: t('dashboard.revenue'), value: `$${totalRevenue.toLocaleString()}`, icon: '💰', bgColor: 'bg-gradient-to-br from-yellow-50 to-yellow-100', iconBg: 'bg-yellow-500' },
-    { title: t('dashboard.categories'), value: totalCategories.toString(), icon: '📁', bgColor: 'bg-gradient-to-br from-pink-50 to-pink-100', iconBg: 'bg-pink-500' },
-    { title: t('dashboard.pendingOrders'), value: pendingOrders.toString(), icon: '⏳', bgColor: 'bg-gradient-to-br from-orange-50 to-orange-100', iconBg: 'bg-orange-500' },
+    { title: t('dashboard.totalProducts'), value: totalProducts.toString(), icon: <Package className="w-5 h-5 sm:w-6 sm:h-6 text-white" />, bgColor: 'bg-gradient-to-br from-blue-50 to-blue-100', iconBg: 'bg-blue-500' },
+    { title: t('dashboard.totalOrders'), value: totalOrders.toString(), icon: <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />, bgColor: 'bg-gradient-to-br from-green-50 to-green-100', iconBg: 'bg-green-500' },
+    { title: t('dashboard.totalUsers'), value: totalUsers.toString(), icon: <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />, bgColor: 'bg-gradient-to-br from-purple-50 to-purple-100', iconBg: 'bg-purple-500' },
+    { title: t('dashboard.revenue'), value: `$${totalRevenue.toLocaleString()}`, icon: <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-white" />, bgColor: 'bg-gradient-to-br from-yellow-50 to-yellow-100', iconBg: 'bg-yellow-500' },
+    { title: t('dashboard.categories'), value: totalCategories.toString(), icon: <Folder className="w-5 h-5 sm:w-6 sm:h-6 text-white" />, bgColor: 'bg-gradient-to-br from-pink-50 to-pink-100', iconBg: 'bg-pink-500' },
+    { title: t('dashboard.pendingOrders'), value: pendingOrders.toString(), icon: <Hourglass className="w-5 h-5 sm:w-6 sm:h-6 text-white" />, bgColor: 'bg-gradient-to-br from-orange-50 to-orange-100', iconBg: 'bg-orange-500' },
   ];
 
   return (
@@ -137,7 +138,7 @@ export default function DashboardPage() {
                 </p>
               </div>
               <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl ${stat.iconBg} flex items-center justify-center shadow-sm shrink-0`}>
-                <span className="text-lg sm:text-2xl">{stat.icon}</span>
+                {stat.icon}
               </div>
             </div>
           </div>
@@ -181,7 +182,7 @@ export default function DashboardPage() {
                     onChange={(e) => setCustomFrom(e.target.value)}
                     className="rounded-lg border-0 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:ring-2 focus:ring-purple-500/30 outline-none min-w-[140px] [color-scheme:light]"
                   />
-                  <span className="text-gray-400 text-sm font-medium">→</span>
+                  <span className="text-gray-400 flex items-center justify-center"><ArrowRight className="w-4 h-4" /></span>
                   <input
                     type="date"
                     value={customTo}
@@ -195,7 +196,7 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-2 mb-4">
-                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 text-purple-600 text-sm">📅</span>
+                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 text-purple-600"><Calendar className="w-4 h-4" /></span>
                 <h3 className="text-sm font-semibold text-gray-800">{t('dashboard.today')}</h3>
               </div>
               <p className="text-xs text-gray-500 mb-3">{analyticsData.today.label}</p>
@@ -207,7 +208,7 @@ export default function DashboardPage() {
             </div>
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-2 mb-4">
-                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 text-blue-600 text-sm">📆</span>
+                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 text-blue-600"><CalendarDays className="w-4 h-4" /></span>
                 <h3 className="text-sm font-semibold text-gray-800">{t('dashboard.thisWeek')}</h3>
               </div>
               <p className="text-xs text-gray-500 mb-3">{analyticsData.week.label}</p>
@@ -219,7 +220,7 @@ export default function DashboardPage() {
             </div>
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-2 mb-4">
-                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-100 text-amber-600 text-sm">📊</span>
+                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-100 text-amber-600"><BarChart3 className="w-4 h-4" /></span>
                 <h3 className="text-sm font-semibold text-gray-800">{t('dashboard.totals')}</h3>
               </div>
               <div className="space-y-3 text-sm mt-7">
@@ -230,7 +231,7 @@ export default function DashboardPage() {
             {analyticsData.customPeriod && (
               <div className="sm:col-span-3 rounded-2xl p-5 shadow-sm border border-purple-100 bg-gradient-to-br from-purple-50/80 to-white">
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-200 text-purple-700 text-sm">📆</span>
+                  <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-200 text-purple-700"><CalendarDays className="w-4 h-4" /></span>
                   <h3 className="text-sm font-semibold text-gray-800">{t('dashboard.customRange')}</h3>
                   <span className="text-xs text-gray-500 font-normal">({analyticsData.customPeriod.label})</span>
                 </div>

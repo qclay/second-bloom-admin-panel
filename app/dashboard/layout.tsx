@@ -7,6 +7,21 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/lib/auth-store';
 import { useLocaleStore, LOCALES, type AdminLocale } from '@/lib/locale-store';
 import { useTranslations, type TranslationKey } from '@/lib/translations';
+import { 
+  LayoutDashboard, 
+  Folder, 
+  ClipboardList, 
+  Ruler, 
+  Package, 
+  ShoppingCart, 
+  Users, 
+  AlertTriangle, 
+  DollarSign, 
+  Settings,
+  Sparkles,
+  Menu,
+  X
+} from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -62,24 +77,24 @@ export default function DashboardLayout({
   const closeSidebar = () => setSidebarOpen(false);
 
   const navigation = [
-    { nameKey: 'nav.dashboard', href: '/dashboard', icon: '📊' },
-    { nameKey: 'nav.categories', href: '/dashboard/categories', icon: '📁' },
-    { nameKey: 'nav.conditions', href: '/dashboard/conditions', icon: '📋' },
-    { nameKey: 'nav.sizes', href: '/dashboard/sizes', icon: '📐' },
-    { nameKey: 'nav.products', href: '/dashboard/products', icon: '📦' },
-    { nameKey: 'nav.orders', href: '/dashboard/orders', icon: '🛒' },
-    { nameKey: 'nav.users', href: '/dashboard/users', icon: '👥' },
-    { nameKey: 'nav.reports', href: '/dashboard/reports', icon: '🚨' },
-    { nameKey: 'nav.publicationPricing', href: '/dashboard/publication-pricing', icon: '💰' },
-    { nameKey: 'nav.settings', href: '/dashboard/settings', icon: '⚙️' },
+    { nameKey: 'nav.dashboard', href: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
+    { nameKey: 'nav.categories', href: '/dashboard/categories', icon: <Folder className="w-5 h-5" /> },
+    { nameKey: 'nav.conditions', href: '/dashboard/conditions', icon: <ClipboardList className="w-5 h-5" /> },
+    { nameKey: 'nav.sizes', href: '/dashboard/sizes', icon: <Ruler className="w-5 h-5" /> },
+    { nameKey: 'nav.products', href: '/dashboard/products', icon: <Package className="w-5 h-5" /> },
+    { nameKey: 'nav.orders', href: '/dashboard/orders', icon: <ShoppingCart className="w-5 h-5" /> },
+    { nameKey: 'nav.users', href: '/dashboard/users', icon: <Users className="w-5 h-5" /> },
+    { nameKey: 'nav.reports', href: '/dashboard/reports', icon: <AlertTriangle className="w-5 h-5" /> },
+    { nameKey: 'nav.publicationPricing', href: '/dashboard/publication-pricing', icon: <DollarSign className="w-5 h-5" /> },
+    { nameKey: 'nav.settings', href: '/dashboard/settings', icon: <Settings className="w-5 h-5" /> },
   ];
 
   const sidebar = (
     <>
       <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between lg:justify-start gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
-            <span className="text-xl">🌸</span>
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/20">
+            <Sparkles className="w-6 h-6 text-white" />
           </div>
           <div className="min-w-0">
             <h1 className="text-lg font-bold text-gray-900 truncate">Second Bloom</h1>
@@ -89,12 +104,10 @@ export default function DashboardLayout({
         <button
           type="button"
           onClick={closeSidebar}
-          className="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-600"
+          className="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors"
           aria-label={t('common.closeMenu')}
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="w-6 h-6" />
         </button>
       </div>
 
@@ -114,7 +127,7 @@ export default function DashboardLayout({
                 }`}
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
-                <span className={`text-xl transition-transform duration-300 group-hover:scale-110 ${isActive ? 'scale-110' : ''}`}>{item.icon}</span>
+                <span className={`transition-transform duration-300 group-hover:scale-110 ${isActive ? 'scale-110' : ''}`}>{item.icon}</span>
                 <span className="text-sm tracking-tight">{t(item.nameKey as TranslationKey)}</span>
               </Link>
             );
@@ -131,16 +144,14 @@ export default function DashboardLayout({
         <button
           type="button"
           onClick={() => setSidebarOpen(true)}
-          className="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100"
+          className="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
           aria-label={t('common.openMenu')}
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
+          <Menu className="w-6 h-6" />
         </button>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
-            <span className="text-lg">🌸</span>
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0 shadow-md shadow-purple-500/20">
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
           <span className="font-bold text-gray-900">Second Bloom</span>
         </div>
