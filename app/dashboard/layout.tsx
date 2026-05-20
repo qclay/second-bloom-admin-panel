@@ -20,7 +20,9 @@ import {
   Settings,
   Sparkles,
   Menu,
-  X
+  X,
+  Bell,
+  File
 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -76,17 +78,44 @@ export default function DashboardLayout({
 
   const closeSidebar = () => setSidebarOpen(false);
 
-  const navigation = [
-    { nameKey: 'nav.dashboard', href: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-    { nameKey: 'nav.categories', href: '/dashboard/categories', icon: <Folder className="w-5 h-5" /> },
-    { nameKey: 'nav.conditions', href: '/dashboard/conditions', icon: <ClipboardList className="w-5 h-5" /> },
-    { nameKey: 'nav.sizes', href: '/dashboard/sizes', icon: <Ruler className="w-5 h-5" /> },
-    { nameKey: 'nav.products', href: '/dashboard/products', icon: <Package className="w-5 h-5" /> },
-    { nameKey: 'nav.orders', href: '/dashboard/orders', icon: <ShoppingCart className="w-5 h-5" /> },
-    { nameKey: 'nav.users', href: '/dashboard/users', icon: <Users className="w-5 h-5" /> },
-    { nameKey: 'nav.reports', href: '/dashboard/reports', icon: <AlertTriangle className="w-5 h-5" /> },
-    { nameKey: 'nav.publicationPricing', href: '/dashboard/publication-pricing', icon: <DollarSign className="w-5 h-5" /> },
-    { nameKey: 'nav.settings', href: '/dashboard/settings', icon: <Settings className="w-5 h-5" /> },
+  const navigationGroups = [
+    {
+      title: 'Main',
+      items: [
+        { nameKey: 'nav.dashboard', href: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
+        { nameKey: 'nav.notifications', href: '/dashboard/notifications', icon: <Bell className="w-5 h-5" /> },
+      ]
+    },
+    {
+      title: 'Store Management',
+      items: [
+        { nameKey: 'nav.orders', href: '/dashboard/orders', icon: <ShoppingCart className="w-5 h-5" /> },
+        { nameKey: 'nav.products', href: '/dashboard/products', icon: <Package className="w-5 h-5" /> },
+        { nameKey: 'nav.categories', href: '/dashboard/categories', icon: <Folder className="w-5 h-5" /> },
+      ]
+    },
+    {
+      title: 'Catalog Attributes',
+      items: [
+        { nameKey: 'nav.conditions', href: '/dashboard/conditions', icon: <ClipboardList className="w-5 h-5" /> },
+        { nameKey: 'nav.sizes', href: '/dashboard/sizes', icon: <Ruler className="w-5 h-5" /> },
+      ]
+    },
+    {
+      title: 'Community & Moderation',
+      items: [
+        { nameKey: 'nav.users', href: '/dashboard/users', icon: <Users className="w-5 h-5" /> },
+        { nameKey: 'nav.reports', href: '/dashboard/reports', icon: <AlertTriangle className="w-5 h-5" /> },
+      ]
+    },
+    {
+      title: 'System & Settings',
+      items: [
+        { nameKey: 'nav.files', href: '/dashboard/files', icon: <File className="w-5 h-5" /> },
+        { nameKey: 'nav.publicationPricing', href: '/dashboard/publication-pricing', icon: <DollarSign className="w-5 h-5" /> },
+        { nameKey: 'nav.settings', href: '/dashboard/settings', icon: <Settings className="w-5 h-5" /> },
+      ]
+    }
   ];
 
   const sidebar = (
@@ -113,25 +142,34 @@ export default function DashboardLayout({
 
       <nav className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-1">
-          {navigation.map((item, index) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.nameKey}
-                href={item.href}
-                onClick={closeSidebar}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${
-                  isActive
-                    ? 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600 font-bold border-r-4 border-purple-500 shadow-sm'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-purple-600 font-medium'
-                }`}
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <span className={`transition-transform duration-300 group-hover:scale-110 ${isActive ? 'scale-110' : ''}`}>{item.icon}</span>
-                <span className="text-sm tracking-tight">{t(item.nameKey as TranslationKey)}</span>
-              </Link>
-            );
-          })}
+          {navigationGroups.map((group, groupIndex) => (
+            <div key={group.title} className="mb-6 last:mb-0">
+              <h3 className="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                {group.title}
+              </h3>
+              <div className="space-y-1">
+                {group.items.map((item, itemIndex) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.nameKey}
+                      href={item.href}
+                      onClick={closeSidebar}
+                      className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 group ${
+                        isActive
+                          ? 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600 font-bold border-r-4 border-purple-500 shadow-sm'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-purple-600 font-medium'
+                      }`}
+                      style={{ animationDelay: `${(groupIndex * 3 + itemIndex) * 0.05}s` }}
+                    >
+                      <span className={`transition-transform duration-300 group-hover:scale-110 ${isActive ? 'scale-110' : ''}`}>{item.icon}</span>
+                      <span className="text-sm tracking-tight">{t(item.nameKey as TranslationKey)}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </nav>
 
