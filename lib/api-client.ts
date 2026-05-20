@@ -30,8 +30,27 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+    const errorData = error.response?.data as ApiError | undefined;
+    
+    // Check if token was explicitly revoked
+    const isTokenRevoked = 
+      errorData?.error?.code === 'TOKEN_REVOKED' || 
+      errorData?.error?.code === 'REFRESH_TOKEN_REVOKED';
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (isTokenRevoked) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      window.location.href = '/login';
+      return Promise.reject(error);
+    }
+
+    const isAuthError = 
+      error.response?.status === 401 || 
+      (error.response?.status === 403 && 
+       errorData?.error?.code === 'FORBIDDEN' && 
+       ['Authentication required', 'Требуется аутентификация', 'Autentifikatsiya talab qilinadi'].includes(errorData?.error?.message || ''));
+
+    if (isAuthError && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
