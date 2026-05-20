@@ -4,9 +4,11 @@ export interface User {
   firstName: string | null;
   lastName: string | null;
   email: string | null;
+  username: string | null;
   role: 'USER' | 'ADMIN';
   isActive: boolean;
   publicationCredits?: number;
+  telegramChatId?: string | null;
   createdAt: string;
   updatedAt: string;
 }

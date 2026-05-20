@@ -5,6 +5,7 @@ export interface UserQuery {
   page?: number;
   limit?: number;
   search?: string;
+  telegramChatId?: string;
   role?: 'USER' | 'ADMIN';
   isActive?: boolean;
 }
@@ -22,18 +23,21 @@ export const userService = {
     const response = await apiClient.get<ApiResponse<User[]>>('/users', {
       params: query,
     });
-    const defaultPagination = { 
-      page: 1, 
-      limit: 20, 
-      total: 0, 
-      totalPages: 0, 
-      hasNextPage: false, 
-      hasPreviousPage: false 
-    };
+    const raw = response.data.meta as Record<string, unknown> | undefined;
+    const pagination = raw?.pagination as Record<string, unknown> | undefined ?? raw;
+    const page = Number(pagination?.page ?? 1);
+    const totalPages = Number(pagination?.totalPages ?? 0);
     return {
       data: response.data.data,
       meta: {
-        pagination: response.data.meta?.pagination || defaultPagination,
+        pagination: {
+          page,
+          limit: Number(pagination?.limit ?? 20),
+          total: Number(pagination?.total ?? 0),
+          totalPages,
+          hasNextPage: page < totalPages,
+          hasPreviousPage: page > 1,
+        },
       },
     };
   },
