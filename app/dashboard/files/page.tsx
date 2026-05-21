@@ -104,6 +104,13 @@ export default function FilesPage() {
                   sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 12vw"
                   fill
                 />
+              ) : file.fileType === 'VIDEO' ? (
+                <video
+                  src={file.url}
+                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                  muted
+                  preload="metadata"
+                />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400 min-h-[120px]">
                   <File className="w-8 h-8" />

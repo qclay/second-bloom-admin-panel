@@ -60,6 +60,7 @@ export default function ProductsPage() {
   });
   const [, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [imageFileTypes, setImageFileTypes] = useState<string[]>([]);
   const [uploadedImageIds, setUploadedImageIds] = useState<string[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; productId: string | null }>({
     isOpen: false,
@@ -198,24 +199,28 @@ export default function ProductsPage() {
     const prevLen = imagePreviews.length;
     setImagePreviews(prev => [...prev, ...newPreviews]);
     const newIds: string[] = [];
+    const newFileTypes: string[] = [];
     for (let i = 0; i < files.length; i++) {
       try {
         const data = await uploadMutation.mutateAsync(files[i]);
-        const id = (data as { id?: string; fileId?: string }).id ?? (data as { id?: string; fileId?: string }).fileId;
+        const uploaded = data as { id?: string; fileId?: string; fileType?: string };
+        const id = uploaded.id ?? uploaded.fileId;
         if (id) newIds.push(id);
+        newFileTypes.push(uploaded.fileType ?? (files[i].type.startsWith('video/') ? 'VIDEO' : 'IMAGE'));
       } catch {
         newPreviews.forEach(p => URL.revokeObjectURL(p));
         setImagePreviews(prev => prev.slice(0, prevLen));
-        toast.error('Image upload failed');
+        toast.error('File upload failed');
         return;
       }
     }
+    setImageFileTypes(prev => [...prev, ...newFileTypes]);
     setUploadedImageIds(prev => {
       const nextIds = [...prev, ...newIds];
       imageIdsRef.current = nextIds;
       return nextIds;
     });
-    if (newIds.length > 0) toast.success(newIds.length === 1 ? 'Image uploaded' : `${newIds.length} images uploaded`);
+    if (newIds.length > 0) toast.success(newIds.length === 1 ? 'File uploaded' : `${newIds.length} files uploaded`);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -316,11 +321,13 @@ export default function ProductsPage() {
     });
     const imageList = Array.isArray(product.images) ? product.images : [];
     const previews = imageList.map((img: { url?: string }) => img?.url ?? '');
+    const fileTypes = imageList.map((img: { fileType?: string }) => img?.fileType ?? 'IMAGE');
     const ids = imageList
       .map((img: { id?: string; fileId?: string }) => img?.id ?? img?.fileId ?? '')
       .filter((id): id is string => typeof id === 'string' && id.length > 0);
     imageIdsRef.current = ids;
     setImagePreviews(previews);
+    setImageFileTypes(fileTypes);
     setUploadedImageIds(ids);
     setIsModalOpen(true);
   };
@@ -348,6 +355,7 @@ export default function ProductsPage() {
       prev.forEach(p => { if (typeof p === 'string' && p.startsWith('blob:')) URL.revokeObjectURL(p); });
       return [];
     });
+    setImageFileTypes([]);
     imageIdsRef.current = [];
     setUploadedImageIds([]);
     setEditingId(null);
@@ -453,14 +461,23 @@ export default function ProductsPage() {
           >
             <div className="relative aspect-square min-h-[140px] w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
               {product.images?.[0]?.url ? (
-                <Image
-                  src={product.images[0].url}
-                  alt={toStringValue(product.title)}
-                  className="w-full h-full object-cover object-center group-hover/card:scale-110 transition-transform duration-300 ease-out"
-                  loading="lazy"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
-                  fill
-                />
+                product.images[0].fileType === 'VIDEO' ? (
+                  <video
+                    src={product.images[0].url}
+                    className="w-full h-full object-cover object-center group-hover/card:scale-110 transition-transform duration-300 ease-out"
+                    muted
+                    preload="metadata"
+                  />
+                ) : (
+                  <Image
+                    src={product.images[0].url}
+                    alt={toStringValue(product.title)}
+                    className="w-full h-full object-cover object-center group-hover/card:scale-110 transition-transform duration-300 ease-out"
+                    loading="lazy"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+                    fill
+                  />
+                )
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400 min-h-[140px] group-hover/card:scale-105 transition-transform duration-300">
                   <Package className="w-10 h-10" />
@@ -594,19 +611,29 @@ export default function ProductsPage() {
                       <div className="grid grid-cols-3 gap-4">
                         {imagePreviews.map((preview, idx) => (
                           <div key={idx} className="relative group">
-                            <Image
-                              src={preview}
-                              alt={`Preview ${idx + 1}`}
-                              className="w-full h-32 object-cover rounded-lg"
-                              loading="lazy"
-                              width={200}
-                              height={128}
-                            />
+                            {imageFileTypes[idx] === 'VIDEO' ? (
+                              <video
+                                src={preview}
+                                className="w-full h-32 object-cover rounded-lg"
+                                muted
+                                preload="metadata"
+                              />
+                            ) : (
+                              <Image
+                                src={preview}
+                                alt={`Preview ${idx + 1}`}
+                                className="w-full h-32 object-cover rounded-lg"
+                                loading="lazy"
+                                width={200}
+                                height={128}
+                              />
+                            )}
                             <button
                               type="button"
                               onClick={() => {
                                 if (preview.startsWith('blob:')) URL.revokeObjectURL(preview);
                                 setImagePreviews(p => p.filter((_, i) => i !== idx));
+                                setImageFileTypes(t => t.filter((_, i) => i !== idx));
                                 setUploadedImageIds(ids => {
                                   const next = ids.filter((_, i) => i !== idx);
                                   imageIdsRef.current = next;
@@ -614,7 +641,7 @@ export default function ProductsPage() {
                                 });
                               }}
                               className="absolute top-1 right-1 w-7 h-7 rounded-full bg-red-500 text-white text-sm font-bold opacity-90 hover:opacity-100 shadow"
-                              aria-label="Remove image"
+                              aria-label="Remove"
                             >
                               ×
                             </button>
@@ -622,10 +649,10 @@ export default function ProductsPage() {
                         ))}
                       </div>
                       <label className="inline-flex items-center gap-2 cursor-pointer text-blue-600 font-semibold hover:underline">
-                        <span>Add more images</span>
+                        <span>Add more files</span>
                         <input
                           type="file"
-                          accept="image/*"
+                          accept="image/*,video/*"
                           multiple
                           onChange={handleImageChange}
                           className="hidden"
@@ -636,10 +663,10 @@ export default function ProductsPage() {
                     <div>
                       <div className="flex justify-center mb-2"><Camera className="w-10 h-10 text-gray-400" /></div>
                       <label className="cursor-pointer">
-                        <span className="text-blue-600 font-semibold">Upload images (multiple)</span>
+                        <span className="text-blue-600 font-semibold">Upload photos or videos</span>
                         <input
                           type="file"
-                          accept="image/*"
+                          accept="image/*,video/*"
                           multiple
                           onChange={handleImageChange}
                           className="hidden"

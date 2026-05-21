@@ -51,6 +51,7 @@ export interface ProductImage {
   id: string;
   fileId?: string;
   url?: string;
+  fileType?: string;
   order?: number;
   createdAt?: string;
 }
