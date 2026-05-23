@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userService } from '@/services/user.service';
 import { Button } from '@/components/ui/button';
@@ -32,7 +32,12 @@ export default function UsersPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
 
-  useEffect(() => { setPage(1); }, [debouncedSearch, debouncedTelegram, roleFilter, statusFilter]);
+  const filterKey = `${debouncedSearch}|${debouncedTelegram}|${roleFilter}|${statusFilter}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (prevFilterKey !== filterKey) {
+    setPrevFilterKey(filterKey);
+    setPage(1);
+  }
 
   const hasFilters = !!(searchTerm || telegramSearch || roleFilter || statusFilter);
 
