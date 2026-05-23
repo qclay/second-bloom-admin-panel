@@ -20,7 +20,8 @@ import {
   Settings,
   Sparkles,
   Menu,
-  X
+  X,
+  CreditCard
 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -108,6 +109,7 @@ export default function DashboardLayout({
     {
       title: 'System & Settings',
       items: [
+        { nameKey: 'nav.payments', href: '/dashboard/payments', icon: <CreditCard className="w-5 h-5" /> },
         { nameKey: 'nav.publicationPricing', href: '/dashboard/publication-pricing', icon: <DollarSign className="w-5 h-5" /> },
         { nameKey: 'nav.settings', href: '/dashboard/settings', icon: <Settings className="w-5 h-5" /> },
       ]

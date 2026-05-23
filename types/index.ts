@@ -131,6 +131,49 @@ export interface Order {
   updatedAt: string;
 }
 
+export type PaymentSource = 'APP' | 'BOT';
+export type AdminPaymentStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'EXPIRED';
+export type PaymentType = 'PUBLICATION' | 'TOP_UP' | 'GOODS_PUBLICATION';
+export type PaymentGateway = 'PAYME' | 'CLICK';
+
+export interface Payment {
+  id: string;
+  amount: number;
+  method: string;
+  gateway: PaymentGateway | null;
+  status: AdminPaymentStatus;
+  paymentType: PaymentType;
+  quantity: number;
+  source: PaymentSource;
+  paidAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+  user?: {
+    id: string;
+    phoneNumber: string;
+    firstName: string | null;
+    lastName: string | null;
+    username: string | null;
+  };
+}
+
+export interface PaymentAnalytics {
+  period: '7d' | '30d' | '90d' | 'all';
+  source: PaymentSource | null;
+  kpi: {
+    totalRevenue: number;
+    totalTransactions: number;
+    completedTransactions: number;
+    pendingCount: number;
+    successRate: number;
+    avgTicket: number;
+  };
+  bySource: Array<{ source: PaymentSource; revenue: number; count: number }>;
+  byType: Array<{ paymentType: PaymentType; revenue: number; count: number; avgTicket: number }>;
+  timeSeries: Array<{ date: string; revenue: number; count: number }>;
+}
+
 export interface PaginationMeta {
   page: number;
   limit: number;
