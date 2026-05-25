@@ -97,7 +97,7 @@ export interface Product {
   activeAuction?: { id: string };
 }
 
-export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
+export type OrderStatus = 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
 
 export interface ShippingAddress {
@@ -121,7 +121,7 @@ export interface Order {
   productId: string;
   product: Product;
   quantity: number;
-  totalPrice: number;
+  amount: number;
   status: OrderStatus;
   shippingAddress: ShippingAddress | Record<string, unknown>;
   paymentMethod: string;

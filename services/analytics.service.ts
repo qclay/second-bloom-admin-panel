@@ -20,6 +20,20 @@ export interface WeekPeriodStats {
 export interface TotalsStats {
   totalUsers: number;
   totalBouquets: number;
+  totalOrders: number;
+  totalRevenue: number;
+  pendingOrders: number;
+  totalCategories: number;
+}
+
+export interface MonthlyRevenue {
+  month: string;
+  revenue: number;
+}
+
+export interface OrderStatusDistribution {
+  status: string;
+  count: number;
 }
 
 export interface CustomPeriodStats {
@@ -35,6 +49,8 @@ export interface AnalyticsDashboard {
   week: WeekPeriodStats;
   totals: TotalsStats;
   customPeriod?: CustomPeriodStats;
+  monthlyRevenue: MonthlyRevenue[];
+  orderStatusDistribution: OrderStatusDistribution[];
 }
 
 export interface AnalyticsQuery {

@@ -74,34 +74,34 @@ export default function DashboardPage() {
     queryFn: () => analyticsService.getDashboard(analyticsParams),
   });
 
-  const totalProducts = productsData?.data.length || 0;
-  const totalOrders = ordersData?.data.length || 0;
-  const totalUsers = usersData?.data.length || 0;
-  const totalCategories = categoriesData?.data.length || 0;
-  const totalRevenue = ordersData?.data.reduce((sum, order) => sum + order.totalPrice, 0) || 0;
-  const pendingOrders = ordersData?.data.filter(o => o.status === 'PENDING').length || 0;
+  const totalProducts = analyticsData?.totals.totalBouquets || 0;
+  const totalOrders = analyticsData?.totals.totalOrders || 0;
+  const totalUsers = analyticsData?.totals.totalUsers || 0;
+  const totalCategories = analyticsData?.totals.totalCategories || 0;
+  const totalRevenue = analyticsData?.totals.totalRevenue || 0;
+  const pendingOrders = analyticsData?.totals.pendingOrders || 0;
 
-  const orderStatusData = [
-    { name: t('dashboard.pending'), value: ordersData?.data.filter(o => o.status === 'PENDING').length || 0 },
-    { name: t('dashboard.confirmed'), value: ordersData?.data.filter(o => o.status === 'CONFIRMED').length || 0 },
-    { name: t('dashboard.processing'), value: ordersData?.data.filter(o => o.status === 'PROCESSING').length || 0 },
-    { name: t('dashboard.shipped'), value: ordersData?.data.filter(o => o.status === 'SHIPPED').length || 0 },
-    { name: t('dashboard.delivered'), value: ordersData?.data.filter(o => o.status === 'DELIVERED').length || 0 },
-  ];
+  const orderStatusData = useMemo(() => {
+    if (!analyticsData?.orderStatusDistribution) return [];
+    return analyticsData.orderStatusDistribution.map(item => {
+      let name = item.status;
+      if (item.status === 'PROCESSING') name = t('dashboard.processing');
+      else if (item.status === 'SHIPPED') name = t('dashboard.shipped');
+      else if (item.status === 'DELIVERED') name = t('dashboard.delivered');
+      else if (item.status === 'CANCELLED') name = t('orders.cancelled');
+      return { name, value: item.count };
+    });
+  }, [analyticsData, t]);
 
-  const monthlyRevenue = [
-    { month: 'Jan', revenue: 0 },
-    { month: 'Feb', revenue: 0 },
-    { month: 'Mar', revenue: 0 },
-    { month: 'Apr', revenue: 0 },
-    { month: 'May', revenue: 0 },
-    { month: 'Jun', revenue: 0 },
-  ];
+  const monthlyRevenue = analyticsData?.monthlyRevenue || [];
 
-  const productCategoryData = categoriesData?.data.map(cat => ({
-    name: toStringValue(cat.name),
-    products: productsData?.data.filter(p => p.categoryId === cat.id).length || 0,
-  })) || [];
+  const productCategoryData = useMemo(() => {
+    if (!categoriesData?.data || !productsData?.data) return [];
+    return categoriesData.data.map(cat => ({
+      name: toStringValue(cat.name),
+      products: productsData.data.filter(p => p.categoryId === cat.id).length || 0,
+    }));
+  }, [categoriesData, productsData]);
 
   const COLORS = ['#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
 

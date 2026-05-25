@@ -51,13 +51,10 @@ export default function OrdersPage() {
   });
 
   const STATUS_COLORS: Record<OrderStatus, string> = {
-    PENDING: 'bg-yellow-100 text-yellow-700',
-    CONFIRMED: 'bg-blue-100 text-blue-700',
     PROCESSING: 'bg-purple-100 text-purple-700',
     SHIPPED: 'bg-indigo-100 text-indigo-700',
     DELIVERED: 'bg-green-100 text-green-700',
     CANCELLED: 'bg-red-100 text-red-700',
-    REFUNDED: 'bg-gray-100 text-gray-700',
   };
 
   if (isLoading) {
@@ -108,7 +105,7 @@ export default function OrdersPage() {
                     <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700 text-sm max-w-[120px] sm:max-w-[200px] truncate">{toStringValue(order.product?.title)}</td>
                     <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700 text-sm">{order.buyer.phoneNumber}</td>
                     <td className="px-3 py-3 sm:px-6 sm:py-4 font-bold text-gray-900 text-sm whitespace-nowrap">
-                      ${order.totalPrice}
+                      ${order.amount}
                     </td>
                     <td className="px-3 py-3 sm:px-6 sm:py-4">
                       <span className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${STATUS_COLORS[order.status]}`}>
@@ -119,29 +116,40 @@ export default function OrdersPage() {
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-3 py-3 sm:px-6 sm:py-4">
-                      <select
-                        value={order.status}
-                        onChange={(e) => {
-                          const newStatus = e.target.value as OrderStatus;
-                          if (newStatus === 'CANCELLED' || newStatus === 'REFUNDED' || (order.status === 'DELIVERED' && newStatus !== 'DELIVERED')) {
-                            setStatusConfirm({ isOpen: true, orderId: order.id, newStatus });
-                          } else {
-                            updateStatusMutation.mutate({
-                              id: order.id,
-                              status: newStatus
-                            });
-                          }
-                        }}
-                        className="text-xs sm:text-sm border-2 border-gray-300 rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 font-bold focus:border-purple-500 focus:outline-none transition-all button-animate min-w-0"
-                      >
-                        <option value="PENDING">{t('dashboard.pending')}</option>
-                        <option value="CONFIRMED">{t('dashboard.confirmed')}</option>
-                        <option value="PROCESSING">{t('dashboard.processing')}</option>
-                        <option value="SHIPPED">{t('dashboard.shipped')}</option>
-                        <option value="DELIVERED">{t('dashboard.delivered')}</option>
-                        <option value="CANCELLED">{t('orders.cancelled')}</option>
-                        <option value="REFUNDED">{t('orders.refunded')}</option>
-                      </select>
+                      {order.status === 'DELIVERED' || order.status === 'CANCELLED' ? (
+                        <span className="text-gray-400 text-xs sm:text-sm font-medium">—</span>
+                      ) : (
+                        <select
+                          value={order.status}
+                          onChange={(e) => {
+                            const newStatus = e.target.value as OrderStatus;
+                            if (newStatus === 'CANCELLED') {
+                              setStatusConfirm({ isOpen: true, orderId: order.id, newStatus });
+                            } else {
+                              updateStatusMutation.mutate({
+                                id: order.id,
+                                status: newStatus
+                              });
+                            }
+                          }}
+                          className="text-xs sm:text-sm border-2 border-gray-300 rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 font-bold focus:border-purple-500 focus:outline-none transition-all button-animate min-w-0"
+                        >
+                          {order.status === 'PROCESSING' && (
+                            <>
+                              <option value="PROCESSING">{t('dashboard.processing')}</option>
+                              <option value="SHIPPED">{t('dashboard.shipped')}</option>
+                              <option value="CANCELLED">{t('orders.cancelled')}</option>
+                            </>
+                          )}
+                          {order.status === 'SHIPPED' && (
+                            <>
+                              <option value="SHIPPED">{t('dashboard.shipped')}</option>
+                              <option value="DELIVERED">{t('dashboard.delivered')}</option>
+                              <option value="CANCELLED">{t('orders.cancelled')}</option>
+                            </>
+                          )}
+                        </select>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -171,11 +179,11 @@ export default function OrdersPage() {
           }
         }}
         title="Change Order Status"
-        message={`Are you sure you want to change this order status to ${statusConfirm.newStatus}? This action ${statusConfirm.newStatus === 'CANCELLED' || statusConfirm.newStatus === 'REFUNDED' ? 'cannot be easily undone' : 'will update the order status'}.`}
+        message={`Are you sure you want to change this order status to ${statusConfirm.newStatus}? This action ${statusConfirm.newStatus === 'CANCELLED' ? 'cannot be easily undone' : 'will update the order status'}.`}
         confirmText="Change Status"
         cancelText={t('common.cancel')}
-        type={statusConfirm.newStatus === 'CANCELLED' || statusConfirm.newStatus === 'REFUNDED' ? "danger" : "warning"}
-        icon={statusConfirm.newStatus === 'CANCELLED' ? <Ban className="w-8 h-8 text-red-600" /> : statusConfirm.newStatus === 'REFUNDED' ? <DollarSign className="w-8 h-8 text-gray-600" /> : <AlertTriangle className="w-8 h-8 text-yellow-600" />}
+        type={statusConfirm.newStatus === 'CANCELLED' ? "danger" : "warning"}
+        icon={statusConfirm.newStatus === 'CANCELLED' ? <Ban className="w-8 h-8 text-red-600" /> : <AlertTriangle className="w-8 h-8 text-yellow-600" />}
       />
     </div>
   );
