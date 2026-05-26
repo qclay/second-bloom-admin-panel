@@ -66,6 +66,11 @@ export default function ProductsPage() {
     isOpen: false,
     productId: null,
   });
+  const [closeSaleConfirm, setCloseSaleConfirm] = useState<{
+    isOpen: boolean;
+    product: Product | null;
+    buyerId: string;
+  } | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [moderationConfirm, setModerationConfirm] = useState<{ isOpen: boolean; productId: string | null; action: 'approve' | 'reject'; rejectionReason?: string } | null>(null);
   const imageIdsRef = useRef<string[]>([]);
@@ -189,6 +194,28 @@ export default function ProductsPage() {
       toast.error(err.response?.data?.error?.message || 'Failed to moderate');
     },
   });
+
+  const closeDirectSaleMutation = useMutation({
+    mutationFn: ({ id, buyerId }: { id: string; buyerId?: string }) =>
+      productService.closeDirectSale(id, buyerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success(t('products.closeSuccess'));
+      setCloseSaleConfirm(null);
+    },
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { error?: { message?: string } } } };
+      toast.error(err.response?.data?.error?.message || 'Failed to complete sale');
+    },
+  });
+
+  const handleCloseDirectSaleClick = (product: Product) => {
+    setCloseSaleConfirm({
+      isOpen: true,
+      product,
+      buyerId: '',
+    });
+  };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -550,6 +577,16 @@ export default function ProductsPage() {
                       <XIcon className="w-4 h-4" />
                     </Button>
                   </>
+                )}
+                {product.status === 'PUBLISHED' && !product.activeAuction?.id && (
+                  <Button
+                    size="sm"
+                    onClick={() => handleCloseDirectSaleClick(product)}
+                    title={t('products.closeDirectSale')}
+                    className="h-7 text-[11px] bg-slate-900 hover:bg-slate-800 text-white transition-transform duration-150 active:scale-95 py-0 flex-1 min-w-0 font-bold shrink-0"
+                  >
+                    {t('products.closeDirectSale')}
+                  </Button>
                 )}
                 <Button
                   variant="outline"
@@ -928,6 +965,52 @@ export default function ProductsPage() {
               />
             </label>
           ) : undefined}
+        />
+      )}
+
+      {closeSaleConfirm && (
+        <ConfirmDialog
+          isOpen={closeSaleConfirm.isOpen}
+          onClose={() => setCloseSaleConfirm(null)}
+          onConfirm={() => {
+            if (closeSaleConfirm.product) {
+              closeDirectSaleMutation.mutate({
+                id: closeSaleConfirm.product.id,
+                buyerId: closeSaleConfirm.buyerId || undefined,
+              });
+            }
+          }}
+          title={t('products.closeDirectSaleTitle')}
+          message={t('products.closeDirectSaleConfirm')}
+          confirmText={t('products.closeDirectSale')}
+          cancelText={t('common.cancel')}
+          type="info"
+          icon={<Check className="w-8 h-8 text-blue-600" />}
+          closeOnConfirm={false}
+          isLoading={closeDirectSaleMutation.isPending}
+          extraContent={
+            <div className="block text-left w-full mt-4">
+              <label className="block text-sm font-semibold text-slate-700 mb-1">
+                {t('products.selectBuyer')}
+              </label>
+              <select
+                value={closeSaleConfirm.buyerId}
+                onChange={(e) =>
+                  setCloseSaleConfirm((prev) =>
+                    prev ? { ...prev, buyerId: e.target.value } : null
+                  )
+                }
+                className="w-full px-3 py-2 border-2 border-slate-200 rounded-xl focus:border-slate-900 focus:outline-none transition-all"
+              >
+                <option value="">{t('products.soldOffline')}</option>
+                {closeSaleConfirm.product?.interestedBuyers?.map((buyer) => (
+                  <option key={buyer.userId} value={buyer.userId}>
+                    {buyer.firstName || ''} {buyer.lastName || ''} ({buyer.phoneNumber})
+                  </option>
+                ))}
+              </select>
+            </div>
+          }
         />
       )}
     </div>

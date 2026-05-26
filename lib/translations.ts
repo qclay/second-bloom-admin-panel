@@ -287,6 +287,12 @@ export const translations: TranslationMap = {
   'chat.active': { en: 'Active', ru: 'Активные', uz: 'Faol' },
   'chat.typeMessage': { en: 'Type a message...', ru: 'Введите сообщение...', uz: "Xabar yozing..." },
   'chat.loading': { en: 'Loading...', ru: 'Загрузка...', uz: 'Yuklanmoqda...' },
+  'products.closeDirectSale': { en: 'Complete Sale', ru: 'Завершить продажу', uz: 'Sotuvni yakunlash' },
+  'products.closeDirectSaleTitle': { en: 'Complete Direct Sale', ru: 'Завершение прямой продажи', uz: "To'g'ridan-to'g'ri sotuvni yakunlash" },
+  'products.closeDirectSaleConfirm': { en: 'Are you sure you want to complete the sale for this product?', ru: 'Вы уверены, что хотите завершить продажу этого товара?', uz: 'Ushbu mahsulot sotuvini yakunlamoqchimisiz?' },
+  'products.selectBuyer': { en: 'Select buyer (optional)', ru: 'Выберите покупателя (необязательно)', uz: 'Xaridorni tanlang (ixtiyoriy)' },
+  'products.soldOffline': { en: 'Sold offline (no buyer)', ru: 'Продано вне платформы (без покупателя)', uz: 'Platformadan tashqarida sotildi (xaridorsiz)' },
+  'products.closeSuccess': { en: 'Direct sale completed successfully', ru: 'Прямая продажа успешно завершена', uz: "To'g'ridan-to'g'ri sotuv muvaffaqiyatli yakunlandi" },
 };
 
 export type TranslationKey = keyof typeof translations;

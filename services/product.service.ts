@@ -90,4 +90,9 @@ export const productService = {
     const response = await apiClient.patch<ApiResponse<Product>>(`/products/${id}/moderate`, dto);
     return response.data.data;
   },
+
+  async closeDirectSale(id: string, buyerId?: string): Promise<Product> {
+    const response = await apiClient.post<ApiResponse<Product>>(`/products/${id}/close`, { buyerId });
+    return response.data.data;
+  },
 };

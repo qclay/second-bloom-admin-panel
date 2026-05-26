@@ -95,6 +95,18 @@ export interface Product {
   updatedAt: string;
   deletedAt: string | null;
   activeAuction?: { id: string };
+  interestedBuyers?: InterestedBuyer[];
+}
+
+export interface InterestedBuyer {
+  userId: string;
+  firstName: string | null;
+  lastName: string | null;
+  phoneNumber: string;
+  avatarUrl: string | null;
+  conversationId: string;
+  lastMessageAt: string;
+  isOnline: boolean;
 }
 
 export type OrderStatus = 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
