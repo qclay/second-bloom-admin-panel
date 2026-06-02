@@ -7,6 +7,7 @@ import { authService } from '@/services/auth.service';
 import { useAuthStore } from '@/lib/auth-store';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { ShieldCheck, Lock, ArrowLeft, Phone, KeyRound } from 'lucide-react';
 
 const DEFAULT_COUNTRY_CODE = '+998';
 
@@ -77,119 +78,139 @@ export default function LoginPage() {
       code,
     });
   };
-  const inputClass =
-    'h-11 w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all';
-  const labelClass = 'block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1';
+
+  const labelClass = 'block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5';
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden p-4 sm:p-6">
-      {/* Background Decorations */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px] animate-float" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px] animate-float" style={{ animationDelay: '-2s' }} />
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(139,92,246,0.07),transparent)]" />
 
-      <div className="w-full max-w-md animate-slide-up">
-        <div className="glass-panel rounded-[2.5rem] p-8 sm:p-10 border border-white/50 relative">
-          <div className="text-center mb-10">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-2xl ai-glow">
-              <span className="text-4xl" aria-hidden>🌸</span>
+      <div className="w-full max-w-sm animate-slide-up relative">
+        {/* Header */}
+        <div className="mb-8 flex flex-col items-center gap-4">
+          <div className="w-11 h-11 rounded-2xl bg-slate-900 flex items-center justify-center shadow-lg">
+            <ShieldCheck className="w-5 h-5 text-white" strokeWidth={1.5} />
+          </div>
+          <div className="text-center">
+            <h1 className="text-lg font-bold text-slate-900 tracking-tight leading-none">Second Bloom</h1>
+            <p className="text-[11px] text-slate-400 mt-1 font-medium tracking-wider uppercase">Admin Panel</p>
+          </div>
+        </div>
+
+        {/* Card */}
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          {/* Step indicator */}
+          <div className="px-7 pt-6 pb-0">
+            <div className="flex items-center gap-2 mb-5">
+              <div className={`h-0.5 flex-1 rounded-full transition-all duration-500 ${step === 'phone' ? 'bg-slate-900' : 'bg-slate-900'}`} />
+              <div className={`h-0.5 flex-1 rounded-full transition-all duration-500 ${step === 'otp' ? 'bg-slate-900' : 'bg-slate-200'}`} />
             </div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">
-              Second Bloom
-            </h1>
-            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">
-              Admin Portal • Secure Access
-            </p>
           </div>
 
-          {step === 'phone' ? (
-            <form onSubmit={handleSendOtp} className="space-y-4">
-              <div>
-                <label htmlFor="country-code" className={labelClass}>
-                  Country code
-                </label>
-                <input
-                  id="country-code"
-                  type="tel"
-                  value={countryCode}
-                  readOnly
-                  tabIndex={-1}
-                  className="input-premium bg-slate-100/50 cursor-not-allowed border-slate-200 !font-black !text-slate-400"
-                  placeholder="+998"
-                  autoComplete="tel-country-code"
-                  aria-readonly="true"
-                />
-              </div>
-              <div>
-                <label htmlFor="phone-number" className={labelClass}>
-                  Phone number
-                </label>
-                <input
-                  id="phone-number"
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                  className="input-premium !font-black !text-slate-900"
-                  placeholder="904440041"
-                  autoComplete="tel-national"
-                />
-              </div>
-              <Button
-                type="submit"
-                className="btn-premium w-full h-14 rounded-2xl font-black text-sm uppercase tracking-widest mt-2"
-                isLoading={sendOtpMutation.isPending}
-                disabled={!localNumber.length}
-              >
-                Send OTP Code
-              </Button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div>
-                <label htmlFor="otp-code" className={labelClass}>
-                  OTP Code
-                </label>
-                <input
-                  id="otp-code"
-                  type="text"
-                  inputMode="numeric"
-                  value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                  className={inputClass}
-                  placeholder="Enter 6-digit code"
-                  maxLength={6}
-                  autoComplete="one-time-code"
-                />
-              </div>
-              <div className="flex gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setStep('phone');
-                    setOtpCode('');
-                  }}
-                  className="flex-1 h-11 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-purple-500 hover:text-purple-600"
-                >
-                  Back
-                </Button>
+          <div className="px-7 pb-7">
+            {step === 'phone' ? (
+              <form onSubmit={handleSendOtp} className="space-y-4">
+                <div>
+                  <p className="text-sm font-semibold text-slate-700 mb-0.5">Sign in</p>
+                  <p className="text-xs text-slate-400 mb-5">Enter your phone number to continue</p>
+
+                  <label htmlFor="country-code" className={labelClass}>
+                    Country code
+                  </label>
+                  <div className="relative mb-3">
+                    <input
+                      id="country-code"
+                      type="tel"
+                      value={countryCode}
+                      readOnly
+                      tabIndex={-1}
+                      className="input-premium w-full cursor-not-allowed text-slate-400 font-semibold"
+                      autoComplete="tel-country-code"
+                      aria-readonly="true"
+                    />
+                  </div>
+
+                  <label htmlFor="phone-number" className={labelClass}>
+                    Phone number
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" strokeWidth={1.5} />
+                    <input
+                      id="phone-number"
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                      className="input-premium w-full pl-11 font-semibold text-slate-900"
+                      placeholder="904440041"
+                      autoComplete="tel-national"
+                    />
+                  </div>
+                </div>
+
                 <Button
                   type="submit"
-                  className="flex-1 h-11 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold border-0"
-                  isLoading={verifyOtpMutation.isPending}
-                  disabled={otpCode.length < 6}
+                  className="btn-premium w-full h-11 rounded-xl font-semibold text-sm mt-1"
+                  isLoading={sendOtpMutation.isPending}
+                  disabled={!localNumber.length}
                 >
-                  Verify
+                  Continue
                 </Button>
-              </div>
-            </form>
-          )}
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyOtp} className="space-y-4">
+                <div>
+                  <p className="text-sm font-semibold text-slate-700 mb-0.5">Verify</p>
+                  <p className="text-xs text-slate-400 mb-5">
+                    Code sent to {normalizedCountryCode} {localNumber}
+                  </p>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500 inline-flex items-center gap-1.5">
-              <span aria-hidden>🔒</span>
-              Secure login with OTP verification
-            </p>
+                  <label htmlFor="otp-code" className={labelClass}>
+                    One-time code
+                  </label>
+                  <div className="relative">
+                    <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" strokeWidth={1.5} />
+                    <input
+                      id="otp-code"
+                      type="text"
+                      inputMode="numeric"
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                      className="input-premium w-full pl-11 font-mono font-bold text-slate-900 tracking-[0.3em] text-center"
+                      placeholder="• • • • • •"
+                      maxLength={6}
+                      autoComplete="one-time-code"
+                      autoFocus
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => { setStep('phone'); setOtpCode(''); }}
+                    className="h-11 w-11 shrink-0 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700 transition-colors"
+                    aria-label="Back"
+                  >
+                    <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
+                  </button>
+                  <Button
+                    type="submit"
+                    className="btn-premium flex-1 h-11 rounded-xl font-semibold text-sm"
+                    isLoading={verifyOtpMutation.isPending}
+                    disabled={otpCode.length < 6}
+                  >
+                    Sign in
+                  </Button>
+                </div>
+              </form>
+            )}
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-5 flex items-center justify-center gap-1.5 text-slate-400">
+          <Lock className="w-3 h-3" strokeWidth={1.5} />
+          <span className="text-[11px]">Secured with OTP</span>
         </div>
       </div>
     </div>
