@@ -133,14 +133,14 @@ export default function LoginPage() {
                   <label htmlFor="phone-number" className={labelClass}>
                     Phone number
                   </label>
-                  <div className="relative">
-                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" strokeWidth={1.5} />
+                  <div className="input-premium flex items-center gap-2.5">
+                    <Phone className="w-4 h-4 text-slate-400 shrink-0" strokeWidth={1.5} />
                     <input
                       id="phone-number"
                       type="tel"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                      className="input-premium w-full pl-11 font-semibold text-slate-900"
+                      className="flex-1 bg-transparent outline-none font-semibold text-slate-900 placeholder:text-slate-400"
                       placeholder="904440041"
                       autoComplete="tel-national"
                     />
@@ -167,15 +167,15 @@ export default function LoginPage() {
                   <label htmlFor="otp-code" className={labelClass}>
                     One-time code
                   </label>
-                  <div className="relative">
-                    <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" strokeWidth={1.5} />
+                  <div className="input-premium flex items-center gap-2.5">
+                    <KeyRound className="w-4 h-4 text-slate-400 shrink-0" strokeWidth={1.5} />
                     <input
                       id="otp-code"
                       type="text"
                       inputMode="numeric"
                       value={otpCode}
                       onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                      className="input-premium w-full pl-11 font-mono font-bold text-slate-900 tracking-[0.3em] text-center"
+                      className="flex-1 bg-transparent outline-none font-mono font-bold text-slate-900 tracking-[0.3em] text-center placeholder:text-slate-400 placeholder:tracking-[0.3em]"
                       placeholder="• • • • • •"
                       maxLength={6}
                       autoComplete="one-time-code"
