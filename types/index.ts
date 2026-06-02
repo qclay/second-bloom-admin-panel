@@ -180,9 +180,13 @@ export interface PaymentAnalytics {
     pendingCount: number;
     successRate: number;
     avgTicket: number;
+    failedCount?: number;
+    expiredCount?: number;
   };
   bySource: Array<{ source: PaymentSource; revenue: number; count: number }>;
   byType: Array<{ paymentType: PaymentType; revenue: number; count: number; avgTicket: number }>;
+  byStatus?: Array<{ status: AdminPaymentStatus; revenue: number; count: number }>;
+  byGateway?: Array<{ gateway: string; revenue: number; count: number; avgTicket: number }>;
   timeSeries: Array<{ date: string; revenue: number; count: number }>;
 }
 

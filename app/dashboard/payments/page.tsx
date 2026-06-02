@@ -6,6 +6,9 @@ import { paymentService } from '@/services/payment.service';
 import { Pagination } from '@/components/ui/pagination';
 import { useTranslations } from '@/lib/translations';
 import { PaymentSource, AdminPaymentStatus } from '@/types';
+
+type StatusFilter = AdminPaymentStatus | 'ALL';
+const STATUS_FILTER_OPTIONS: StatusFilter[] = ['ALL', 'COMPLETED', 'PENDING', 'EXPIRED'];
 import { AnalyticsBlock } from '@/components/payments/analytics-block';
 
 const STATUS_COLORS: Record<AdminPaymentStatus, string> = {
@@ -25,18 +28,20 @@ type SourceFilter = PaymentSource | 'ALL';
 
 export default function PaymentsPage() {
   const t = useTranslations();
-  const [source, setSource] = useState<SourceFilter>('APP');
+  const [source, setSource] = useState<SourceFilter>('ALL');
+  const [status, setStatus] = useState<StatusFilter>('ALL');
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [period, setPeriod] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
 
   const { data, isLoading } = useQuery({
-    queryKey: ['payments', source, page, limit],
+    queryKey: ['payments', source, status, page, limit],
     queryFn: () =>
       paymentService.getAll({
         page,
         limit,
         ...(source !== 'ALL' && { source }),
+        ...(status !== 'ALL' && { status }),
       }),
   });
 
@@ -67,8 +72,8 @@ export default function PaymentsPage() {
         onPeriodChange={setPeriod}
       />
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 mr-2">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 mr-2 min-w-[64px]">
           {t('payments.source')}:
         </span>
         {(['APP', 'BOT', 'ALL'] as SourceFilter[]).map((opt) => {
@@ -79,10 +84,7 @@ export default function PaymentsPage() {
             <button
               key={opt}
               type="button"
-              onClick={() => {
-                setSource(opt);
-                setPage(1);
-              }}
+              onClick={() => { setSource(opt); setPage(1); }}
               className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${
                 isActive
                   ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md'
@@ -90,6 +92,38 @@ export default function PaymentsPage() {
               }`}
             >
               {t(labelKey)}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 mr-2 min-w-[64px]">
+          {t('payments.statusFilter')}:
+        </span>
+        {STATUS_FILTER_OPTIONS.map((opt) => {
+          const isActive = status === opt;
+          const label =
+            opt === 'ALL' ? t('payments.statusAll') :
+            opt === 'COMPLETED' ? 'Completed' :
+            opt === 'PENDING' ? 'Pending' : 'Expired';
+          const activeClass =
+            opt === 'COMPLETED' ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-md' :
+            opt === 'PENDING' ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white shadow-md' :
+            opt === 'EXPIRED' ? 'bg-gradient-to-r from-gray-400 to-slate-500 text-white shadow-md' :
+            'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md';
+          return (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => { setStatus(opt); setPage(1); }}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${
+                isActive
+                  ? activeClass
+                  : 'bg-white border border-gray-200 text-slate-600 hover:border-purple-300'
+              }`}
+            >
+              {label}
             </button>
           );
         })}
