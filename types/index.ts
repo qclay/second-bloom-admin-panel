@@ -190,6 +190,20 @@ export interface PaymentAnalytics {
   timeSeries: Array<{ date: string; revenue: number; count: number }>;
 }
 
+export interface ProductAnalytics {
+  period: '7d' | '30d' | '90d' | 'all';
+  kpi: {
+    total: number;
+    published: number;
+    pending: number;
+    rejected: number;
+    draft: number;
+  };
+  byStatus: Array<{ status: string; count: number }>;
+  bySource: Array<{ source: string; count: number }>;
+  timeSeries: Array<{ date: string; count: number }>;
+}
+
 export interface PaginationMeta {
   page: number;
   limit: number;

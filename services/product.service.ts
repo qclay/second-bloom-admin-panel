@@ -1,5 +1,5 @@
 import { apiClient, ApiResponse } from '@/lib/api-client';
-import { Product, PaginatedResponse } from '@/types';
+import { Product, PaginatedResponse, ProductAnalytics } from '@/types';
 
 export interface AuctionOptions {
   startPrice?: number;
@@ -93,6 +93,11 @@ export const productService = {
 
   async closeDirectSale(id: string, buyerId?: string): Promise<Product> {
     const response = await apiClient.post<ApiResponse<Product>>(`/products/${id}/close`, { buyerId });
+    return response.data.data;
+  },
+
+  async getAnalytics(query?: { period?: '7d' | '30d' | '90d' | 'all' }): Promise<ProductAnalytics> {
+    const response = await apiClient.get<ApiResponse<ProductAnalytics>>('/products/admin/analytics', { params: query });
     return response.data.data;
   },
 };
