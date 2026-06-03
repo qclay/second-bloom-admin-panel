@@ -225,7 +225,7 @@ export const translations: TranslationMap = {
   'publications.analytics.published': { en: 'Published', ru: 'Опубликовано', uz: 'Nashr qilingan' },
   'publications.analytics.pending': { en: 'Pending review', ru: 'На модерации', uz: 'Koʼrib chiqilmoqda' },
   'publications.analytics.rejected': { en: 'Rejected', ru: 'Отклонено', uz: 'Rad etilgan' },
-  'publications.analytics.sourceSplit': { en: 'By source', ru: 'По источникам', uz: 'Manba boʼyicha' },
+  'publications.analytics.sourceSplit': { en: 'By source (approximate for historical data)', ru: 'По источникам (приближённо для старых данных)', uz: 'Manba boʼyicha (taxminiy)' },
   'publications.analytics.dailyChart': { en: 'Submissions per day', ru: 'Публикаций в день', uz: 'Kunlik nashrlar' },
   'publications.analytics.byStatus': { en: 'By status', ru: 'По статусам', uz: "Status bo'yicha" },
   'publications.analytics.noData': { en: 'No data for this period', ru: 'Нет данных за период', uz: "Bu davr uchun ma'lumot yo'q" },

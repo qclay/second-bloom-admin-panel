@@ -70,8 +70,7 @@ export function PublicationsAnalyticsBlock({ period, onPeriodChange }: Publicati
 
   const sourceLabel = (src: string) => {
     if (src === 'APP') return t('publications.analytics.sourceApp');
-    if (src === 'BOT') return t('publications.analytics.sourceBot');
-    return t('publications.analytics.sourceUnknown');
+    return t('publications.analytics.sourceBot');
   };
 
   return (
@@ -161,7 +160,7 @@ export function PublicationsAnalyticsBlock({ period, onPeriodChange }: Publicati
             <div className="space-y-3">
               {data.bySource.map((row) => {
                 const share = totalBySource > 0 ? row.count / totalBySource : 0;
-                const colorClass = row.source === 'APP' ? 'bg-purple-500' : row.source === 'BOT' ? 'bg-sky-500' : 'bg-slate-400';
+                const colorClass = row.source === 'APP' ? 'bg-purple-500' : 'bg-sky-500';
                 return (
                   <div key={row.source}>
                     <div className="flex justify-between items-baseline text-sm mb-1">
