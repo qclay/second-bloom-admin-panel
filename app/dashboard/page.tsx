@@ -74,6 +74,12 @@ export default function DashboardPage() {
     queryFn: () => analyticsService.getDashboard(analyticsParams),
   });
 
+  const { data: activeUsersData } = useQuery({
+    queryKey: ['analytics-active-users'],
+    queryFn: () => analyticsService.getActiveUsers(),
+    refetchInterval: 60_000,
+  });
+
   const totalProducts = analyticsData?.totals.totalBouquets || 0;
   const totalOrders = analyticsData?.totals.totalOrders || 0;
   const totalUsers = analyticsData?.totals.totalUsers || 0;
@@ -152,7 +158,7 @@ export default function DashboardPage() {
               <h2 className="text-lg font-bold text-gray-900">{t('dashboard.analytics')}</h2>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-50 border border-purple-100">
                 <span className="text-sm text-gray-600">{t('dashboard.usersOnlineNow')}</span>
-                <span className="font-bold text-purple-600 tabular-nums text-lg">{analyticsData.today.usersOnline}</span>
+                <span className="font-bold text-purple-600 tabular-nums text-lg">{activeUsersData?.activeUsers ?? 0}</span>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -201,7 +207,7 @@ export default function DashboardPage() {
               </div>
               <p className="text-xs text-gray-500 mb-3">{analyticsData.today.label}</p>
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.usersOnline')}</span><span className="font-semibold text-purple-600 tabular-nums">{analyticsData.today.usersOnline}</span></div>
+                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.usersOnline')}</span><span className="font-semibold text-purple-600 tabular-nums">{activeUsersData?.activeUsers ?? 0}</span></div>
                 <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.bouquetsAdded')}</span><span className="font-semibold text-blue-600 tabular-nums">{analyticsData.today.bouquetsAdded}</span></div>
                 <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.bids')}</span><span className="font-semibold text-emerald-600 tabular-nums">{analyticsData.today.bidsCount}</span></div>
               </div>
@@ -213,7 +219,7 @@ export default function DashboardPage() {
               </div>
               <p className="text-xs text-gray-500 mb-3">{analyticsData.week.label}</p>
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.usersOnline')}</span><span className="font-semibold text-purple-600 tabular-nums">{analyticsData.week.usersOnline}</span></div>
+                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.usersOnline')}</span><span className="font-semibold text-purple-600 tabular-nums">{activeUsersData?.activeUsers ?? 0}</span></div>
                 <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.bouquetsAdded')}</span><span className="font-semibold text-blue-600 tabular-nums">{analyticsData.week.bouquetsAdded}</span></div>
                 <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.bids')}</span><span className="font-semibold text-emerald-600 tabular-nums">{analyticsData.week.bidsCount}</span></div>
               </div>

@@ -53,6 +53,10 @@ export interface AnalyticsDashboard {
   orderStatusDistribution: OrderStatusDistribution[];
 }
 
+export interface ActiveUsersStats {
+  activeUsers: number;
+}
+
 export interface AnalyticsQuery {
   dateFrom?: string;
   dateTo?: string;
@@ -63,6 +67,11 @@ export const analyticsService = {
     const response = await apiClient.get<ApiResponse<AnalyticsDashboard>>('/analytics/dashboard', {
       params: params?.dateFrom && params?.dateTo ? { dateFrom: params.dateFrom, dateTo: params.dateTo } : undefined,
     });
+    return response.data.data;
+  },
+
+  async getActiveUsers(): Promise<ActiveUsersStats> {
+    const response = await apiClient.get<ApiResponse<ActiveUsersStats>>('/analytics/active-users');
     return response.data.data;
   },
 };

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userService } from '@/services/user.service';
+import { analyticsService } from '@/services/analytics.service';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Pagination } from '@/components/ui/pagination';
@@ -51,6 +52,12 @@ export default function UsersPage() {
       page,
       limit,
     }),
+  });
+
+  const { data: activeUsersData } = useQuery({
+    queryKey: ['analytics-active-users'],
+    queryFn: () => analyticsService.getActiveUsers(),
+    refetchInterval: 60_000,
   });
 
   const toggleActiveMutation = useMutation({
@@ -130,7 +137,7 @@ export default function UsersPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {[
           { label: t('users.totalUsers'), value: total, color: 'from-blue-500 to-cyan-400' },
-          { label: t('users.activeUsers'), value: data?.data.filter(u => u.isActive).length ?? 0, color: 'from-emerald-500 to-teal-400' },
+          { label: t('users.activeUsers'), value: activeUsersData?.activeUsers ?? 0, color: 'from-emerald-500 to-teal-400' },
           { label: t('users.blockedUsers'), value: data?.data.filter(u => !u.isActive).length ?? 0, color: 'from-rose-500 to-pink-400' },
           { label: t('users.admins'), value: data?.data.filter(u => u.role === 'ADMIN').length ?? 0, color: 'from-purple-500 to-indigo-400' },
         ].map((stat, i) => (
