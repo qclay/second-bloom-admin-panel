@@ -54,7 +54,12 @@ export interface AnalyticsDashboard {
 }
 
 export interface ActiveUsersStats {
+  /** Active users right now (GA4 realtime). */
   activeUsers: number;
+  /** GA total users today (all platforms). */
+  today: number;
+  /** GA total users this week, Monday→today (all platforms). */
+  week: number;
 }
 
 export interface AnalyticsQuery {

@@ -113,6 +113,7 @@ export const translations: TranslationMap = {
   'dashboard.thisWeek': { en: 'This week', ru: 'На этой неделе', uz: "Bu hafta" },
   'dashboard.totals': { en: 'Totals', ru: 'Итого', uz: 'Jami' },
   'dashboard.usersOnline': { en: 'Users online', ru: 'Онлайн', uz: 'Onlayn' },
+  'dashboard.gaUsers': { en: 'Users (GA)', ru: 'Пользователи', uz: 'Foydalanuvchilar' },
   'dashboard.bouquetsAdded': { en: 'Bouquets added', ru: 'Добавлено букетов', uz: "Qo'shilgan buketlar" },
   'dashboard.bids': { en: 'Bids', ru: 'Ставки', uz: 'Takliflar' },
   'dashboard.totalBouquets': { en: 'Total bouquets', ru: 'Всего букетов', uz: "Jami buketlar" },

@@ -207,7 +207,7 @@ export default function DashboardPage() {
               </div>
               <p className="text-xs text-gray-500 mb-3">{analyticsData.today.label}</p>
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.usersOnline')}</span><span className="font-semibold text-purple-600 tabular-nums">{activeUsersData?.activeUsers ?? 0}</span></div>
+                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.gaUsers')}</span><span className="font-semibold text-purple-600 tabular-nums">{activeUsersData?.today ?? 0}</span></div>
                 <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.bouquetsAdded')}</span><span className="font-semibold text-blue-600 tabular-nums">{analyticsData.today.bouquetsAdded}</span></div>
                 <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.bids')}</span><span className="font-semibold text-emerald-600 tabular-nums">{analyticsData.today.bidsCount}</span></div>
               </div>
@@ -219,7 +219,7 @@ export default function DashboardPage() {
               </div>
               <p className="text-xs text-gray-500 mb-3">{analyticsData.week.label}</p>
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.usersOnline')}</span><span className="font-semibold text-purple-600 tabular-nums">{activeUsersData?.activeUsers ?? 0}</span></div>
+                <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.gaUsers')}</span><span className="font-semibold text-purple-600 tabular-nums">{activeUsersData?.week ?? 0}</span></div>
                 <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.bouquetsAdded')}</span><span className="font-semibold text-blue-600 tabular-nums">{analyticsData.week.bouquetsAdded}</span></div>
                 <div className="flex justify-between items-center"><span className="text-gray-600">{t('dashboard.bids')}</span><span className="font-semibold text-emerald-600 tabular-nums">{analyticsData.week.bidsCount}</span></div>
               </div>
