@@ -105,7 +105,7 @@ export default function OrdersPage() {
                     <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700 text-sm max-w-[120px] sm:max-w-[200px] truncate">{toStringValue(order.product?.title)}</td>
                     <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700 text-sm">{order.buyer.phoneNumber}</td>
                     <td className="px-3 py-3 sm:px-6 sm:py-4 font-bold text-gray-900 text-sm whitespace-nowrap">
-                      ${order.amount}
+                      {order.amount}
                     </td>
                     <td className="px-3 py-3 sm:px-6 sm:py-4">
                       <span className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${STATUS_COLORS[order.status]}`}>

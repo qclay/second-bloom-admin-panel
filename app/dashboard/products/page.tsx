@@ -518,7 +518,7 @@ export default function ProductsPage() {
                   {toStringValue(product.title)}
                 </h3>
                 <span className="text-sm font-bold text-blue-600 shrink-0">
-                  ${product.price}
+                  {product.price}
                 </span>
               </div>
               <p className="text-[11px] text-gray-500 line-clamp-2 mb-2 min-h-[1.75rem]">
@@ -817,7 +817,7 @@ export default function ProductsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label={formData.createAuction ? 'Price / Start Price ($)' : 'Price ($)'}
+                  label={formData.createAuction ? 'Price / Start Price' : 'Price'}
                   type="number"
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value === '' ? '' : e.target.value })}
@@ -856,7 +856,7 @@ export default function ProductsPage() {
                     {formData.createAuction && (
                       <div className="grid grid-cols-2 gap-4 pl-7">
                         <Input
-                          label="Auction start price ($)"
+                          label="Auction start price"
                           type="number"
                           value={formData.auctionStartPrice !== '' ? formData.auctionStartPrice : formData.price}
                           onChange={(e) => setFormData({ ...formData, auctionStartPrice: e.target.value === '' ? '' : e.target.value })}

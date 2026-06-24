@@ -115,7 +115,7 @@ export default function DashboardPage() {
     { title: t('dashboard.totalProducts'), value: totalProducts.toString(), icon: <Package className="w-5 h-5 sm:w-6 sm:h-6 text-white" />, bgColor: 'bg-gradient-to-br from-blue-50 to-blue-100', iconBg: 'bg-blue-500' },
     { title: t('dashboard.totalOrders'), value: totalOrders.toString(), icon: <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />, bgColor: 'bg-gradient-to-br from-green-50 to-green-100', iconBg: 'bg-green-500' },
     { title: t('dashboard.totalUsers'), value: totalUsers.toString(), icon: <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />, bgColor: 'bg-gradient-to-br from-purple-50 to-purple-100', iconBg: 'bg-purple-500' },
-    { title: t('dashboard.revenue'), value: `$${totalRevenue.toLocaleString()}`, icon: <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-white" />, bgColor: 'bg-gradient-to-br from-yellow-50 to-yellow-100', iconBg: 'bg-yellow-500' },
+    { title: t('dashboard.revenue'), value: totalRevenue.toLocaleString(), icon: <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-white" />, bgColor: 'bg-gradient-to-br from-yellow-50 to-yellow-100', iconBg: 'bg-yellow-500' },
     { title: t('dashboard.categories'), value: totalCategories.toString(), icon: <Folder className="w-5 h-5 sm:w-6 sm:h-6 text-white" />, bgColor: 'bg-gradient-to-br from-pink-50 to-pink-100', iconBg: 'bg-pink-500' },
     { title: t('dashboard.pendingOrders'), value: pendingOrders.toString(), icon: <Hourglass className="w-5 h-5 sm:w-6 sm:h-6 text-white" />, bgColor: 'bg-gradient-to-br from-orange-50 to-orange-100', iconBg: 'bg-orange-500' },
   ];
@@ -284,9 +284,9 @@ export default function DashboardPage() {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} />
-                <YAxis stroke="#94a3b8" fontSize={12} tickFormatter={(v) => `$${v}`} />
+                <YAxis stroke="#94a3b8" fontSize={12} tickFormatter={(v) => `${v}`} />
                 <Tooltip
-                  formatter={(value: number | undefined) => [`$${Number(value ?? 0).toLocaleString()}`, 'Revenue']}
+                  formatter={(value: number | undefined) => [`${Number(value ?? 0).toLocaleString()}`, 'Revenue']}
                   contentStyle={{
                     backgroundColor: '#fff',
                     border: '1px solid #e5e7eb',
