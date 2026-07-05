@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { requestService } from '@/services/request.service';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
-import { BouquetRequestStatus } from '@/types';
+import { BouquetRequestImage, BouquetRequestStatus } from '@/types';
 import { useTranslations } from '@/lib/translations';
 import { Trash2, Flower2 } from 'lucide-react';
 
@@ -20,6 +21,7 @@ export default function RequestsPage() {
     isOpen: false,
     requestId: null,
   });
+  const [gallery, setGallery] = useState<BouquetRequestImage[] | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['requests', statusFilter, page, limit],
@@ -94,6 +96,7 @@ export default function RequestsPage() {
           <table className="w-full min-w-[720px]">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
+                <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('requests.photo')}</th>
                 <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase">{t('requests.buyer')}</th>
                 <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">{t('requests.budget')}</th>
                 <th className="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">{t('requests.targetDate')}</th>
@@ -106,7 +109,7 @@ export default function RequestsPage() {
             <tbody className="divide-y divide-gray-200">
               {requests.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 sm:px-6 py-12 text-center text-gray-500 text-sm sm:text-base">
+                  <td colSpan={8} className="px-4 sm:px-6 py-12 text-center text-gray-500 text-sm sm:text-base">
                     <div className="flex flex-col items-center gap-2">
                       <Flower2 className="w-8 h-8 text-gray-300" />
                       {t('requests.noRequests')}
@@ -116,6 +119,32 @@ export default function RequestsPage() {
               ) : (
                 requests.map((request) => (
                   <tr key={request.id} className="hover:bg-gray-50">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4">
+                      {request.images.length > 0 ? (
+                        <button
+                          type="button"
+                          onClick={() => setGallery(request.images)}
+                          className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 shrink-0 hover:opacity-80 transition-opacity"
+                        >
+                          <Image
+                            src={request.images[0].url}
+                            alt=""
+                            fill
+                            sizes="48px"
+                            className="object-cover"
+                          />
+                          {request.images.length > 1 && (
+                            <span className="absolute bottom-0 right-0 px-1 text-[9px] font-bold text-white bg-black/60 rounded-tl">
+                              +{request.images.length - 1}
+                            </span>
+                          )}
+                        </button>
+                      ) : (
+                        <div className="w-12 h-12 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0">
+                          <Flower2 className="w-5 h-5 text-gray-300" />
+                        </div>
+                      )}
+                    </td>
                     <td className="px-3 py-3 sm:px-6 sm:py-4 text-sm">
                       <p className="font-semibold text-gray-900">
                         {request.buyer?.firstName || ''} {request.buyer?.lastName || ''}
@@ -181,6 +210,26 @@ export default function RequestsPage() {
         closeOnConfirm={false}
         isLoading={deleteMutation.isPending}
       />
+
+      {gallery && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setGallery(null)}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {gallery.map((img) => (
+                <div key={img.fileId} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100">
+                  <Image src={img.url} alt="" fill sizes="200px" className="object-cover" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

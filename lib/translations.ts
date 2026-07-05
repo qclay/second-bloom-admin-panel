@@ -186,6 +186,7 @@ export const translations: TranslationMap = {
   'requests.all': { en: 'All', ru: 'Все', uz: 'Barchasi' },
   'requests.active': { en: 'Active', ru: 'Активные', uz: 'Faol' },
   'requests.closed': { en: 'Closed', ru: 'Закрытые', uz: 'Yopilgan' },
+  'requests.photo': { en: 'Photo', ru: 'Фото', uz: 'Rasm' },
   'requests.buyer': { en: 'Buyer', ru: 'Покупатель', uz: 'Xaridor' },
   'requests.budget': { en: 'Budget', ru: 'Бюджет', uz: 'Byudjet' },
   'requests.targetDate': { en: 'Needed by', ru: 'Нужно к', uz: 'Kerak bo\'lgan sana' },
