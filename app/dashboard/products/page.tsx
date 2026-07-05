@@ -17,7 +17,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { Product } from '@/types';
 import { useTranslations } from '@/lib/translations';
-import { Package, Check, X as XIcon, Trash2, Camera } from 'lucide-react';
+import { Package, Check, X as XIcon, Trash2, Camera, Star } from 'lucide-react';
 
 function toStringValue(value: unknown): string {
   if (value == null) return '';
@@ -192,6 +192,19 @@ export default function ProductsPage() {
     onError: (error: unknown) => {
       const err = error as { response?: { data?: { error?: { message?: string } } } };
       toast.error(err.response?.data?.error?.message || 'Failed to moderate');
+    },
+  });
+
+  const toggleFeaturedMutation = useMutation({
+    mutationFn: ({ id, isFeatured }: { id: string; isFeatured: boolean }) =>
+      productService.update(id, { isFeatured }),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success(variables.isFeatured ? t('products.featuredOn') : t('products.featuredOff'));
+    },
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { error?: { message?: string } } } };
+      toast.error(err.response?.data?.error?.message || 'Failed to update');
     },
   });
 
@@ -555,6 +568,11 @@ export default function ProductsPage() {
                 <span className="text-[10px] font-medium text-gray-600 flex items-center gap-1">
                   <Package className="w-3 h-3" /> {product.quantity}
                 </span>
+                {product.isFeatured && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700">
+                    <Star className="w-3 h-3 fill-amber-500 text-amber-500" /> {t('products.top')}
+                  </span>
+                )}
               </div>
               <div className="flex gap-1 flex-wrap">
                 {(product.status === 'PENDING' || product.status === 'DRAFT') && (
@@ -588,6 +606,20 @@ export default function ProductsPage() {
                     {t('products.closeDirectSale')}
                   </Button>
                 )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => toggleFeaturedMutation.mutate({ id: product.id, isFeatured: !product.isFeatured })}
+                  disabled={toggleFeaturedMutation.isPending}
+                  title={product.isFeatured ? t('products.featuredOff') : t('products.featuredOn')}
+                  className={`h-7 w-7 p-0 transition-transform duration-150 active:scale-95 flex items-center justify-center shrink-0 ${
+                    product.isFeatured
+                      ? 'border-amber-300 text-amber-600 bg-amber-50 hover:bg-amber-100'
+                      : 'border-gray-200 text-gray-400 hover:bg-gray-50'
+                  }`}
+                >
+                  <Star className={`w-4 h-4 ${product.isFeatured ? 'fill-amber-500 text-amber-500' : ''}`} />
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"
