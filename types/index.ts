@@ -204,6 +204,39 @@ export interface ProductAnalytics {
   timeSeries: Array<{ date: string; count: number }>;
 }
 
+export type BouquetRequestStatus = 'ACTIVE' | 'CLOSED';
+
+export interface BouquetRequestImage {
+  fileId: string;
+  url: string;
+}
+
+export interface BouquetRequestBuyer {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  phoneNumber: string;
+  telegramUsername?: string | null;
+}
+
+export interface BouquetRequest {
+  id: string;
+  buyerId: string;
+  buyer?: BouquetRequestBuyer | null;
+  budget: number;
+  currency: string;
+  targetDate: string;
+  sizeId: string | null;
+  size?: { id: string; name: string | Record<string, string>; slug: string } | null;
+  description: string | Record<string, string> | null;
+  status: BouquetRequestStatus;
+  images: BouquetRequestImage[];
+  offersCount?: number;
+  unreadCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface PaginationMeta {
   page: number;
   limit: number;

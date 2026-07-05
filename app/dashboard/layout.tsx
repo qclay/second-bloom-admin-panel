@@ -23,6 +23,7 @@ import {
   X,
   CreditCard,
   FileText,
+  Flower2,
 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -104,6 +105,7 @@ export default function DashboardLayout({
       title: 'Community & Moderation',
       items: [
         { nameKey: 'nav.users', href: '/dashboard/users', icon: <Users className="w-5 h-5" /> },
+        { nameKey: 'nav.requests', href: '/dashboard/requests', icon: <Flower2 className="w-5 h-5" /> },
         { nameKey: 'nav.reports', href: '/dashboard/reports', icon: <AlertTriangle className="w-5 h-5" /> },
       ]
     },
