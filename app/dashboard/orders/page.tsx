@@ -8,6 +8,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { OrderStatus } from '@/types';
 import { useTranslations } from '@/lib/translations';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import { Ban, DollarSign, AlertTriangle } from 'lucide-react';
 
 function toStringValue(value: unknown): string {
@@ -23,6 +24,7 @@ function toStringValue(value: unknown): string {
 
 export default function OrdersPage() {
   const t = useTranslations();
+  const isReadOnly = useIsReadOnly();
   const queryClient = useQueryClient();
   const [statusConfirm, setStatusConfirm] = useState<{ isOpen: boolean; orderId: string | null; newStatus: OrderStatus | null }>({
     isOpen: false,
@@ -116,7 +118,7 @@ export default function OrdersPage() {
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-3 py-3 sm:px-6 sm:py-4">
-                      {order.status === 'DELIVERED' || order.status === 'CANCELLED' ? (
+                      {order.status === 'DELIVERED' || order.status === 'CANCELLED' || isReadOnly ? (
                         <span className="text-gray-400 text-xs sm:text-sm font-medium">—</span>
                       ) : (
                         <select

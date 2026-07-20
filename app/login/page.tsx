@@ -41,7 +41,7 @@ export default function LoginPage() {
   const verifyOtpMutation = useMutation({
     mutationFn: authService.verifyOtp,
     onSuccess: (data) => {
-      if (data.user.role !== 'ADMIN') {
+      if (data.user.role !== 'ADMIN' && data.user.role !== 'FINANCIST') {
         toast.error('Access denied. Only admins can access this panel.');
         return;
       }

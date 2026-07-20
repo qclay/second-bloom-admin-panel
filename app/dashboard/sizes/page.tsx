@@ -9,6 +9,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { useTranslations } from '@/lib/translations';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import { Ruler, Trash2 } from 'lucide-react';
 
 function toStringName(value: unknown): string {
@@ -24,6 +25,7 @@ function toStringName(value: unknown): string {
 
 export default function SizesPage() {
   const t = useTranslations();
+  const isReadOnly = useIsReadOnly();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -125,13 +127,15 @@ export default function SizesPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{t('sizes.title')}</h1>
           <p className="text-sm text-gray-600 mt-0.5">{t('sizes.subtitle')}</p>
         </div>
-        <Button
-          onClick={() => setIsModalOpen(true)}
-          size="sm"
-          className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white shrink-0"
-        >
-          {t('sizes.add')}
-        </Button>
+        {!isReadOnly && (
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            size="sm"
+            className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white shrink-0"
+          >
+            {t('sizes.add')}
+          </Button>
+        )}
       </div>
 
       {sizes.length === 0 ? (
@@ -144,12 +148,14 @@ export default function SizesPage() {
             <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
               Add sizes so products can be categorized (e.g. Small, Medium, Large). Used in product forms.
             </p>
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700"
-            >
-              {t('sizes.add')}
-            </Button>
+            {!isReadOnly && (
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700"
+              >
+                {t('sizes.add')}
+              </Button>
+            )}
           </div>
         </div>
       ) : (
@@ -165,24 +171,26 @@ export default function SizesPage() {
                   {toStringName(size.name)}
                 </h3>
                 <p className="text-xs text-gray-500 font-mono truncate mb-3">{size.slug}</p>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(size)}
-                    className="flex-1 h-8 text-xs border-teal-200 text-teal-700 hover:bg-teal-50"
-                  >
-                    {t('common.edit')}
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => setDeleteConfirm({ isOpen: true, sizeId: size.id })}
-                    className="h-8 px-2 min-w-0 bg-red-500 hover:bg-red-600 flex items-center justify-center"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                {!isReadOnly && (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(size)}
+                      className="flex-1 h-8 text-xs border-teal-200 text-teal-700 hover:bg-teal-50"
+                    >
+                      {t('common.edit')}
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setDeleteConfirm({ isOpen: true, sizeId: size.id })}
+                      className="h-8 px-2 min-w-0 bg-red-500 hover:bg-red-600 flex items-center justify-center"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           ))}

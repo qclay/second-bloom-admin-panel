@@ -9,10 +9,12 @@ import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { BouquetRequestImage, BouquetRequestStatus } from '@/types';
 import { useTranslations } from '@/lib/translations';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import { Trash2, Flower2 } from 'lucide-react';
 
 export default function RequestsPage() {
   const t = useTranslations();
+  const isReadOnly = useIsReadOnly();
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<BouquetRequestStatus | ''>('');
   const [page, setPage] = useState(1);
@@ -170,12 +172,14 @@ export default function RequestsPage() {
                       {new Date(request.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-3 py-3 sm:px-6 sm:py-4">
-                      <Trash2
-                        role="button"
-                        aria-label={t('common.delete')}
-                        onClick={() => setDeleteConfirm({ isOpen: true, requestId: request.id })}
-                        className="w-4 h-4 text-red-500 hover:text-red-700 cursor-pointer transition-transform active:scale-95"
-                      />
+                      {!isReadOnly && (
+                        <Trash2
+                          role="button"
+                          aria-label={t('common.delete')}
+                          onClick={() => setDeleteConfirm({ isOpen: true, requestId: request.id })}
+                          className="w-4 h-4 text-red-500 hover:text-red-700 cursor-pointer transition-transform active:scale-95"
+                        />
+                      )}
                     </td>
                   </tr>
                 ))

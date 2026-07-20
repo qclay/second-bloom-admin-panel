@@ -17,6 +17,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { Product } from '@/types';
 import { useTranslations } from '@/lib/translations';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import { Package, Check, X as XIcon, Trash2, Camera, Star } from 'lucide-react';
 
 function toStringValue(value: unknown): string {
@@ -37,6 +38,7 @@ function toStringValue(value: unknown): string {
 
 export default function ProductsPage() {
   const t = useTranslations();
+  const isReadOnly = useIsReadOnly();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -434,12 +436,14 @@ export default function ProductsPage() {
           <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-1">{t('products.title')}</h1>
           <p className="text-slate-500 font-medium">{t('products.subtitle')}</p>
         </div>
-        <Button
-          onClick={() => setIsModalOpen(true)}
-          className="btn-premium px-8 py-6 rounded-2xl font-black text-sm uppercase tracking-widest"
-        >
-          {t('products.addProduct')}
-        </Button>
+        {!isReadOnly && (
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            className="btn-premium px-8 py-6 rounded-2xl font-black text-sm uppercase tracking-widest"
+          >
+            {t('products.addProduct')}
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center gap-2 mb-8">
@@ -480,7 +484,7 @@ export default function ProductsPage() {
             <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
               {effectiveFilter ? t('products.tryAnotherFilter') : t('products.emptyHint')}
             </p>
-            {!effectiveFilter && (
+            {!effectiveFilter && !isReadOnly && (
               <Button
                 onClick={() => setIsModalOpen(true)}
                 className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
@@ -574,6 +578,7 @@ export default function ProductsPage() {
                   </span>
                 )}
               </div>
+              {!isReadOnly && (
               <div className="flex gap-1 flex-wrap">
                 {(product.status === 'PENDING' || product.status === 'DRAFT') && (
                   <>
@@ -637,6 +642,7 @@ export default function ProductsPage() {
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
+              )}
             </div>
           </div>
           ))}

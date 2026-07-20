@@ -5,7 +5,7 @@ export interface User {
   lastName: string | null;
   email: string | null;
   username: string | null;
-  role: 'USER' | 'ADMIN';
+  role: 'USER' | 'ADMIN' | 'MODERATOR' | 'FINANCIST';
   isActive: boolean;
   publicationCredits?: number;
   telegramChatId?: string | null;

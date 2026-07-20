@@ -9,6 +9,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { useTranslations } from '@/lib/translations';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import { ClipboardList, Trash2 } from 'lucide-react';
 
 function toStringName(value: unknown): string {
@@ -24,6 +25,7 @@ function toStringName(value: unknown): string {
 
 export default function ConditionsPage() {
   const t = useTranslations();
+  const isReadOnly = useIsReadOnly();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -125,13 +127,15 @@ export default function ConditionsPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{t('conditions.title')}</h1>
           <p className="text-sm text-gray-600 mt-0.5">{t('conditions.subtitle')}</p>
         </div>
-        <Button
-          onClick={() => setIsModalOpen(true)}
-          size="sm"
-          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shrink-0"
-        >
-          {t('conditions.add')}
-        </Button>
+        {!isReadOnly && (
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            size="sm"
+            className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shrink-0"
+          >
+            {t('conditions.add')}
+          </Button>
+        )}
       </div>
 
       {conditions.length === 0 ? (
@@ -144,12 +148,14 @@ export default function ConditionsPage() {
             <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
               Add conditions so products can be labeled (e.g. Like New, Good condition). Used in product forms.
             </p>
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700"
-            >
-              {t('conditions.add')}
-            </Button>
+            {!isReadOnly && (
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700"
+              >
+                {t('conditions.add')}
+              </Button>
+            )}
           </div>
         </div>
       ) : (
@@ -165,24 +171,26 @@ export default function ConditionsPage() {
                   {toStringName(condition.name)}
                 </h3>
                 <p className="text-xs text-gray-500 font-mono truncate mb-3">{condition.slug}</p>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(condition)}
-                    className="flex-1 h-8 text-xs border-amber-200 text-amber-700 hover:bg-amber-50"
-                  >
-                    {t('common.edit')}
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => setDeleteConfirm({ isOpen: true, conditionId: condition.id })}
-                    className="h-8 px-2 min-w-0 bg-red-500 hover:bg-red-600 flex items-center justify-center"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                {!isReadOnly && (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(condition)}
+                      className="flex-1 h-8 text-xs border-amber-200 text-amber-700 hover:bg-amber-50"
+                    >
+                      {t('common.edit')}
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setDeleteConfirm({ isOpen: true, conditionId: condition.id })}
+                      className="h-8 px-2 min-w-0 bg-red-500 hover:bg-red-600 flex items-center justify-center"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
