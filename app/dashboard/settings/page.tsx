@@ -9,10 +9,12 @@ import { useAuthStore } from '@/lib/auth-store';
 import { userService } from '@/services/user.service';
 import { toast } from 'sonner';
 import { useTranslations } from '@/lib/translations';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import { Check, PartyPopper } from 'lucide-react';
 
 export default function SettingsPage() {
   const t = useTranslations();
+  const isReadOnly = useIsReadOnly();
   const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
   
@@ -84,13 +86,15 @@ export default function SettingsPage() {
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="your.email@example.com"
               />
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold"
-                isLoading={updateMutation.isPending}
-              >
-                {updateMutation.isPending ? t('common.saving') : t('settings.saveChanges')}
-              </Button>
+              {!isReadOnly && (
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold"
+                  isLoading={updateMutation.isPending}
+                >
+                  {updateMutation.isPending ? t('common.saving') : t('settings.saveChanges')}
+                </Button>
+              )}
             </form>
           </CardContent>
         </Card>

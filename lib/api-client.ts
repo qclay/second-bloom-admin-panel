@@ -1,5 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { toast } from 'sonner';
 import { useLocaleStore } from '@/lib/locale-store';
+import { useAuthStore } from '@/lib/auth-store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
 
@@ -10,9 +12,20 @@ export const apiClient = axios.create({
   },
 });
 
+const READ_METHODS = ['get', 'head', 'options'];
+
 apiClient.interceptors.request.use(
   (config) => {
     if (typeof window !== 'undefined') {
+      const role = useAuthStore.getState().user?.role;
+      const method = (config.method || 'get').toLowerCase();
+      const isAuthCall = (config.url || '').startsWith('/auth');
+      if (role === 'FINANCIST' && !READ_METHODS.includes(method) && !isAuthCall) {
+        toast.error('Read-only access: this action is not allowed for your role.');
+        return Promise.reject(
+          new axios.Cancel('Blocked: FINANCIST role is read-only'),
+        );
+      }
       const token = localStorage.getItem('accessToken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;

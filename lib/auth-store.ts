@@ -7,7 +7,7 @@ export interface User {
   firstName: string | null;
   lastName: string | null;
   email: string | null;
-  role: 'USER' | 'ADMIN';
+  role: 'USER' | 'ADMIN' | 'MODERATOR' | 'FINANCIST';
   isActive: boolean;
 }
 

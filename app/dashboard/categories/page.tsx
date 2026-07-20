@@ -12,6 +12,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { Category } from '@/types';
 import { useTranslations } from '@/lib/translations';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import { Folder, Camera, Trash2 } from 'lucide-react';
 
 function toStringValue(value: unknown): string {
@@ -45,6 +46,7 @@ function getFileIdFromResponse(data: unknown): string {
 
 export default function CategoriesPage() {
   const t = useTranslations();
+  const isReadOnly = useIsReadOnly();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -216,12 +218,14 @@ export default function CategoriesPage() {
           <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-1">{t('categories.title')}</h1>
           <p className="text-slate-500 font-medium">{t('categories.subtitle')}</p>
         </div>
-        <Button
-          onClick={() => setIsModalOpen(true)}
-          className="btn-premium px-8 py-6 rounded-2xl font-black text-sm uppercase tracking-widest"
-        >
-          {t('categories.addCategory')}
-        </Button>
+        {!isReadOnly && (
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            className="btn-premium px-8 py-6 rounded-2xl font-black text-sm uppercase tracking-widest"
+          >
+            {t('categories.addCategory')}
+          </Button>
+        )}
       </div>
 
       {data?.data.length === 0 ? (
@@ -237,12 +241,14 @@ export default function CategoriesPage() {
               Start organizing your marketplace by creating product categories. 
               Categories help buyers find what they&apos;re looking for.
             </p>
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
-            >
-              + Create First Category
-            </Button>
+            {!isReadOnly && (
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
+              >
+                + Create First Category
+              </Button>
+            )}
           </div>
         </div>
       ) : (
@@ -254,28 +260,49 @@ export default function CategoriesPage() {
             className="glass-card group/card rounded-3xl overflow-hidden border border-slate-200/50"
             style={{ animationDelay: `${index * 0.03}s` }}
           >
-            <button
-              type="button"
-              onClick={() => handleEdit(category)}
-              className="block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-lg overflow-hidden bg-gray-100"
-            >
-              <div className="relative aspect-square min-h-[140px] w-full overflow-hidden">
-                {category.image ? (
-                  <Image
-                    src={category.image.url}
-                    alt={toStringValue(category.name)}
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                    sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
-                    fill
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50">
-                    <Folder className="w-10 h-10" />
-                  </div>
-                )}
+            {isReadOnly ? (
+              <div className="block w-full text-left rounded-t-lg overflow-hidden bg-gray-100">
+                <div className="relative aspect-square min-h-[140px] w-full overflow-hidden">
+                  {category.image ? (
+                    <Image
+                      src={category.image.url}
+                      alt={toStringValue(category.name)}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                      sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
+                      fill
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50">
+                      <Folder className="w-10 h-10" />
+                    </div>
+                  )}
+                </div>
               </div>
-            </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => handleEdit(category)}
+                className="block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-lg overflow-hidden bg-gray-100"
+              >
+                <div className="relative aspect-square min-h-[140px] w-full overflow-hidden">
+                  {category.image ? (
+                    <Image
+                      src={category.image.url}
+                      alt={toStringValue(category.name)}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                      sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
+                      fill
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50">
+                      <Folder className="w-10 h-10" />
+                    </div>
+                  )}
+                </div>
+              </button>
+            )}
 
             <div className="p-2">
               <div className="flex items-center justify-between gap-1.5 mb-0.5">
@@ -294,27 +321,29 @@ export default function CategoriesPage() {
                 {toStringValue(category.description) || 'No description'}
               </p>
 
-              <div className="flex gap-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleEdit(category)}
-                  className="flex-1 h-7 text-[11px] button-animate border-emerald-200 text-emerald-700 hover:bg-emerald-50 py-0"
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDeleteConfirm({ isOpen: true, categoryId: category.id });
-                  }}
-                  className="h-7 px-1.5 min-w-0 button-animate bg-red-500 hover:bg-red-600 flex items-center justify-center"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
+              {!isReadOnly && (
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEdit(category)}
+                    className="flex-1 h-7 text-[11px] button-animate border-emerald-200 text-emerald-700 hover:bg-emerald-50 py-0"
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteConfirm({ isOpen: true, categoryId: category.id });
+                    }}
+                    className="h-7 px-1.5 min-w-0 button-animate bg-red-500 hover:bg-red-600 flex items-center justify-center"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
           ))}

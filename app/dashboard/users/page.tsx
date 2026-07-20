@@ -11,10 +11,12 @@ import { toast } from 'sonner';
 import { User as UserType } from '@/types';
 import { useTranslations } from '@/lib/translations';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import { Search, X, Check, Ban, Crown, Users } from 'lucide-react';
 
 export default function UsersPage() {
   const t = useTranslations();
+  const isReadOnly = useIsReadOnly();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [telegramSearch, setTelegramSearch] = useState('');
@@ -292,18 +294,28 @@ export default function UsersPage() {
 
                   {/* Role */}
                   <td>
-                    <select
-                      value={user.role}
-                      onChange={(e) => setRoleConfirm({ isOpen: true, user, newRole: e.target.value as 'USER' | 'ADMIN' })}
-                      className={`px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border-2 transition-all cursor-pointer ${
+                    {isReadOnly ? (
+                      <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border-2 ${
                         user.role === 'ADMIN'
                           ? 'bg-purple-100 text-purple-700 border-purple-200'
                           : 'bg-slate-100 text-slate-600 border-slate-200'
-                      }`}
-                    >
-                      <option value="USER">USER</option>
-                      <option value="ADMIN">ADMIN</option>
-                    </select>
+                      }`}>
+                        {user.role}
+                      </span>
+                    ) : (
+                      <select
+                        value={user.role}
+                        onChange={(e) => setRoleConfirm({ isOpen: true, user, newRole: e.target.value as 'USER' | 'ADMIN' })}
+                        className={`px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border-2 transition-all cursor-pointer ${
+                          user.role === 'ADMIN'
+                            ? 'bg-purple-100 text-purple-700 border-purple-200'
+                            : 'bg-slate-100 text-slate-600 border-slate-200'
+                        }`}
+                      >
+                        <option value="USER">USER</option>
+                        <option value="ADMIN">ADMIN</option>
+                      </select>
+                    )}
                   </td>
 
                   {/* Credits */}
@@ -312,14 +324,16 @@ export default function UsersPage() {
                       <span className="font-bold text-slate-900 tabular-nums text-sm">
                         {(user.publicationCredits ?? 0).toLocaleString()}
                       </span>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setAddCreditsModal({ user, amount: '' })}
-                        className="text-[10px] h-6 px-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50 shrink-0 font-black"
-                      >
-                        +
-                      </Button>
+                      {!isReadOnly && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setAddCreditsModal({ user, amount: '' })}
+                          className="text-[10px] h-6 px-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50 shrink-0 font-black"
+                        >
+                          +
+                        </Button>
+                      )}
                     </div>
                   </td>
 
@@ -344,20 +358,22 @@ export default function UsersPage() {
 
                   {/* Actions */}
                   <td>
-                    <Button
-                      size="sm"
-                      onClick={() => setBlockConfirm({ isOpen: true, user })}
-                      className={`h-8 px-3 rounded-xl font-black text-[10px] tracking-widest uppercase transition-all active:scale-95 flex items-center gap-1 shadow-sm ${
-                        user.isActive
-                          ? 'bg-rose-500 hover:bg-rose-600 text-white'
-                          : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                      }`}
-                    >
-                      {user.isActive
-                        ? <><Ban className="w-3 h-3" /> {t('users.block')}</>
-                        : <><Check className="w-3 h-3" /> {t('users.unblock')}</>
-                      }
-                    </Button>
+                    {!isReadOnly && (
+                      <Button
+                        size="sm"
+                        onClick={() => setBlockConfirm({ isOpen: true, user })}
+                        className={`h-8 px-3 rounded-xl font-black text-[10px] tracking-widest uppercase transition-all active:scale-95 flex items-center gap-1 shadow-sm ${
+                          user.isActive
+                            ? 'bg-rose-500 hover:bg-rose-600 text-white'
+                            : 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                        }`}
+                      >
+                        {user.isActive
+                          ? <><Ban className="w-3 h-3" /> {t('users.block')}</>
+                          : <><Check className="w-3 h-3" /> {t('users.unblock')}</>
+                        }
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ))}

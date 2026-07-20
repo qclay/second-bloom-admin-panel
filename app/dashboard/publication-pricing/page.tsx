@@ -10,9 +10,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { useTranslations } from '@/lib/translations';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 
 export default function PublicationPricingPage() {
   const t = useTranslations();
+  const isReadOnly = useIsReadOnly();
   const queryClient = useQueryClient();
   const [price, setPrice] = useState<string>('');
   const [description, setDescription] = useState('');
@@ -96,30 +98,32 @@ export default function PublicationPricingPage() {
           )}
         </div>
 
-        <div className="rounded-xl border-2 border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('publicationPricing.updatePrice')}</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label={t('publicationPricing.pricePerPost')}
-              type="number"
-              min="0"
-              step="1"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder={currentPricing ? String(currentPricing.pricePerPost) : '25000'}
-            />
-            <Input
-              label={t('publicationPricing.descriptionOptional')}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="e.g. Price adjusted for promotion"
-            />
-            <Button type="submit" disabled={updateMutation.isPending}>
-              {updateMutation.isPending ? t('common.saving') : t('publicationPricing.saveNewPrice')}
-            </Button>
-          </form>
-          <p className="mt-3 text-xs text-gray-500">{t('publicationPricing.savingHint')}</p>
-        </div>
+        {!isReadOnly && (
+          <div className="rounded-xl border-2 border-gray-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('publicationPricing.updatePrice')}</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                label={t('publicationPricing.pricePerPost')}
+                type="number"
+                min="0"
+                step="1"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder={currentPricing ? String(currentPricing.pricePerPost) : '25000'}
+              />
+              <Input
+                label={t('publicationPricing.descriptionOptional')}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="e.g. Price adjusted for promotion"
+              />
+              <Button type="submit" disabled={updateMutation.isPending}>
+                {updateMutation.isPending ? t('common.saving') : t('publicationPricing.saveNewPrice')}
+              </Button>
+            </form>
+            <p className="mt-3 text-xs text-gray-500">{t('publicationPricing.savingHint')}</p>
+          </div>
+        )}
       </div>
     </div>
   );

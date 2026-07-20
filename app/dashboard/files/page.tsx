@@ -9,10 +9,12 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Pagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { useTranslations } from '@/lib/translations';
+import { useIsReadOnly } from '@/hooks/useIsReadOnly';
 import { Upload, File, Trash2 } from 'lucide-react';
 
 export default function FilesPage() {
   const t = useTranslations();
+  const isReadOnly = useIsReadOnly();
   const queryClient = useQueryClient();
   const [, setUploading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; fileId: string | null }>({
@@ -74,17 +76,19 @@ export default function FilesPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{t('files.title')}</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">{t('files.subtitle')}</p>
         </div>
-        <label className="cursor-pointer shrink-0">
-          <Button className="bg-gradient-to-r from-blue-500 to-blue-600 w-full sm:w-auto flex items-center justify-center gap-2">
-            <Upload className="w-4 h-4" /> {t('files.upload')}
-          </Button>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            className="hidden"
-            accept="image/*"
-          />
-        </label>
+        {!isReadOnly && (
+          <label className="cursor-pointer shrink-0">
+            <Button className="bg-gradient-to-r from-blue-500 to-blue-600 w-full sm:w-auto flex items-center justify-center gap-2">
+              <Upload className="w-4 h-4" /> {t('files.upload')}
+            </Button>
+            <input
+              type="file"
+              onChange={handleFileChange}
+              className="hidden"
+              accept="image/*"
+            />
+          </label>
+        )}
       </div>
 
       <div className="w-full min-w-0 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 min-[1920px]:grid-cols-12 min-[2560px]:grid-cols-16 gap-3">
@@ -121,14 +125,16 @@ export default function FilesPage() {
               <p className="text-[11px] font-semibold text-gray-900 truncate mb-1.5">
                 {file.filename}
               </p>
-              <Button
-                size="sm"
-                variant="destructive"
-                className="w-full h-7 bg-red-500 hover:bg-red-600 text-[11px] button-animate py-0"
-                onClick={() => setDeleteConfirm({ isOpen: true, fileId: file.id })}
-              >
-                Delete
-              </Button>
+              {!isReadOnly && (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  className="w-full h-7 bg-red-500 hover:bg-red-600 text-[11px] button-animate py-0"
+                  onClick={() => setDeleteConfirm({ isOpen: true, fileId: file.id })}
+                >
+                  Delete
+                </Button>
+              )}
             </div>
           </div>
         ))}
